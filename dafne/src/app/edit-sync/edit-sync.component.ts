@@ -336,16 +336,9 @@ export class EditSyncComponent implements OnInit, AfterViewInit {
   
   parseJsonDate = (jsonDate)  => {
     try {
-      var offset = new Date().getTimezoneOffset();
       let parts:any = /\/Date\((-?\d+)([+-]\d{2})?(\d{2})?.*/.exec(jsonDate);
-
-      if (parts[2] == undefined)
-          parts[2] = 0;
-
-      if (parts[3] == undefined)
-          parts[3] = 0;
-
-      return new Date(+parts[1] + offset + parts[2] * 3600000 + parts[3] * 60000).toISOString().slice(0, -1);
+      let output = new Date(+parts[1]).toISOString().slice(0, -1);
+      return output;
     } catch (error) {
       return "N/A";
     }

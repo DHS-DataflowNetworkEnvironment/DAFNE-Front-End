@@ -23,7 +23,7 @@
                         <td class="cell-service_url">{{sync.ServiceUrl}}</td>
                         <td class="cell-copy_product">{{sync.CopyProduct}}</td>
                         <td class="cell-schedule">{{sync.Schedule}}</td>
-                        <td class="cell-schedule">{{sync.Status}}</td>
+                        <td class="cell-status">{{sync.Status}}</td>
                         <td *ngIf="this.authenticationService.currentUser.isAdmin" class="cell-actions" id="actions-cell">
                             <i class="fas fa-play pr-3" style="color: rgb(0, 255, 0)" (click)="startSynchronizer(sync.Id, 'start', sync.ServiceUrlBackend)"></i>
                             <i class="fas fa-stop pr-3" style="color: rgb(255, 0, 0)" (click)="startSynchronizer(sync.Id, 'stop', sync.ServiceUrlBackend)"></i>
