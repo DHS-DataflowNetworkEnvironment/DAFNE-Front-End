@@ -122,9 +122,10 @@ export class EditSyncComponent implements OnInit, AfterViewInit {
   getSynchronizers() {
     this.authenticationService.getSynchronizers().subscribe(
       (res: object) => {
-        //console.log("GET SYNC: " + JSON.stringify(res, null, 2));
+        //console.log("GET SYNC - Res: " + JSON.stringify(res, null, 2));
         this.syncBackendLength = Object.keys(res).length;
         this.syncBackendLengthArray = Array.from(Array(this.syncBackendLength).keys());
+        
         for (var i = 0; i < this.syncBackendLength; i++) {
           this.syncList[i] = res[i].synchronizers;
           this.serviceUrlBackendList[i] = res[i].serviceUrl;  // Backend serviceUrl..
@@ -133,10 +134,14 @@ export class EditSyncComponent implements OnInit, AfterViewInit {
             //console.log("SYNC_LIST[" + i + "]["+ k +"] - SERVICE URL BE: " + this.syncList[i][k].ServiceUrlBackend); 
           }
           this.collectionsList.push([]);
-          res[i].collections.forEach((item, index) => {
-            //console.log("Pushing Collection item: " + item + " at pos: " + index);
-            this.collectionsList[i].push(item.Name);
-          });
+          if (res[i].collection == undefined) {
+            //this.collectionsList[i].push();
+          } else {
+            res[i].collections.forEach((item, index) => {
+              //console.log("Pushing Collection item: " + item + " at pos: " + index);
+              this.collectionsList[i].push(item.Name);
+            });
+          }
         }
       }
     );
