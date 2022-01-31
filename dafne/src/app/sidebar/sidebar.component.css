@@ -1,0 +1,35 @@
+.sidebar-title {
+    background-color: var(--title-bg-color);
+    color: var(--main-text-color);
+    align-items: center;
+    padding-left: 0.5rem;
+}
+.sidebar-content {
+    overflow-y: auto;
+    background-color: var(--main-bg-color);
+    color: var(--main-text-color);
+}
+
+/* Responsiveness */
+@media screen and (max-width: 767px) { 
+    .sidebar-title {
+        height: 1.5rem;
+        line-height: 1.5rem;
+        font-size: 1.0rem;
+    }
+    .sidebar-content {
+        height: calc(100vh - 7.5rem);
+        padding-top: 1rem;
+    }
+}
+@media screen and (min-width: 768px) { 
+    .sidebar-title {
+        height: 2rem;
+        line-height: 2rem;
+        font-size: 1.5rem;
+    }
+    .sidebar-content {
+        height: calc(100vh - 9.0rem);
+        padding-top: 1rem;
+    }
+}

@@ -1,0 +1,332 @@
+<div class="central-div row">
+    <div class="main-view-content ml-auto" id="main-view-content">
+        <div class="edit-sync-page-title">Edit Synchronizers</div>
+        <div class="edit-sync-page-content">
+            <div class="title-row row">
+                <p class="table-title"><span *ngIf="localCentre.name">{{localCentre.name}}:</span> Synchronizers List</p>
+                <button *ngIf="this.authenticationService.currentUser.isAdmin && isLocalConfigured" class="add-synchronizer-button btn btn-primary ml-auto" (click)="addNewSynchronizer()">Add Synch<i class="plus-icon fas fa-plus"></i></button>
+            </div>
+            <table id="edit-sync-table">
+                <tr>
+                    <th>Label</th>
+                    <th>Service URL Backend</th>
+                    <th>Service URL Synchronizer</th>
+                    <th>Copy product</th>
+                    <th>Schedule</th>
+                    <th>Status</th>
+                    <th *ngIf="this.authenticationService.currentUser.isAdmin" id="actions-header">Actions</th>
+                </tr>
+                <tbody *ngFor="let arr of syncBackendLengthArray; let i = index">
+                    <tr *ngFor="let sync of syncList[i]">
+                        <td class="cell-label">{{sync.Label}}</td>
+                        <td class="cell-service_url_backend">{{sync.ServiceUrlBackend}}</td>
+                        <td class="cell-service_url">{{sync.ServiceUrl}}</td>
+                        <td class="cell-copy_product">{{sync.CopyProduct}}</td>
+                        <td class="cell-schedule">{{sync.Schedule}}</td>
+                        <td class="cell-schedule">{{sync.Status}}</td>
+                        <td *ngIf="this.authenticationService.currentUser.isAdmin" class="cell-actions" id="actions-cell">
+                            <i class="fas fa-play pr-3" style="color: rgb(0, 255, 0)" (click)="startSynchronizer(sync.Id, 'start', sync.ServiceUrlBackend)"></i>
+                            <i class="fas fa-stop pr-3" style="color: rgb(255, 0, 0)" (click)="startSynchronizer(sync.Id, 'stop', sync.ServiceUrlBackend)"></i>
+                            <i class="fas fa-pen pr-3" style="color: orange" (click)="editSynchronizer(sync.Id, sync.ServiceUrlBackend)"></i>
+                            <i class="fas fa-trash pr-3 mr-0" style="color: red" (click)="deleteSynchronizer(sync.Id, sync.ServiceUrlBackend)"></i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div *ngIf="isLocalConfigured == false" id="local-advise">Please configure a Local Centre</div>
+        </div>
+    </div>
+</div>
+<app-footer class="footer row"></app-footer>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addSynchronizerModal" tabindex="-1" aria-labelledby="addSyncModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">ADD SYNCHRONIZER</h5>
+            </div>
+            <div class="modal-body">
+                <form id="addSyncForm">
+                    <div class="input-group mb-1">
+                        <div class="mb-1">
+                            <label for="add_id" class="form-label">Id</label>
+                            <input type="text" class="form-control" id="add_id" [value]="currentSync.id" onkeydown="return false" disabled>
+                        </div>
+                        <div class="mb-1 ml-auto">
+                            <label for="add_service_url_backend" class="form-label">Service URL Backend</label>
+                            <div class="input-group" id="add_service_url_backend-input-group"> 
+                                <input type="text" class="form-control" id="add_service_url_backend" [value]="currentSync.serviceUrlBackend" onkeydown="return false">
+                                <i id="add_service_url_backend-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
+                                <ul class="dropdown-menu" aria-labelledby="add_service_url_backend-dropdown">
+                                    <li *ngFor="let serviceUrl of serviceUrlBackendList; let k = index">
+                                        <a class="dropdown-item" (click)="setNewFormServiceUrlBackend(k)">{{serviceUrl}}</a>
+                                    </li>
+                                </ul> 
+                            </div>  
+                        </div>
+                    </div>
+                    <div class="input-group mb-1">
+                        <div class="mb-1">
+                            <label for="add_label" class="form-label">Label</label>
+                            <input type="text" class="form-control" id="add_label" [value]="currentSync.label">
+                            <small id="labelHelp" class="form-text">Length: 1 - 60 characters</small>
+                        </div>
+                        <div class="mb-1 ml-auto">
+                            <label for="add_service_url_sync" class="form-label">Service URL</label>
+                            <input type="text" class="form-control" id="add_service_url_sync" [value]="currentSync.serviceUrl">
+                            <small id="serviceUrlSyncHelp" class="form-text">Length: 1 - 256 characters. Invalid characters: , ; and SPACE</small>
+                        </div>
+                    </div>
+                    <div class="input-group mb-1">
+                        <div class="mb-1">
+                            <label for="add_service_login" class="form-label">Service Login</label>
+                            <input type="text" class="form-control" id="add_service_login" [value]="currentSync.serviceLogin">
+                            <small id="serviceLoginHelp" class="form-text">Length: 1 - 60 characters</small>
+                        </div>
+                        <div class="mb-1 ml-auto">
+                            <label for="add_service_password" class="form-label">Service Password</label>
+                            <input type="text" class="form-control" id="add_service_password" [value]="currentSync.servicePassword">
+                            <small id="servicePasswordHelp" class="form-text">Length: 1 - 60 characters</small>
+                        </div>
+                    </div>
+                    <div class="input-group mb-1">
+                        <div class="mb-1">
+                            <label for="add_schedule" class="form-label">Schedule</label>
+                            <input type="text" class="form-control" id="add_schedule" [value]="currentSync.schedule">
+                            <!-- COMPLETE CRON FORMAT: Seconds Minutes Hours Day-of-Month Month Day-of-Week Year -->
+                            <small id="scheduleHelp" class="form-text">Insert a valid CRON string. Valid characters: 0-9 * , - / ? and SPACE</small>
+                        </div>
+                        <div class="mb-1 ml-auto copy_product_div">
+                            <label for="add_copy_product" id="copy_product_label" class="form-label">Copy product</label>
+                            <div class="input-group mb-1">
+                                <input type="text" class="form-control" id="add_copy_product" [value]="currentSync.copyProduct">
+                                <i id="sync-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
+                                <ul class="dropdown-menu" aria-labelledby="sync-dropdown">
+                                    <li><a class="dropdown-item" (click)="setCopyProduct('true')">true</a></li>
+                                    <li><a class="dropdown-item" (click)="setCopyProduct('false')">false</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group mb-1">
+                        <div class="mb-1">
+                            <label for="add_page_size" class="form-label">Page size</label>
+                            <input type="text" class="form-control" id="add_page_size" [value]="currentSync.pageSize">
+                            <small id="pageSizeHelp" class="form-text">Number: 1 to 199</small>
+                        </div>
+                        <div class="mb-1 ml-auto">
+                            <label for="add_request" class="form-label">Request</label>
+                            <div class="input-group mb-1">
+                                <input type="text" class="form-control" id="add_request" [value]="currentSync.request">
+                                <i id="sync-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
+                                    <ul class="dropdown-menu" aria-labelledby="sync-dropdown">
+                                        <li><a class="dropdown-item" (click)="setNewFormRequest('start')">start</a></li>
+                                        <li><a class="dropdown-item" (click)="setNewFormRequest('stop')">stop</a></li>
+                                    </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group mb-1">
+                        <div class="mb-1">
+                            <label for="add_source_collection" class="form-label">Source collection</label>
+                            <input type="text" class="form-control" id="add_source_collection" [value]="currentSync.sourceCollection">
+                            <small id="sourceCollectionHelp" class="form-text">Anything</small>
+                        </div>
+                        <div class="mb-1 ml-auto">
+                            <label for="add_target_collection" class="form-label">Target Collection</label>
+                            <div class="input-group mb-1">
+                                <input type="text" class="form-control" id="add_target_collection" [value]="currentSync.targetCollection">
+                                <i id="sync-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
+                                <ul class="dropdown-menu" aria-labelledby="sync-dropdown">
+                                    <li *ngFor="let collection of collectionsList[tempServiceUrlBackendNumber]; let k = index">
+                                        <a class="dropdown-item" (click)="setTargetCollection(k)">{{collection}}</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group mb-1">
+                        <div class="mb-1">
+                            <label for="add_remote_incoming" class="form-label">Remote incoming</label>
+                            <input type="text" class="form-control" id="add_remote_incoming" [value]="currentSync.remoteIncoming">
+                            <small id="remoteIncomingHelp" class="form-text">Anything</small>
+                        </div>
+                        <div class="mb-1 ml-auto">
+                            <label for="add_last_creation_date" class="form-label">Last creation date</label>
+                            <input type="text" class="form-control" id="add_last_creation_date" [value]="parseJsonDate(currentSync.lastCreationDate)">
+                            <small id="lastCreationDateHelp" class="form-text">Insert a valid data string: YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS.mmm</small>
+                        </div>
+                    </div>
+                    <div class="input-group mb-1">
+                        <div class="mb-1">
+                            <label for="add_filter_param" class="form-label">Filter param</label>
+                            <input type="text" class="form-control" id="add_filter_param" [value]="currentSync.filterParam">
+                            <small id="filterParamHelp" class="form-text">Anything</small>
+                        </div>
+                        <div class="mb-1 ml-auto">
+                            <label for="add_geo_filter" class="form-label">Geo filter</label>
+                            <input type="text" class="form-control" id="add_geo_filter" [value]="currentSync.geoFilter">
+                            <small id="geoFilterHelp" class="form-text">Anything</small>
+                        </div>
+                    </div>
+                    <div class="row" >
+                        <button type="button" class="btn btn-secondary ml-auto m-3" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                        <button type="submit" class="btn btn-primary m-3" (click)="onAddSubmit()" data-bs-dismiss="modal">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editSyncModal" tabindex="-1" aria-labelledby="editSyncModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">EDIT SYNCHRONIZER</h5>
+            </div>
+            <div class="modal-body">
+                <form id="editSyncForm">
+                    <div class="input-group mb-1">
+                        <div class="mb-1">
+                            <label for="edit_id" class="form-label">Id</label>
+                            <input type="text" class="form-control" id="edit_id" [value]="currentSync.id" onkeydown="return false" disabled>
+                        </div>
+                        <div class="mb-1 ml-auto">
+                            <label for="edit_service_url_backend" class="form-label">Service URL Backend</label>
+                            <input type="text" class="form-control" id="edit_service_url_backend" [value]="currentSync.serviceUrlBackend" onkeydown="return false" disabled>
+                        </div>
+                    </div>
+                    <div class="input-group mb-1">
+                        <div class="mb-1">
+                            <label for="edit_label" class="form-label">Label</label>
+                            <input type="text" class="form-control" id="edit_label" [value]="currentSync.label">
+                            <small id="labelHelp" class="form-text">Length: 1 - 60 characters</small>
+                        </div>
+                        <div class="mb-1 ml-auto">
+                            <label for="edit_service_url_sync" class="form-label">Service URL</label>
+                            <input type="text" class="form-control" id="edit_service_url_sync" [value]="currentSync.serviceUrl">
+                            <small id="serviceUrlSyncHelp" class="form-text">Length: 1 - 256 characters. Invalid characters: , ; and SPACE</small>
+                        </div>
+                    </div>
+                    <div class="input-group mb-1">
+                        <div class="mb-1">
+                            <label for="edit_service_login" class="form-label">Service Login</label>
+                            <input type="text" class="form-control" id="edit_service_login" [value]="currentSync.serviceLogin">
+                            <small id="serviceLoginHelp" class="form-text">Length: 1 - 60 characters</small>
+                        </div>
+                        <div class="mb-1 ml-auto">
+                            <label for="edit_service_password" class="form-label">Service Password</label>
+                            <input type="text" class="form-control" id="edit_service_password" [value]="currentSync.servicePassword">
+                            <small id="servicePasswordHelp" class="form-text">Length: 1 - 60 characters</small>
+                        </div>
+                    </div>
+                    <div class="input-group mb-1">
+                        <div class="mb-1">
+                            <label for="edit_copy_product" class="form-label">Copy product</label>
+                            <div class="input-group mb-1">
+                                <input type="text" class="form-control" id="edit_copy_product" [value]="currentSync.copyProduct">
+                                <i id="sync-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
+                                    <ul class="dropdown-menu" aria-labelledby="sync-dropdown">
+                                        <li><a class="dropdown-item" (click)="editCopyProduct('true')">true</a></li>
+                                        <li><a class="dropdown-item" (click)="editCopyProduct('false')">false</a></li>
+                                    </ul>
+                            </div>
+                        </div>
+                        <div class="mb-1 ml-auto">
+                            <label for="edit_schedule" class="form-label">Schedule</label>
+                            <input type="text" class="form-control" id="edit_schedule" [value]="currentSync.schedule">
+                            <small id="scheduleHelp" class="form-text">Insert a valid CRON string. Valid characters: 0-9 * , - / ? and SPACE</small>
+                        </div>
+                    </div>
+                    <div class="input-group mb-1">
+                        <div class="mb-1">
+                            <label for="edit_page_size" class="form-label">Page size</label>
+                            <input type="text" class="form-control" id="edit_page_size" [value]="currentSync.pageSize">
+                            <small id="pageSizeHelp" class="form-text">Number: 1 to 199</small>
+                        </div>
+                        <div class="mb-1 ml-auto">
+                            <label for="edit_request" class="form-label">Request</label>
+                            <div class="input-group mb-1">
+                                <input type="text" class="form-control" id="edit_request" [value]="currentSync.request">
+                                <i id="sync-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
+                                    <ul class="dropdown-menu" aria-labelledby="sync-dropdown">
+                                        <li><a class="dropdown-item" (click)="setNewFormRequest('start')">start</a></li>
+                                        <li><a class="dropdown-item" (click)="setNewFormRequest('stop')">stop</a></li>
+                                    </ul> 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group mb-1">
+                        <div class="mb-1">
+                            <label for="edit_source_collection" class="form-label">Source collection</label>
+                            <input type="text" class="form-control" id="edit_source_collection" [value]="currentSync.sourceCollection">
+                            <small id="sourceCollectionHelp" class="form-text">Anything</small>
+                        </div>
+                        <div class="mb-1 ml-auto">
+                            <label for="edit_target_collection" class="form-label">Target Collection</label>
+                            <div class="input-group mb-1">
+                                <input type="text" class="form-control" id="edit_target_collection" [value]="currentSync.targetCollection">
+                                <i id="sync-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
+                                <ul class="dropdown-menu" aria-labelledby="sync-dropdown">
+                                    <li *ngFor="let collection of collectionsList[tempServiceUrlBackendNumber]; let k = index">
+                                        <a class="dropdown-item" (click)="setTargetCollection(k)">{{collection}}</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group mb-1">
+                        <div class="mb-1">
+                            <label for="edit_remote_incoming" class="form-label">Remote incoming</label>
+                            <input type="text" class="form-control" id="edit_remote_incoming" [value]="currentSync.remoteIncoming">
+                            <small id="remoteIncomingHelp" class="form-text">Anything</small>
+                        </div>
+                        <div class="mb-1 ml-auto">
+                            <label for="edit_last_creation_date" class="form-label">Last creation date</label>
+                            <input type="text" class="form-control" id="edit_last_creation_date" [value]="parseJsonDate(currentSync.lastCreationDate)">
+                            <small id="lastCreationDateHelp" class="form-text">Insert a valid data string: YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS.mmm</small>
+                        </div>
+                    </div>
+                    <div class="input-group mb-1">
+                        <div class="mb-1">
+                            <label for="edit_filter_param" class="form-label">Filter param</label>
+                            <input type="text" class="form-control" id="edit_filter_param" [value]="currentSync.filterParam">
+                            <small id="filterParamHelp" class="form-text">Anything</small>
+                        </div>
+                        <div class="mb-1 ml-auto">
+                            <label for="edit_geo_filter" class="form-label">Geo filter</label>
+                            <input type="text" class="form-control" id="edit_geo_filter" [value]="currentSync.geoFilter">
+                            <small id="geoFilterHelp" class="form-text">Anything</small>
+                        </div>
+                    </div>
+                    <div class="row" >
+                        <button type="button" class="btn btn-secondary ml-auto m-3" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                        <button type="submit" class="btn btn-primary m-3" (click)="onEditSubmit(currentSync.id)" data-bs-dismiss="modal">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Alert! -->
+<div class="modal fade" id="deleteSynchronizerModal" tabindex="-1" aria-labelledby="deleteSynchronizerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle mr-4"></i>Delete Synchronizer: {{tempDeleteSync.Label}}<br><h6>{{tempDeleteSync.ServiceUrl}}</h6></h5>
+            </div>
+            <div class="modal-body">
+                <label>Are you sure?</label>
+                <div class="row">
+                    <button type="button" class="btn btn-secondary ml-auto" (click)="deleteSynchronizerCanceled()" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary ml-4 mr-4" (click)="deleteSynchronizerConfirmed()" data-bs-dismiss="modal">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

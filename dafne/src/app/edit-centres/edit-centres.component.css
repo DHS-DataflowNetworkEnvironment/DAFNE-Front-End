@@ -1,0 +1,187 @@
+/* Centres Page */
+.central-div {
+    padding-top: 1rem;
+}
+.main-view-content {
+    width: calc(100%);
+}
+.edit-centres-page-title {
+    background-color: var(--title-bg-color);
+    color: var(--main-text-color);
+    align-items: center;
+    padding-left: 0.5rem;
+}
+.edit-centres-page-content {
+    background-color: var(--main-bg-color);
+    color: var(--main-text-color);
+    border-width: 1px;
+    padding: 1rem;
+    overflow-y: auto;
+}
+.add-centre-button {
+    width: 10rem;
+    height: 2.4rem;
+    border-radius: 1.2rem;
+    border-width: 0;
+    font-size: 1.2rem;
+}
+.plus-icon {
+    padding-left: 1rem;
+}
+.footer {
+    position: sticky;
+    bottom: 0;
+    background-color: var(--main-bg-color);
+    color: var(--main-text-color);
+    align-items: center;
+}
+
+/* Table */
+.title-row {
+    padding: 1rem;
+}
+.table-title {
+    color: var(--brighter-text-color);
+    font-size: 2rem;
+}
+table {
+    width: 100%;
+}
+th {
+    background-color: var(--table-header-bg-color);
+    color: var(--brighter-text-color);
+    font-size: 1rem;
+}
+td {
+    font-size: 0.8rem;
+}
+table, th, td {
+    border: 1px solid var(--table-border-color);
+    text-align: center;
+}
+input, i {
+    cursor: pointer !important;
+}
+.cell-color {
+    position: relative;
+}
+#color-rect {
+    width: 1rem;
+    height: 1rem;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -0.5rem;
+    margin-left: -0.5rem;
+}
+
+/* Centre Modals */
+.modal-content {
+    background-color: var(--title-bg-color);
+    color: var(--main-text-color);
+}
+.modal-header {
+    border-bottom: 1px solid var(--table-border-color);
+}
+.modal-title {
+    color: var(--brighter-text-color);
+}
+.modal-content input {
+    background-color: var(--modal-bg-color);
+    border-color: var(--title-bg-color);
+    color: var(--main-text-color);
+}
+.modal-content label {
+    margin-bottom: 0;
+}
+.form-control.valid {
+    border-color: green;
+}
+
+.form-control.invalid {
+    border-color: red;
+}
+
+.form-control + small {
+    color: red;
+    opacity: 0;
+    height: 0;
+    transition: opacity .4s ease-out;
+}
+
+.form-control.invalid + small {
+    opacity: 1;
+    height: auto;
+    margin-bottom: 20px;
+    transition: opacity .4s ease-out;
+}
+#add-color-picker {
+    -webkit-box-shadow:inset 0px 0px 0px 1px #000;
+    -moz-box-shadow:inset 0px 0px 0px 1px #000;
+    box-shadow:inset 0px 0px 0px 1px #000;
+}
+#add-local {
+    appearance: none;
+}
+#add-local:checked:after {
+	content: '\2714';
+	color: var(--checked-color);
+    font-size: 2rem;
+    position: relative;
+    bottom: 5px;
+    left: 2px;
+}
+
+/* Hide arrows in lat-lon inputs */
+/* Chrome, Safari, Edge, Opera */
+#addCentreForm input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/* Firefox */
+#addCentreForm input[type=number] {
+  -moz-appearance: textfield;
+}
+
+
+
+
+::ng-deep .color-picker .button-area {
+    margin-top: -20px;
+}
+
+/* Delete Modal */
+.fa-exclamation-triangle {
+    font-size: 2rem;
+    color: tomato;
+}
+
+/* Responsiveness */
+@media screen and (max-width: 767px) {
+    .edit-centres-page-title {
+        height: 1.5rem;
+        line-height: 1.5rem;
+        font-size: 1.0rem;
+    }
+    .edit-centres-page-content {
+        height: calc(100vh - 7.5rem);
+    }
+    .footer {
+        height: 2rem;
+        line-height: 2rem;
+    }
+}
+@media screen and (min-width: 768px) {
+    .edit-centres-page-title {
+        height: 2rem;
+        line-height: 2rem;
+        font-size: 1.5rem;
+    }
+    .edit-centres-page-content {
+        height: calc(100vh - 9rem);
+    }
+    .footer {
+        height: 3rem;
+        line-height: 3rem;
+    }
+}

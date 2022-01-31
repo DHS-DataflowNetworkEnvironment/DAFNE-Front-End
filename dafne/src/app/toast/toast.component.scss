@@ -1,0 +1,32 @@
+#portal-toast {
+	pointer-events:none;
+	position: fixed;
+	margin-bottom: 80px;
+	right: 10px;
+	z-index: 10000;
+}
+
+.toast-icon {
+	width: 25px;
+}
+
+.toast {
+	min-width: 300px;
+	background-color: rgba(255,255,255,1) !important;	
+}
+
+.toast-container {
+	position: relative;
+	width: 100%;
+}
+
+.toast-title {
+	text-align: center;
+	font-weight: bold;
+	text-transform: capitalize;
+}
+
+.toast-body {
+	text-align: justify !important;	
+	margin: 15px 5px 15px;
+}

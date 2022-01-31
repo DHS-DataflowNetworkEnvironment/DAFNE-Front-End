@@ -1,0 +1,79 @@
+/* Header */
+.header {
+    background-color: var(--main-bg-color);
+    color: var(--main-text-color);
+    height: 3rem;
+    line-height: 3rem;
+    align-items: center;
+}
+.dafne-logo {
+    padding: 0.3rem 0;
+}
+.home-icon {
+    color: var(--main-buttons-bg-color);
+    cursor: pointer !important;
+}
+.home-icon:hover {
+    opacity: 0.8;
+}
+.account-icon {
+    color: var(--main-buttons-bg-color);
+    font-family: 'Dafne Icon';
+    font-style: normal;
+    cursor: pointer !important;
+}
+.account-icon:hover {
+    opacity: 0.8;
+}
+
+/* Dropdown menu */
+.dropdown-menu{
+    background-color: var(--title-bg-color);
+    opacity: 90%;
+    /*  box-shadow: none|h-offset v-offset blur spread color */
+    -webkit-box-shadow: 0px 0px 20px 0px rgba(0,0,0,0.5);
+    -moz-box-shadow: 0px 0px 20px 0px rgba(0,0,0,0.5);
+    box-shadow: 0px 0px 20px 0px rgba(0,0,0,0.5);
+    justify-items: center;
+}
+.dropdown-item{
+    font-size: 1.3rem;
+    color: var(--brighter-text-color);
+    text-align: center;
+}
+
+
+
+/* Responsiveness */
+@media screen and (max-width: 767px) {
+    img {
+        margin: 0 1.2rem 0 0.8rem;
+        height: 2.5rem;
+    }
+    span {
+        font-size:1.2rem;
+    }
+    .home-icon {
+        font-size: 2.0rem;
+    }
+    .account-icon {
+        font-size: 2.0rem;
+        margin: 0 0.8rem;
+    }
+}
+@media screen and (min-width: 768px)  {
+    img {
+        margin: 0 1.2rem 0 0.8rem;
+        height: 2.5rem;
+    }
+    span {
+        font-size:1.5rem;
+    }
+    .home-icon {
+        font-size: 2.0rem;
+    }
+    .account-icon {
+        font-size: 2.0rem;
+        margin: 0 0.8rem;
+    }
+}

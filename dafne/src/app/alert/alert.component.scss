@@ -1,0 +1,20 @@
+/* Alert Modal */
+.modal-content {
+  background-color: var(--title-bg-color);
+  color: var(--main-text-color);
+}
+.modal-header {
+  border-bottom: 1px solid var(--table-border-color);
+}
+.modal-title {
+  color: var(--brighter-text-color);
+  text-align: left;
+}
+.modal-body button {
+  margin: 0 2rem 0 0;
+}
+
+.fa-exclamation-triangle {
+  font-size: 2rem;
+  color: tomato;
+}

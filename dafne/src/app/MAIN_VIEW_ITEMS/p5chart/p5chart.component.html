@@ -1,0 +1,91 @@
+<div id="chart-title">Network View - Completeness</div>
+<div id="main-column-container">
+    <!-- Filter header -->
+    <div id="filters-form-container">
+        <form id="filters-form">
+            <div id="filters-form-row">
+                <div>
+                    <label class="form-label">Mission:</label>
+                    <select id="mission-select" class="form-select" (change)="onMissionChange($event)">
+                        <option [value]="mission.name" *ngFor="let mission of totalMissionList">{{mission.name}}</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label">Product Type:</label>
+                    <select id="product-type-select" class="form-select" (change)="onProductTypeChange($event)">
+                        <option [value]="productType" *ngFor="let productType of missionFiltered.productType">{{productType}}</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label">Platform N.:</label>
+                    <select id="platform-number-select" class="form-select" (change)="onPlatformNumberChange($event)">
+                        <!-- <option [value]="platformNumber" *ngFor="let platformNumber of platformNumberList">{{platformNumber}}</option> -->
+                        <option [value]="platformNumber" *ngFor="let platformNumber of missionFiltered.platform">{{platformNumber}}</option>
+                    </select>
+                </div>
+                <div class="date-picker">
+                    <label class="form-label">Start Date:</label>
+                    <dp-date-picker class="" theme="dp-material" id="filter-start-date" name="filter-start-date"
+                        [(ngModel)]="startDate" (ngModelChange)="onStartDateChanged($event)" [config]="startDatePickerConfig" placeholder="YYYY-MM-DD">
+                    </dp-date-picker>
+                </div>
+                <div>
+                    <label class="form-label">Stop Date:</label>
+                    <dp-date-picker class="" theme="dp-material" id="filter-stop-date" name="filter-stop-date"
+                        [(ngModel)]="stopDate" (ngModelChange)="onStopDateChanged($event)" [config]="stopDatePickerConfig" placeholder="YYYY-MM-DD">
+                    </dp-date-picker>
+                </div>
+                <button type="submit" class="btn btn-primary col-1" id="filter-submit-button" (click)="onFilterSubmit()">Filter</button>
+            </div>
+        </form>
+    </div>
+    <div id="main-row-container">
+        <!-- Center list -->
+        <section id="target-id-list-container">
+            <ul id="target-id-local">
+                <li id="target-id-local-title" style="color: white">Local:</li>
+                <li [ngStyle]="{'color': serviceLocalCentre.color}">{{serviceLocalCentre.name}}</li>
+                <li id="target-id-remote-title" class="mt-2" style="color: white">Remotes:</li>
+            </ul>
+            <ul *ngFor="let item of serviceRemoteCentreList | uniqueCentreFilter; let i = index;" id="target-id-list">
+                <li [ngStyle]='{color: item.color}'>
+                    {{item.name}}
+                </li>
+            </ul>
+        </section>
+        <!-- Charts -->
+        <div id="p5Canvas-column-div">
+            <div id="p5Canvas"></div>
+            <i class="fa fa-grip-lines" id="table-toggle-button" aria-hidden="false" (click)="toggleTable()"></i>
+        </div>
+        <!-- Selectors -->
+        <section id="selectors-container">
+            <h2>CHART</h2>
+            <button (click)="chartChangeTo('Sunburst Single')">Sunburst Single</button>
+            <button (click)="chartChangeTo('Sunburst Stacked')">Sunburst Stacked</button>
+            <button (click)="chartChangeTo('Single Bars')">Single Bars</button>
+            <button (click)="chartChangeTo('Stacked Bars')">Stacked Bars</button>
+            <button (click)="chartChangeTo('Marimekko')">Marimekko</button>
+        </section>
+    </div>
+</div>
+
+<!-- Data Table -->
+<div class="data-table-container" id="data-table-container">
+    <div id="export-div">
+        <label for="export-button">Click to export data in csv format</label>
+        <button id="export-button" (click)="saveAsCSV()">Export</button>
+    </div>
+    <div id="table-div">
+        <table id="data-table">
+            <thead>
+                <th style="color: white">{{missionName}} {{platformNumber}} ({{productType}})</th>
+                <th *ngFor="let column of completenessDataList">{{column.date}}</th>
+            </thead>
+            <tr *ngFor="let centre of serviceAllCentreList; let i=index">
+                <td [ngStyle]="{'color': centre.color }">{{centre.name}}</td>
+                <td [ngStyle]="{'color': centre.color }" *ngFor="let data of completenessDataList">{{(data.values[i].value < 0 ? "NaN" : data.values[i].value)}}</td>
+            </tr>
+        </table>
+    </div>
+</div>

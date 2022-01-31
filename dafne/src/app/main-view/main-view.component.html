@@ -1,0 +1,8 @@
+<div class="central-div row" id="central-div">
+    <app-sidebar class="sidebar" id="sidebar"></app-sidebar>
+    <div class="main-view-content ml-auto" id="main-view-content">
+        <i class="fa fa-grip-lines-vertical" id="sidebar-toggle-button" aria-hidden="false" (click)="toggleSidebar()"></i>
+        <router-outlet name="centralBodyRouter"></router-outlet>
+    </div>
+</div>
+<app-footer class="footer row"></app-footer>

@@ -1,0 +1,14 @@
+<div class="row">
+    <div id="archive-icon">B</div>
+    <div id="archive-title">Archive info</div>
+</div>
+<div id="archive-data-div">
+    <h1>Rolling policy</h1>
+    <ul *ngFor="let item of archiveList" id="archive-info-list">
+        <li>
+            <div rel="tooltip" data-bs-placement="right" data-bs-toggle="tooltip" data-bs-html="true" title='{{localName}}&#10;Filter: {{item.filter}}'>
+                {{item.text}}
+            </div>
+        </li>
+    </ul>
+</div>

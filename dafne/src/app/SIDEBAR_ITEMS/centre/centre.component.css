@@ -1,0 +1,55 @@
+/* Centre info Title */
+.row {
+    margin-left: 0;
+    align-items: center;
+    margin-right: 1rem;
+    margin-bottom: 1rem;
+}
+#centre-icon {
+    color: var(--main-buttons-bg-color);
+    display: inline-block;
+}
+#centre-title {
+    color: var(--main-text-color);
+    display: inline-block;
+}
+
+/* Window */
+#centre-name-container {
+    background-color: var(--windows-bg-color);
+    border-radius: 5px;
+    margin-left: auto;
+    margin-right: 1rem;
+
+    -webkit-box-shadow: 0px 0px 20px 0px rgba(0,0,0,0.5);
+    -moz-box-shadow: 0px 0px 20px 0px rgba(0,0,0,0.5);
+    box-shadow: 0px 0px 20px 0px rgba(0,0,0,0.5);
+}
+#centre-name {
+    text-align: center;
+}
+
+/* Responsiveness */
+@media screen and (max-width: 767px) {
+    #centre-title {
+        padding-left: 0.5rem;
+        font-size: 1.0rem
+    }
+}
+@media screen and (min-width: 768px) {
+    #centre-icon {
+        font-size: 2.0rem;
+        padding-left: 0.5rem;
+    }
+    #centre-title {
+        font-size: 1.2rem;
+        padding-left: 0.8rem;
+    }
+    #centre-name-container {
+        width: 12.5rem;
+        height: 2rem;
+        margin-top: -1rem;
+        font-size: 1rem;
+        padding-top: 0.3rem;
+    }
+}

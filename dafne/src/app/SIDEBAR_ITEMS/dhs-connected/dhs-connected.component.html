@@ -1,0 +1,10 @@
+<div class="row">
+    <div id="dhs-connected-icon">D</div>
+    <div id="dhs-connected-title">DHS connected:</div>
+    <div class="dhs-connected ml-auto">{{numOfDhsConnected}}</div>
+</div>
+<button id="dhs-connected-show-but" (click)="refreshDHSConnected()"
+    [routerLink]="[{ outlets: { centralBodyRouter: ['network-component', 'dhsConnected']}}]"
+    [skipLocationChange]="true" 
+    routerLinkActive="active">Show on map
+</button>

@@ -1,0 +1,14 @@
+<div class="header row">
+      <img class="dafne-logo" src="assets/images/Logo_DAFNE_white.png" alt="DAFNE Logo">
+      <span>Dataflow Network Environment</span>
+      <i class="home-icon fa fa-home ml-auto" aria-hidden="true"></i>
+      <i class="account-icon" data-bs-toggle="dropdown" (click)="checkUserAuthenticated()">A</i>
+      <ul class="dropdown-menu" id="dropdown-menu" aria-labelledby="account-dropdown-button" >
+            <li id="centres-link"><a class="dropdown-item" routerLink="edit-centres" [skipLocationChange]="true" >Centres</a></li>
+            <li id="services-link"><a class="dropdown-item" routerLink="edit-services" [skipLocationChange]="true" >Services</a></li>
+            <li id="synchronizers-link">
+                  <a class="dropdown-item" routerLink="edit-synchronizers" [skipLocationChange]="true" >Synchronizers</a>
+            </li>
+            <li><a class="dropdown-item" (click)="logout()">Logout</a></li>
+      </ul>
+</div>

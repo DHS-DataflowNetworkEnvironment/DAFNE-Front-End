@@ -1,0 +1,15 @@
+<div class="map-title">{{mapTitle}}</div>
+<div id="map-content"></div>
+
+<div id="target-id-list-div">
+    <ul id="target-id-local">
+        <li id="target-id-local-title" style="color: white">Local:</li>
+        <li *ngIf="localCentre.name" [ngStyle]="{'color': localCentre.color}">{{localCentre.name}}</li>
+        <li id="target-id-remote-title" class="mt-2" style="color: white">Remotes:</li> 
+    </ul>
+    <ul *ngFor="let item of remoteCentreList | uniqueCentreFilter; let i = index;" id="target-id-list">
+        <li [ngStyle]='{color: item.color}'>
+            {{item.name}}
+        </li>
+    </ul>
+</div>

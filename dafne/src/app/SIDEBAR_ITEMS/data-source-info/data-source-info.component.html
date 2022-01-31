@@ -1,0 +1,19 @@
+<div class="row">
+    <div id="data-sources-icon">C</div>
+    <div id="data-sources-title">Data sources info</div>
+</div>
+<div id="data-sources-data-div">
+    <h1>Active data sources</h1>
+    <ul *ngFor="let item of dataSourcesList" id="data-sources-info-list">
+        <li>
+            <div rel="tooltip" data-bs-placement="right" data-bs-toggle="tooltip" data-bs-html="true" title='{{item.centre.name}}&#10;Filter: {{item.filter}}' [ngStyle]='{color: item.centre.color}'>
+                {{item.centre.name}} <span style="color:var(--main-text-color)">{{item.info}} {{item.lastCreationDate}}</span>
+            </div>
+        </li>
+    </ul>
+</div>
+<button id="data-sources-show-but" (click)="refreshDataSources()" 
+    [routerLink]="[{ outlets: { centralBodyRouter: ['network-component', 'dataSourcesInfo'] }}]"
+    [skipLocationChange]="true" 
+    routerLinkActive="active">Show on map
+</button>

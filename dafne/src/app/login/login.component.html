@@ -1,0 +1,20 @@
+ <div class="card-container row">
+    <div class="card">
+        <h4 class="card-header">DAFNE Login</h4>
+        <form [formGroup]="loginForm" (ngSubmit)="submit()" autocomplete="on">
+            <div class="card-body d-flex flex-column">
+                <div class="username">
+                    <label class="p-2" for="username">Username: </label>
+                    <input id="username" type="text" formControlName="username">
+                </div>
+                <div class="password">
+                    <label class="p-2" for="password">Password: </label>
+                    <input id="password" type="password" formControlName="password">
+                </div>
+                <div class="buttons ml-auto">
+                    <button class="btn btn-primary mr-3" type="submit">Login</button>
+                </div>                
+            </div>
+        </form>
+    </div>
+</div>

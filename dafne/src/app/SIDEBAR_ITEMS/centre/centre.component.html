@@ -1,0 +1,7 @@
+<div class="row">
+    <i id="centre-icon" class="fa fa-home" aria-hidden="true"></i>
+    <div id="centre-title">Centre</div>
+</div>
+<div id="centre-name-container">
+    <div *ngIf="localCentre.name" id="centre-name" [ngStyle]="{'color': localCentre.color}">{{localCentre.name}}</div>
+</div>
