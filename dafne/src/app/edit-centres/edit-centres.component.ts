@@ -8,13 +8,13 @@ import { MessageService } from '../services/message.service';
 declare var $: any;
 
 const regexPatterns = {
-  add_name: "",
+  add_name: "^.{1,60}$",
   add_description: "",
   add_latitude: "^[+-]?([0-9]*[.])?[0-9]+$",
   add_longitude: "^[+-]?([0-9]*[.])?[0-9]+$",
   add_color: "^#(?:[0-9a-f]{6})$",
 
-  edit_name: "",
+  edit_name: "^.{1,60}$",
   edit_description: "",
   edit_latitude: "^[+-]?([0-9]*[.])?[0-9]+$",
   edit_longitude: "^[+-]?([0-9]*[.])?[0-9]+$",
@@ -89,6 +89,10 @@ export class EditCentresComponent implements OnInit {
         this.alert.showErrorAlert("Form value error", "You entered an invalid value into '" + input.id + "' field.");
       }
     });
+    if ((<HTMLInputElement>document.getElementById("add_name")).value == '') {
+      this.alert.showErrorAlert("Form value error", "A Centre name is needed.");
+      valid = false;
+    }
     if (valid) {
       /* console.log("ADD CENTRE SUBMITTED"); */
       let body = {
@@ -149,12 +153,17 @@ export class EditCentresComponent implements OnInit {
   public onEditSubmit(id: number) {
     let valid = true;
     let inputs = document.querySelectorAll('#editCentreForm input.form-control');
+    
     inputs.forEach((input) => {
       if (input.className == "form-control invalid") {
         valid = false;
         this.alert.showErrorAlert("Form value error", "You entered an invalid value into '" + input.id + "' field.");
       }
     });
+    if ((<HTMLInputElement>document.getElementById("edit_name")).value == '') {
+      this.alert.showErrorAlert("Form value error", "A Centre name is needed.");
+      valid = false;
+    }
     if (valid) {
       /* console.log("EDIT CENTRE SUBMITTED from ID: " + id); */
       let body = {
