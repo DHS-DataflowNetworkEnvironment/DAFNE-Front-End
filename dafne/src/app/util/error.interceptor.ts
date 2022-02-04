@@ -39,7 +39,7 @@ export class ErrorInterceptor implements HttpInterceptor {
 
         if (err.status === 401) {
           // auto logout if 401 response returned from api
-          console.log("ERROR INTERCEPTOR: 401");
+          console.log("ERROR 401: Not Authorized");
           
           this.authenticationService.logout().subscribe(
             data => {
@@ -52,9 +52,11 @@ export class ErrorInterceptor implements HttpInterceptor {
               console.log(error);
               console.log(error.status);
             });
-          //this.authenticationService.isAuthenticated = false;
-          //this.authenticationService.currentUser = null;
-          //this.router.navigate(['/dafne-login']);
+        } else if (err.status === 404) {
+          // show alert with message if error is 404: Not found
+          console.log("ERROR 404: Not Found.");
+          this.alert.showErrorAlert("ERROR " + err.status + ": " + err.statusText, err.message);
+          this.reloadCurrentRoute();
         } else {
           // Show alert on any other error
           if (err.error.hasOwnProperty('errors')) {
@@ -66,5 +68,12 @@ export class ErrorInterceptor implements HttpInterceptor {
 
         return throwError(err);
       }));
+  }
+
+  reloadCurrentRoute() {
+    const currentUrl = this.router.url;
+    this.router.navigateByUrl('/', {skipLocationChange: true}).then(() => {
+        this.router.navigate([currentUrl]);
+    });
   }
 }
