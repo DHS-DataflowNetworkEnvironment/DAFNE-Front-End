@@ -143,34 +143,37 @@ export class EditServicesComponent implements OnInit {
         valid = false;
         this.alert.showErrorAlert("Form value error", "You entered an invalid value into '" + input.id + "' field.");
       }
+      if ((<HTMLInputElement>input).value == '') {
+        valid = false;
+        this.alert.showErrorAlert("Form value error", "Please fill in all fields.");
+      }
     });
-    let tempCentreId = this.centreList.filter(a => a.name == (<HTMLInputElement>document.getElementById('add_centre')).value)[0].id;
-    //console.log("EDIT SERVICES - Trying to add Centre Id: " + tempCentreId);
-    let tempServiceTypeId = this.serviceTypesList.filter(a => a.service_type == (<HTMLInputElement>document.getElementById('add_service_type')).value)[0].id;
-    if (tempServiceTypeId != this.serviceTypesList.filter(a => a.service_type == 'DHuS Back-End')[0].id) {
-      for (var i = 0; i < this.serviceList.length; i++) {
-        if (tempCentreId == this.centreList.filter(a => a.name == this.serviceList[i].centre)[0].id) {
-          //console.log("EDIT SERVICES - Centre already in list");
-          if (
-            this.serviceTypesList.filter(a => a.service_type == this.serviceList[i].service_type)[0].id == this.serviceTypesList.filter(a => a.service_type == 'DHuS Front-End')[0].id ||
-            this.serviceTypesList.filter(a => a.service_type == this.serviceList[i].service_type)[0].id == this.serviceTypesList.filter(a => a.service_type == 'DHuS Single Instance')[0].id
-          ) {
-            //console.log("EDIT SERVICES - Service configuration not accepted!");
-            valid = false;
-            this.alert.showErrorAlert("Service Configuration Error", "You cannot setup two services associated to the same Centre with Single Instance or Front-End service types");
+    
+    if (valid) {
+      let tempCentreId = this.centreList.filter(a => a.name == (<HTMLInputElement>document.getElementById('add_centre')).value)[0].id;
+      //console.log("EDIT SERVICES - Trying to add Centre Id: " + tempCentreId);
+      let tempServiceTypeId = this.serviceTypesList.filter(a => a.service_type == (<HTMLInputElement>document.getElementById('add_service_type')).value)[0].id;
+      if (tempServiceTypeId != this.serviceTypesList.filter(a => a.service_type == 'DHuS Back-End')[0].id) {
+        for (var i = 0; i < this.serviceList.length; i++) {
+          if (tempCentreId == this.centreList.filter(a => a.name == this.serviceList[i].centre)[0].id) {
+            //console.log("EDIT SERVICES - Centre already in list");
+            if (
+              this.serviceTypesList.filter(a => a.service_type == this.serviceList[i].service_type)[0].id == this.serviceTypesList.filter(a => a.service_type == 'DHuS Front-End')[0].id ||
+              this.serviceTypesList.filter(a => a.service_type == this.serviceList[i].service_type)[0].id == this.serviceTypesList.filter(a => a.service_type == 'DHuS Single Instance')[0].id
+            ) {
+              //console.log("EDIT SERVICES - Service configuration not accepted!");
+              valid = false;
+              this.alert.showErrorAlert("Service Configuration Error", "You cannot setup two services associated to the same Centre with Single Instance or Front-End service types");
+            }
           }
         }
       }
-    }
-    if (valid) {
       //console.log("ADD SERVICE SUBMITTED");
       let body = {
         username: (<HTMLInputElement>document.getElementById("add_username")).value,
         password: (<HTMLInputElement>document.getElementById('add_password')).value,
         service_url: (<HTMLInputElement>document.getElementById('add_service_url')).value,
-        //service_type: this.serviceTypesList.filter(a => a.service_type == (<HTMLInputElement>document.getElementById('add_service_type')).value)[0].id,
         service_type: tempServiceTypeId,
-        //centre: this.centreList.filter(a => a.name == (<HTMLInputElement>document.getElementById('add_centre')).value)[0].id,
         centre: tempCentreId,
       };
       this.authenticationService.addNewService(body).subscribe(
