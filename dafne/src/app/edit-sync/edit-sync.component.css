@@ -123,6 +123,10 @@ small {
     transition: opacity .4s ease-out;
 }
 
+#add_id, #edit_id, #edit_service_url_backend{
+    color: #505053;
+}
+
 /* Delete Modal */
 .fa-exclamation-triangle {
     font-size: 2rem;

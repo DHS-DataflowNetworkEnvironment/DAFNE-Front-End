@@ -14,7 +14,9 @@ const regexPatterns = {
   add_service_login: "^.{1,60}$",
   add_service_password: "^.{1,60}$",
   add_schedule:  "^(@(annually|yearly|monthly|weekly|daily|hourly|reboot))|(@every ([\\d]+(ns|us|µs|ms|s|m|h))+)|(((([1-5]?[0-9])|[\*])[\/|\,|\-])?(([1-5]?[0-9])|[\*]) (((2[0-3]|1[0-9]|[0-9])|[\*])([\/|\,|\-]))?((2[0-3]|1[0-9]|[0-9])|[\*]) (((3[01]|[12][0-9]|[1-9])|[\*])[\/|\,|\-])?((3[01]|[12][0-9]|[1-9])|[\*]) (((1[0-2]|[1-9])|[\*])[\/|\,|\-])?((1[0-2]|[1-9])|[\*]) ((([0-6])|[\*])[\/|\,|\-])?(([0-6])|[\*]) [\?])$",
+  add_copy_product: "^.{1,60}$",
   add_page_size: "^((1[0-9][0-9])|([1-9][0-9])|([1-9]))$", /* number: 1 to 199 */
+  add_request: "^.{1,60}$",
   add_source_collection: "",
   add_remote_incoming: "",
   add_last_creation_date: "^([0-9]{4}-[0-9]{2}-[0-9]{2})(T[0-9]{2}[\:][0-9]{2}[\:][0-9]{2}[\.][0-9]{3})?$",
@@ -25,9 +27,11 @@ const regexPatterns = {
   edit_service_url_backend: "^[^\ \,\;]{1,256}$",
   edit_service_url_sync: "^[^\ \,\;]{1,256}$",
   edit_service_login: "^.{1,60}$",
-  edit_service_password: "^.{1,60}$",
+  edit_service_password: "^.{0,60}$",
   edit_schedule:  "^(@(annually|yearly|monthly|weekly|daily|hourly|reboot))|(@every ([\\d]+(ns|us|µs|ms|s|m|h))+)|(((([1-5]?[0-9])|[\*])[\/|\,|\-])?(([1-5]?[0-9])|[\*]) (((2[0-3]|1[0-9]|[0-9])|[\*])([\/|\,|\-]))?((2[0-3]|1[0-9]|[0-9])|[\*]) (((3[01]|[12][0-9]|[1-9])|[\*])[\/|\,|\-])?((3[01]|[12][0-9]|[1-9])|[\*]) (((1[0-2]|[1-9])|[\*])[\/|\,|\-])?((1[0-2]|[1-9])|[\*]) ((([0-6])|[\*])[\/|\,|\-])?(([0-6])|[\*]) [\?])$",
+  edit_copy_product: "^.{1,60}$",
   edit_page_size: "^((1[0-9][0-9])|([1-9][0-9])|([1-9]))$", /* number: 1 to 199 */
+  edit_request: "^.{1,60}$",
   edit_source_collection: "",
   edit_remote_incoming: "",
   edit_last_creation_date: "^([0-9]{4}-[0-9]{2}-[0-9]{2})(T[0-9]{2}[\:][0-9]{2}[\:][0-9]{2}[\.][0-9]{3})?$",
@@ -83,14 +87,14 @@ export class EditSyncComponent implements OnInit, AfterViewInit {
 
     let inputs = document.querySelectorAll('input.form-control');
     inputs.forEach((input) => {
-      input.addEventListener('keyup', (e:any) => {        
+      input.addEventListener('input', (e:any) => {        
         this.validate(e.target, regexPatterns[e.target.attributes.id.value]);
       });
     });
   }
 
   ngAfterViewInit(): any {
-    
+
   }
 
   validate(field, regex) {
@@ -199,10 +203,10 @@ export class EditSyncComponent implements OnInit, AfterViewInit {
     this.currentSync.serviceUrl = "";
     this.currentSync.serviceLogin = "";
     this.currentSync.servicePassword = "";
-    this.currentSync.copyProduct = "";
+    this.currentSync.copyProduct = "true";
     this.currentSync.schedule = "";
     this.currentSync.pageSize = null;
-    this.currentSync.request = "";
+    this.currentSync.request = "stop";
     this.currentSync.targetCollection = "";
     this.currentSync.remoteIncoming = "";
     this.currentSync.sourceCollection = "";
@@ -244,13 +248,24 @@ export class EditSyncComponent implements OnInit, AfterViewInit {
     this.tempSyncUrlToDelete = '';
   }
 
+  public findLableForControl(el) {
+    var idVal = el.id;
+    let labels = document.getElementsByTagName('label');
+    for( var i = 0; i < labels.length; i++ ) {
+       if (labels[i].htmlFor == idVal)
+            return labels[i];
+    }
+    return undefined;
+  }
+
   public onEditSubmit(id: number) {
     let valid = true;
     let inputs = document.querySelectorAll('#editSyncForm input.form-control');
     inputs.forEach((input) => {
+      this.validate(input, regexPatterns[input.id]);
       if (input.className == "form-control invalid") {
         valid = false;
-        this.alert.showErrorAlert("Form value error", "You entered an invalid value into '" + input.id + "' field.");
+        this.alert.showErrorAlert("Form value error", "You entered an invalid value into '" + this.findLableForControl(input).innerHTML + "' field.");
       }
     });
     if (valid) {
@@ -295,10 +310,12 @@ export class EditSyncComponent implements OnInit, AfterViewInit {
     let valid = true;
     let inputs = document.querySelectorAll('#addSyncForm input.form-control');
     inputs.forEach((input) => {
+      this.validate(input, regexPatterns[input.id]);
       if (input.className == "form-control invalid") {
         valid = false;
-        this.alert.showErrorAlert("Form value error", "You entered an invalid value into '" + input.id + "' field.");
+        this.alert.showErrorAlert("Form value error", "You entered an invalid value into '" + this.findLableForControl(input).innerHTML + "' field.");
       }
+      
     });
     if (valid) {
       /* console.log("ADD SYNC SUBMITTED"); */

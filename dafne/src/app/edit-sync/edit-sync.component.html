@@ -101,7 +101,7 @@
                             <label for="add_copy_product" id="copy_product_label" class="form-label">Copy product</label>
                             <div class="input-group mb-1">
                                 <input type="text" class="form-control" id="add_copy_product" [value]="currentSync.copyProduct" onkeydown="return false">
-                                <i id="sync-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
+                                <i id="add_copy_product-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
                                 <ul class="dropdown-menu" aria-labelledby="sync-dropdown">
                                     <li><a class="dropdown-item" (click)="setCopyProduct('true')">true</a></li>
                                     <li><a class="dropdown-item" (click)="setCopyProduct('false')">false</a></li>
@@ -119,7 +119,7 @@
                             <label for="add_request" class="form-label">Request</label>
                             <div class="input-group mb-1">
                                 <input type="text" class="form-control" id="add_request" [value]="currentSync.request" onkeydown="return false">
-                                <i id="sync-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
+                                <i id="add_request-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
                                     <ul class="dropdown-menu" aria-labelledby="sync-dropdown">
                                         <li><a class="dropdown-item" (click)="setNewFormRequest('start')">start</a></li>
                                         <li><a class="dropdown-item" (click)="setNewFormRequest('stop')">stop</a></li>
@@ -137,7 +137,7 @@
                             <label for="add_target_collection" class="form-label">Target Collection</label>
                             <div class="input-group mb-1">
                                 <input type="text" class="form-control" id="add_target_collection" [value]="currentSync.targetCollection" onkeydown="return false">
-                                <i id="sync-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
+                                <i id="add_target_collection-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
                                 <ul class="dropdown-menu" aria-labelledby="sync-dropdown">
                                     <li *ngFor="let collection of collectionsList[tempServiceUrlBackendNumber]; let k = index">
                                         <a class="dropdown-item" (click)="setTargetCollection(k)">{{collection}}</a>
@@ -234,7 +234,7 @@
                             <label for="edit_copy_product" class="form-label">Copy product</label>
                             <div class="input-group mb-1">
                                 <input type="text" class="form-control" id="edit_copy_product" [value]="currentSync.copyProduct" onkeydown="return false">
-                                <i id="sync-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
+                                <i id="edit_copy_product-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
                                     <ul class="dropdown-menu" aria-labelledby="sync-dropdown">
                                         <li><a class="dropdown-item" (click)="editCopyProduct('true')">true</a></li>
                                         <li><a class="dropdown-item" (click)="editCopyProduct('false')">false</a></li>
@@ -252,7 +252,7 @@
                             <label for="edit_request" class="form-label">Request</label>
                             <div class="input-group mb-1">
                                 <input type="text" class="form-control" id="edit_request" [value]="currentSync.request" onkeydown="return false">
-                                <i id="sync-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
+                                <i id="edit_request-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
                                     <ul class="dropdown-menu" aria-labelledby="sync-dropdown">
                                         <li><a class="dropdown-item" (click)="setNewFormRequest('start')">start</a></li>
                                         <li><a class="dropdown-item" (click)="setNewFormRequest('stop')">stop</a></li>
@@ -270,7 +270,7 @@
                             <label for="edit_target_collection" class="form-label">Target Collection</label>
                             <div class="input-group mb-1">
                                 <input type="text" class="form-control" id="edit_target_collection" [value]="currentSync.targetCollection" onkeydown="return false">
-                                <i id="sync-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
+                                <i id="edit_target_collection-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
                                 <ul class="dropdown-menu" aria-labelledby="sync-dropdown">
                                     <li *ngFor="let collection of collectionsList[tempServiceUrlBackendNumber]; let k = index">
                                         <a class="dropdown-item" (click)="setTargetCollection(k)">{{collection}}</a>

@@ -47,7 +47,7 @@ export class EditCentresComponent implements OnInit {
     
     let inputs = document.querySelectorAll('input.form-control');
     inputs.forEach((input) => {
-      input.addEventListener('keyup', (e:any) => {        
+      input.addEventListener('input', (e:any) => {        
         this.validate(e.target, regexPatterns[e.target.attributes.id.value]);
       });
     });
@@ -70,6 +70,16 @@ export class EditCentresComponent implements OnInit {
     );
   }
 
+  public findLableForControl(el) {
+    var idVal = el.id;
+    let labels = document.getElementsByTagName('label');
+    for( var i = 0; i < labels.length; i++ ) {
+       if (labels[i].htmlFor == idVal)
+            return labels[i];
+    }
+    return undefined;
+  }
+
   public addNewCentre() {
     /* TODO: On second ADD should clean values.. */
     this.tempCentre.name = '';
@@ -84,15 +94,12 @@ export class EditCentresComponent implements OnInit {
     let valid = true;
     let inputs = document.querySelectorAll('#addCentreForm input.form-control');
     inputs.forEach((input) => {
+      this.validate(input, regexPatterns[input.id]);
       if (input.className == "form-control invalid") {
         valid = false;
-        this.alert.showErrorAlert("Form value error", "You entered an invalid value into '" + input.id + "' field.");
+        this.alert.showErrorAlert("Form value error", "You entered an invalid value into '" + this.findLableForControl(input).innerHTML + "' field.");
       }
     });
-    if ((<HTMLInputElement>document.getElementById("add_name")).value == '') {
-      this.alert.showErrorAlert("Form value error", "A Centre name is needed.");
-      valid = false;
-    }
     if (valid) {
       /* console.log("ADD CENTRE SUBMITTED"); */
       let body = {
@@ -155,15 +162,12 @@ export class EditCentresComponent implements OnInit {
     let inputs = document.querySelectorAll('#editCentreForm input.form-control');
     
     inputs.forEach((input) => {
+      this.validate(input, regexPatterns[input.id]);
       if (input.className == "form-control invalid") {
         valid = false;
-        this.alert.showErrorAlert("Form value error", "You entered an invalid value into '" + input.id + "' field.");
+        this.alert.showErrorAlert("Form value error", "You entered an invalid value into '" + this.findLableForControl(input).innerHTML + "' field.");
       }
     });
-    if ((<HTMLInputElement>document.getElementById("edit_name")).value == '') {
-      this.alert.showErrorAlert("Form value error", "A Centre name is needed.");
-      valid = false;
-    }
     if (valid) {
       /* console.log("EDIT CENTRE SUBMITTED from ID: " + id); */
       let body = {

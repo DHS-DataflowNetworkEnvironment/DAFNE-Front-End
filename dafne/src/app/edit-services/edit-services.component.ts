@@ -10,14 +10,14 @@ const regexPatterns = {
   add_username: "^.{1,60}$",
   add_password: "^.{1,60}$",
   add_service_url: "^[^\ \,\;]{1,256}$",
-  add_service_type: "",
-  add_centre: "",
+  add_service_type: "^.{1,60}$",
+  add_centre: "^.{1,60}$",
 
   edit_username: "^.{1,60}$",
-  edit_password: "^.{1,60}$",
+  edit_password: "",
   edit_service_url: "^[^\ \,\;]{1,256}$",
-  edit_service_type: "",
-  edit_centre: ""
+  edit_service_type: "^.{1,60}$",
+  edit_centre: "^.{1,60}$"
 };
 
 @Component({
@@ -46,7 +46,7 @@ export class EditServicesComponent implements OnInit {
 
     let inputs = document.querySelectorAll('input.form-control');
     inputs.forEach((input) => {
-      input.addEventListener('keyup', (e:any) => {        
+      input.addEventListener('input', (e:any) => {        
         this.validate(e.target, regexPatterns[e.target.attributes.id.value]);
       });
     });
@@ -124,6 +124,16 @@ export class EditServicesComponent implements OnInit {
     this.service.centre = this.centreList.filter(a => a.id == centreId)[0].name;
   }
 
+  public findLableForControl(el) {
+    var idVal = el.id;
+    let labels = document.getElementsByTagName('label');
+    for( var i = 0; i < labels.length; i++ ) {
+       if (labels[i].htmlFor == idVal)
+            return labels[i];
+    }
+    return undefined;
+  }
+
   /* Function called by addCentre button */
   public addNewService() {
     this.service.username = '';
@@ -139,13 +149,10 @@ export class EditServicesComponent implements OnInit {
     let valid = true;
     let inputs = document.querySelectorAll('#addServiceForm input.form-control');
     inputs.forEach((input) => {
+      this.validate(input, regexPatterns[input.id]);
       if (input.className == "form-control invalid") {
         valid = false;
-        this.alert.showErrorAlert("Form value error", "You entered an invalid value into '" + input.id + "' field.");
-      }
-      if ((<HTMLInputElement>input).value == '') {
-        valid = false;
-        this.alert.showErrorAlert("Form value error", "Please fill in all fields.");
+        this.alert.showErrorAlert("Form value error", "You entered an invalid value into '" + this.findLableForControl(input).innerHTML + "' field.");
       }
     });
     
@@ -223,9 +230,10 @@ export class EditServicesComponent implements OnInit {
     let valid = true;
     let inputs = document.querySelectorAll('#editServiceForm input.form-control');
     inputs.forEach((input) => {
+      this.validate(input, regexPatterns[input.id]);
       if (input.className == "form-control invalid") {
         valid = false;
-        this.alert.showErrorAlert("Form value error", "You entered an invalid value into '" + input.id + "' field.");
+        this.alert.showErrorAlert("Form value error", "You entered an invalid value into '" + this.findLableForControl(input).innerHTML + "' field.");
       }
     });
     let tempCentreId = this.centreList.filter(a => a.name == (<HTMLInputElement>document.getElementById('edit_centre')).value)[0].id;

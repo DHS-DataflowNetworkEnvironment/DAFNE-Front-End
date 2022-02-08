@@ -72,17 +72,17 @@
                         <div class="mb-1">
                             <label for="add_latitude" class="form-label">Latitude</label>
                             <input type="number" class="form-control" id="add_latitude" [value]="tempCentre.latitude">
-                            <small id="latitudeHelp" class="form-text">Input a number in the range: [-90.0 to 90.0]</small>
+                            <small id="latitudeHelp" class="form-text">Input a number in the range: [-90.0, 90.0]</small>
                         </div>
                         <div class="mb-1 ml-auto">
                             <label for="add_longitude" class="form-label">Longitude</label>
                             <input type="number" class="form-control" id="add_longitude" [value]="tempCentre.longitude">
-                            <small id="longitudeHelp" class="form-text">Input a number in the range: [-180.0 to 180.0]</small>
+                            <small id="longitudeHelp" class="form-text">Input a number in the range: [-180.0, 180.0]</small>
                         </div>
                     </div>
                     <div class="input-group mb-1">
                         <div class="mb-1">
-                            <label for="add-color-div" class="form-label">Color</label>
+                            <label for="add_color" class="form-label">Color</label>
                             <div class="input-group" id="add-color-div">
                                 <input type="button" class="form-control" id="add-color-picker"
                                         [(colorPicker)]="tempCentre.color" cpWidth='400px' cpHeight="300px"
@@ -131,17 +131,17 @@
                         <div class="mb-1">
                             <label for="edit_latitude" class="form-label">Latitude</label>
                             <input type="text" class="form-control" id="edit_latitude" [value]="tempCentre.latitude">
-                            <small id="latitudeHelp" class="form-text">Input a number in the range: [-90.0 to 90.0]</small>
+                            <small id="latitudeHelp" class="form-text">Input a number in the range: [-90.0, 90.0]</small>
                         </div>
                         <div class="mb-1 ml-auto">
                             <label for="edit_longitude" class="form-label">Longitude</label>
                             <input type="text" class="form-control" id="edit_longitude" [value]="tempCentre.longitude">
-                            <small id="latitudeHelp" class="form-text">Input a number in the range: [-180.0 to 180.0]</small>
+                            <small id="latitudeHelp" class="form-text">Input a number in the range: [-180.0, 180.0]</small>
                         </div>
                     </div>
                     <div class="input-group mb-1">
                         <div>
-                            <label for="edit-color-div" class="form-label">Color</label>
+                            <label for="edit_color" class="form-label">Color</label>
                             <div class="input-group" id="edit-color-div">
                                 <input type="button" class="form-control" id="edit-color-picker"
                                         [(colorPicker)]="tempCentre.color" cpWidth='400px' cpHeight="300px"
