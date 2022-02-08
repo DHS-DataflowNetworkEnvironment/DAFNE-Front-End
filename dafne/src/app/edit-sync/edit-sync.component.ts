@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { Synchronizer } from '../models/synchronizer';
 import { AuthenticationService } from '../services/authentication.service';
 import { AlertComponent } from '../alert/alert.component';
@@ -45,7 +45,8 @@ const regexPatterns = {
   styleUrls: ['./edit-sync.component.css']
 })
 export class EditSyncComponent implements OnInit, AfterViewInit {
-
+  navigationSubscription;
+  private pageRefreshed: boolean = true;
   public isLocalConfigured = false;
   public syncList = [];
   public currentSync: Synchronizer = new Synchronizer();
@@ -72,7 +73,16 @@ export class EditSyncComponent implements OnInit, AfterViewInit {
     private router: Router,
     private alert: AlertComponent,
     private messageService: MessageService
-  ) { }
+  ) {
+    this.navigationSubscription = this.router.events.subscribe((e: any) => {
+      if (e instanceof NavigationEnd) {
+        if (this.pageRefreshed == false) {
+          this.pageRefreshed = true;
+          this.ngOnInit();
+        }
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.messageService.localCurrentMessage.subscribe(message => {
@@ -82,7 +92,7 @@ export class EditSyncComponent implements OnInit, AfterViewInit {
         this.isLocalConfigured = true;
         this.getLocalCentre();
         this.getSynchronizers();
-      }
+      }      
     });
 
     let inputs = document.querySelectorAll('input.form-control');
@@ -147,6 +157,7 @@ export class EditSyncComponent implements OnInit, AfterViewInit {
             });
           }
         }
+        this.pageRefreshed = false;
       }
     );
   }

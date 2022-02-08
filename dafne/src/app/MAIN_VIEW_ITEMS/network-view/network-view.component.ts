@@ -15,7 +15,7 @@ import { MessageService } from '../../services/message.service';
 })
 export class NetworkViewComponent implements AfterViewInit, OnDestroy {
   navigationSubscription;
-  private pageRefreshed: boolean = false;
+  private pageRefreshed: boolean = true;
   public mapTitle = 'Network View - Active Data Sources';
   private mapType = 'homeView';
   private mapTypePrec = 'homeView';
@@ -45,7 +45,7 @@ export class NetworkViewComponent implements AfterViewInit, OnDestroy {
         if (this.pageRefreshed == false) {
           this.pageRefreshed = true;
           //console.log("REFRESHING NETWORK VIEW PAGE");
-          this.ngOnInit_();
+          this.ngOnInit();
         }
       }
     });
@@ -73,7 +73,7 @@ export class NetworkViewComponent implements AfterViewInit, OnDestroy {
     place: 'assets/icons/place_black_48dp.svg'
   };
 
-  ngOnInit_(): any {
+  ngOnInit(): any {
     if (this.sub) {
       this.sub.unsubscribe();
     }
@@ -125,7 +125,7 @@ export class NetworkViewComponent implements AfterViewInit, OnDestroy {
   }
 
   refreshPage() {
-    this.router.navigate(['/dafne', { outlets: { centralBodyRouter: ['network-component', this.mapType]}}], { skipLocationChange: true });
+    this.router.navigate(['/gui', { outlets: { centralBodyRouter: ['network-component', this.mapType]}}], { skipLocationChange: true });
   }
 
   windowResize() {

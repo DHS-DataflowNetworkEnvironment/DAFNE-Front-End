@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Service } from '../models/service';
 import { AuthenticationService } from '../services/authentication.service';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { AlertComponent } from '../alert/alert.component';
 
 declare var $: any;
@@ -26,6 +26,8 @@ const regexPatterns = {
   styleUrls: ['./edit-services.component.css']
 })
 export class EditServicesComponent implements OnInit {
+  navigationSubscription;
+  private pageRefreshed: boolean = true;
   public serviceList: any;
   public centreList: any;
   public service: Service = new Service();
@@ -38,7 +40,16 @@ export class EditServicesComponent implements OnInit {
     public authenticationService: AuthenticationService,
     private router: Router,
     private alert: AlertComponent
-  ) { }
+  ) {
+    this.navigationSubscription = this.router.events.subscribe((e: any) => {
+      if (e instanceof NavigationEnd) {
+        if (this.pageRefreshed == false) {
+          this.pageRefreshed = true;
+          this.ngOnInit();
+        }
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.getAllServiceTypes();
@@ -112,6 +123,7 @@ export class EditServicesComponent implements OnInit {
         for (var i = 0; i < this.serviceList.length; i++) {
           this.serviceList[i].centre = this.centreList.filter(a => a.id == this.serviceList[i].centre)[0].name;
         }
+        this.pageRefreshed = false;
       }
     );
   }

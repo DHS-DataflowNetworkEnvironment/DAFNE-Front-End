@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Centre } from '../models/centre';
 import { AuthenticationService } from '../services/authentication.service';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { AlertComponent } from '../alert/alert.component';
 import { MessageService } from '../services/message.service';
 
@@ -27,7 +27,8 @@ const regexPatterns = {
   styleUrls: ['./edit-centres.component.css']
 })
 export class EditCentresComponent implements OnInit {
-
+  navigationSubscription;
+  private pageRefreshed: boolean = true;
   public centreList:any;
   public editCentreId: number = 0;
   public tempCentre: Centre = new Centre();
@@ -40,7 +41,16 @@ export class EditCentresComponent implements OnInit {
     private router: Router,
     private alert: AlertComponent,
     private messageService: MessageService
-  ) { }
+  ) {
+    this.navigationSubscription = this.router.events.subscribe((e: any) => {
+      if (e instanceof NavigationEnd) {
+        if (this.pageRefreshed == false) {
+          this.pageRefreshed = true;
+          this.ngOnInit();
+        }
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.getCentresData();
@@ -66,6 +76,7 @@ export class EditCentresComponent implements OnInit {
     this.authenticationService.getAllCentres().subscribe(
       (res: object) => {
         this.centreList = res;
+        this.pageRefreshed = false;
       }
     );
   }
