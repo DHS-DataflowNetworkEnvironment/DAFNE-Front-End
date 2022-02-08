@@ -65,6 +65,14 @@ input, i {
     cursor: pointer !important;
 }
 
+.action {
+    padding: 0 0.75rem;
+    opacity: 100%;
+}
+.action:hover {
+    opacity: 75%;
+}
+
 /* Service Modals */
 .modal-content {
     background-color: var(--title-bg-color);

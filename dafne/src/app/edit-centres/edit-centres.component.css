@@ -75,6 +75,14 @@ input, i {
     margin-left: -0.5rem;
 }
 
+.action {
+    padding: 0 0.75rem;
+    opacity: 100%;
+}
+.action:hover {
+    opacity: 75%;
+}
+
 /* Centre Modals */
 .modal-content {
     background-color: var(--title-bg-color);

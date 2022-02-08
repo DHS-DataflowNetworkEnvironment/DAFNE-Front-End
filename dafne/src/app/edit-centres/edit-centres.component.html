@@ -26,8 +26,8 @@
                     </td>
                     <td class="cell-description" [ngStyle]="{'color': centre.color }">{{centre.description}}</td>
                     <td *ngIf="this.authenticationService.currentUser.isAdmin" class="cell-actions">
-                        <i class="fas fa-pen pr-3" style="color: orange" (click)="editCentre(centre.id)"></i>
-                        <i class="fas fa-trash pl-3" style="color: red" (click)="deleteCentre(centre.id)"></i>
+                        <i class="fas fa-pen action" style="color: orange" (click)="editCentre(centre.id)"></i>
+                        <i class="fas fa-trash action" style="color: red" (click)="deleteCentre(centre.id)"></i>
                     </td>
                 </tr>
             </table>
