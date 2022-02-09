@@ -5,8 +5,9 @@
         "textSize": 12,
         "iconSize": 30
     },
+    "dataRefreshTime": 300000,
     "apiUrl": "<back-end-url>",
-    "version": "1.0.4",
+    "version": "2.0.0",
     "satelliteList": [
         {
             "name": "Sentinel-1",

@@ -1,8 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Service } from '../models/service';
 import { AuthenticationService } from '../services/authentication.service';
 import { Router, NavigationEnd } from '@angular/router';
 import { AlertComponent } from '../alert/alert.component';
+import { MessageService } from '../services/message.service';
+import { interval, Subscription } from 'rxjs';
+import { AppConfig } from '../services/app.config';
 
 declare var $: any;
 
@@ -25,7 +28,7 @@ const regexPatterns = {
   templateUrl: './edit-services.component.html',
   styleUrls: ['./edit-services.component.css']
 })
-export class EditServicesComponent implements OnInit {
+export class EditServicesComponent implements OnInit, OnDestroy {
   navigationSubscription;
   private pageRefreshed: boolean = true;
   public serviceList: any;
@@ -36,10 +39,14 @@ export class EditServicesComponent implements OnInit {
   
   public serviceTypesList;
 
+  public dataRefreshTime = AppConfig.settings.dataRefreshTime;
+  subscription: Subscription;
+
   constructor(
     public authenticationService: AuthenticationService,
     private router: Router,
-    private alert: AlertComponent
+    private alert: AlertComponent,
+    private messageService: MessageService
   ) {
     this.navigationSubscription = this.router.events.subscribe((e: any) => {
       if (e instanceof NavigationEnd) {
@@ -52,8 +59,18 @@ export class EditServicesComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    const dataRefresh = interval(this.dataRefreshTime);
+
+    this.messageService.showSpinner(true);
     this.getAllServiceTypes();
     this.getServices();
+
+    this.subscription = dataRefresh.subscribe(n => {
+      // get data after Init every x milliseconds:
+      this.messageService.showSpinner(false);
+      this.getAllServiceTypes();
+      this.getServices();
+    });
 
     let inputs = document.querySelectorAll('input.form-control');
     inputs.forEach((input) => {
@@ -63,6 +80,12 @@ export class EditServicesComponent implements OnInit {
     });
   }
 
+  ngOnDestroy(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+  }
+  
   validate(field, regex) {
     const rx = new RegExp(regex, 'i');
     if (rx.test(field.value)) {      

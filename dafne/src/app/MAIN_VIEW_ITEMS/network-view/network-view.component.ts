@@ -7,6 +7,7 @@ import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { AppConfig } from '../../services/app.config';
 import { AuthenticationService } from '../../services/authentication.service';
 import { MessageService } from '../../services/message.service';
+import { interval, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-network-view',
@@ -32,6 +33,9 @@ export class NetworkViewComponent implements AfterViewInit, OnDestroy {
     longitude: '0.0'
   };
   private localId: number;
+
+  public dataRefreshTime = AppConfig.settings.dataRefreshTime;
+  subscription: Subscription;
 
   constructor(
     private activatedroute: ActivatedRoute,
@@ -74,9 +78,11 @@ export class NetworkViewComponent implements AfterViewInit, OnDestroy {
   };
 
   ngOnInit(): any {
+    const dataRefresh = interval(this.dataRefreshTime);
     if (this.sub) {
       this.sub.unsubscribe();
     }
+    this.messageService.showSpinner(true);
     this.sub = this.activatedroute.paramMap.subscribe(params => {
       var tempMapType = params.get('mapType');
       this.mapType = (tempMapType != null) ? tempMapType : 'homeView';
@@ -84,22 +90,40 @@ export class NetworkViewComponent implements AfterViewInit, OnDestroy {
       if (this.mapType != this.mapTypePrec) {
         //console.log("MAPTYPE Not equals..");
       }
+      if (this.subscription) {
+        this.subscription.unsubscribe();
+      }
       this.mapTypePrec = this.mapType;
       if (this.mapType == 'homeView') {
         this.mapTitle = 'Network View';
         this.INITIAL_VIEW_STATE = this.HOME_INITIAL_VIEW_STATE;
         this.showArcs = false;
         this.getAllCentres();
+        this.subscription = dataRefresh.subscribe(n => {
+          // get data after Init every x milliseconds:
+          this.messageService.showSpinner(false);
+          this.getAllCentres();          
+        });
       } else if (this.mapType == 'dhsConnected') {
         this.mapTitle = 'Network View - Connected Data Sources';
         this.INITIAL_VIEW_STATE = this.ACTIVE_INITIAL_VIEW_STATE;
         this.showArcs = true;
         this.getDHSConnected();
+        this.subscription = dataRefresh.subscribe(n => {
+          // get data after Init every x milliseconds:
+          this.messageService.showSpinner(false);
+          this.getDHSConnected();
+        });
       } else if (this.mapType == 'dataSourcesInfo') {
         this.mapTitle = 'Network View - Active Data Sources';
         this.INITIAL_VIEW_STATE = this.ACTIVE_INITIAL_VIEW_STATE;
         this.showArcs = true;
         this.getActiveDataSource();
+        this.subscription = dataRefresh.subscribe(n => {
+          // get data after Init every x milliseconds:
+          this.messageService.showSpinner(false);
+          this.getActiveDataSource();
+        });
       }
     });
   }
@@ -121,6 +145,9 @@ export class NetworkViewComponent implements AfterViewInit, OnDestroy {
     }
     if (this.sub) {
       this.sub.unsubscribe();
+    }
+    if (this.subscription) {
+      this.subscription.unsubscribe();
     }
   }
 

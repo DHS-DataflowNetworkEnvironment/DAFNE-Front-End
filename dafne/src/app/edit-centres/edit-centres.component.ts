@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Centre } from '../models/centre';
 import { AuthenticationService } from '../services/authentication.service';
 import { Router, NavigationEnd } from '@angular/router';
 import { AlertComponent } from '../alert/alert.component';
 import { MessageService } from '../services/message.service';
+import { interval, Subscription } from 'rxjs';
+import { AppConfig } from '../services/app.config';
 
 declare var $: any;
 
@@ -26,7 +28,7 @@ const regexPatterns = {
   templateUrl: './edit-centres.component.html',
   styleUrls: ['./edit-centres.component.css']
 })
-export class EditCentresComponent implements OnInit {
+export class EditCentresComponent implements OnInit, OnDestroy {
   navigationSubscription;
   private pageRefreshed: boolean = true;
   public centreList:any;
@@ -35,6 +37,9 @@ export class EditCentresComponent implements OnInit {
   public tempCentreIdToDelete = -1;
   public tempCentreNameToDelete = '';
   public tempCentreColorToDelete = '';
+
+  public dataRefreshTime = AppConfig.settings.dataRefreshTime;
+  subscription: Subscription;
 
   constructor(
     public authenticationService: AuthenticationService,
@@ -53,14 +58,29 @@ export class EditCentresComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    const dataRefresh = interval(this.dataRefreshTime);
+
+    this.messageService.showSpinner(true);
     this.getCentresData();
     
+    this.subscription = dataRefresh.subscribe(n => {
+      // get data after Init every x milliseconds:
+      this.messageService.showSpinner(false);
+      this.getCentresData();
+    });
+
     let inputs = document.querySelectorAll('input.form-control');
     inputs.forEach((input) => {
       input.addEventListener('input', (e:any) => {        
         this.validate(e.target, regexPatterns[e.target.attributes.id.value]);
       });
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 
   validate(field, regex) {

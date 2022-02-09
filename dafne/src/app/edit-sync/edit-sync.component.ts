@@ -1,9 +1,11 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { Synchronizer } from '../models/synchronizer';
 import { AuthenticationService } from '../services/authentication.service';
 import { AlertComponent } from '../alert/alert.component';
 import { MessageService } from '../services/message.service';
+import { interval, Subscription } from 'rxjs';
+import { AppConfig } from '../services/app.config';
 
 declare var $: any;
 
@@ -44,7 +46,7 @@ const regexPatterns = {
   templateUrl: './edit-sync.component.html',
   styleUrls: ['./edit-sync.component.css']
 })
-export class EditSyncComponent implements OnInit, AfterViewInit {
+export class EditSyncComponent implements OnInit, OnDestroy {
   navigationSubscription;
   private pageRefreshed: boolean = true;
   public isLocalConfigured = false;
@@ -68,6 +70,9 @@ export class EditSyncComponent implements OnInit, AfterViewInit {
     color: "#ffffff"
   };
 
+  public dataRefreshTime = AppConfig.settings.dataRefreshTime;
+  subscription: Subscription;
+
   constructor(
     public authenticationService: AuthenticationService,
     private router: Router,
@@ -85,13 +90,22 @@ export class EditSyncComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    const dataRefresh = interval(this.dataRefreshTime);
+
     this.messageService.localCurrentMessage.subscribe(message => {
       if (message == false) {
         this.isLocalConfigured = false;       
       } else {
+        this.messageService.showSpinner(true);
         this.isLocalConfigured = true;
         this.getLocalCentre();
         this.getSynchronizers();
+        this.subscription = dataRefresh.subscribe(n => {
+          // get data after Init every x milliseconds:
+          this.messageService.showSpinner(false);
+          this.getLocalCentre();
+          this.getSynchronizers();
+        });
       }      
     });
 
@@ -103,8 +117,10 @@ export class EditSyncComponent implements OnInit, AfterViewInit {
     });
   }
 
-  ngAfterViewInit(): any {
-
+  ngOnDestroy(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 
   validate(field, regex) {

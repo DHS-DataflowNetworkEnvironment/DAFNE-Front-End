@@ -12,6 +12,8 @@ export class MessageService {
   private localMessageSource = new BehaviorSubject(false);
   localCurrentMessage = this.localMessageSource.asObservable();
 
+  private spinnerMessageSource = new BehaviorSubject(false);
+  spinnerCurrentMessage = this.spinnerMessageSource.asObservable();
   constructor() { }
 
   changeMessage(message: string) {
@@ -20,5 +22,9 @@ export class MessageService {
 
   setLocalPresent(local: boolean) {
     this.localMessageSource.next(local);
+  }
+
+  showSpinner(show: boolean) {
+    this.spinnerMessageSource.next(show);
   }
 }
