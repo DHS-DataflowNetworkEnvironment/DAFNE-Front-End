@@ -58,6 +58,9 @@ export class EditCentresComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    if (this.subscription != undefined) {
+      this.subscription.unsubscribe();
+    }
     const dataRefresh = interval(this.dataRefreshTime);
 
     this.messageService.showSpinner(true);
@@ -78,7 +81,10 @@ export class EditCentresComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.subscription) {
+    if (this.navigationSubscription != undefined) {
+      this.navigationSubscription.unsubscribe();
+    }
+    if (this.subscription != undefined) {
       this.subscription.unsubscribe();
     }
   }

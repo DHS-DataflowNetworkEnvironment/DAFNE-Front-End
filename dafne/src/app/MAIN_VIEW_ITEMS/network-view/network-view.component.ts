@@ -79,8 +79,11 @@ export class NetworkViewComponent implements AfterViewInit, OnDestroy {
 
   ngOnInit(): any {
     const dataRefresh = interval(this.dataRefreshTime);
-    if (this.sub) {
+    if (this.sub != undefined) {
       this.sub.unsubscribe();
+    }
+    if (this.subscription != undefined) {
+      this.subscription.unsubscribe();
     }
     this.messageService.showSpinner(true);
     this.sub = this.activatedroute.paramMap.subscribe(params => {
@@ -137,16 +140,13 @@ export class NetworkViewComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // avoid memory leaks here by cleaning up after ourselves. If we  
-    // don't then we will continue to run our initialiseInvites()   
-    // method on every navigationEnd event.
-    if (this.navigationSubscription) {
+    if (this.navigationSubscription != undefined) {
       this.navigationSubscription.unsubscribe();
     }
-    if (this.sub) {
+    if (this.sub != undefined) {
       this.sub.unsubscribe();
     }
-    if (this.subscription) {
+    if (this.subscription != undefined) {
       this.subscription.unsubscribe();
     }
   }
