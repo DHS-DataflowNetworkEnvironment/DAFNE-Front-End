@@ -139,6 +139,15 @@ input, i {
     bottom: 5px;
     left: 2px;
 }
+#add_latitude, #add_longitude, #edit_latitude, #edit_longitude {
+    width: 225px;
+}
+#add-color-picker, #edit-color-picker {
+    width: 35px;
+}
+#add_color, #edit_color {
+    width: 190px;
+}
 
 /* Hide arrows in lat-lon inputs */
 /* Chrome, Safari, Edge, Opera */
@@ -150,8 +159,6 @@ input, i {
 #addCentreForm input[type=number] {
   -moz-appearance: textfield;
 }
-
-
 
 
 ::ng-deep .color-picker .button-area {

@@ -44,7 +44,6 @@
     color: var(--brighter-text-color);
     font-size: 2rem;
 }
-
 table {
     width: 100%;
     
@@ -61,10 +60,6 @@ table, th, td {
     border: 1px solid var(--table-border-color);
     text-align: center;
 }
-input, i {
-    cursor: pointer !important;
-}
-
 .action {
     padding: 0 0.75rem;
     opacity: 100%;
@@ -77,6 +72,7 @@ input, i {
 .modal-content {
     background-color: var(--title-bg-color);
     color: var(--main-text-color);
+    /* width: 400px; */
 }
 .modal-header {
     border-bottom: 1px solid var(--table-border-color);
@@ -88,16 +84,34 @@ input, i {
     background-color: var(--modal-bg-color);
     border-color: var(--title-bg-color);
     color: var(--main-text-color);
+    width: 225px;
+    cursor: pointer !important;
+}
+.modal-content .fa-angle-down, .fa-eye, .fa-eye-slash {
+    font-size: 1.0rem;
+    top: 1.7rem;
+    right: 0;
+    border: 0.5rem solid var(--modal-bg-color);
+    background-color: var(--modal-bg-color);
+    color: var(--main-text-color);
+    position: absolute;
+    z-index: 99;
+    cursor: pointer !important;
 }
 .modal-content label {
     margin-bottom: 0;
 }
+small {
+    position: absolute;
+}
+
 .form-control.valid {
     border-width: 0;
 }
 
 .form-control.invalid {
     border: 1px solid red;
+    margin-bottom: 50px;
 }
 
 .form-control + small {
@@ -113,6 +127,11 @@ input, i {
     margin-bottom: 20px;
     transition: opacity .4s ease-out;
 }
+#add_id, #edit_id {
+    color: #505053;
+}
+
+
 /* Dropdown menus */
 .dropdown-menu{
     background-color: var(--title-bg-color);
@@ -127,13 +146,6 @@ input, i {
     font-size: 1.3rem;
     color: var(--brighter-text-color);
     text-align: center;
-}
-#service-type-input-group {
-    text-align: center;
-    align-items: center;
-}
-#service-type-dropdown, #centre-dropdown {
-    font-size: 2rem;
 }
 
 /* Delete Modal */

@@ -6,7 +6,7 @@
                 <p class="table-title"><span *ngIf="localCentre.name">{{localCentre.name}}:</span> Synchronizers List</p>
                 <button *ngIf="this.authenticationService.currentUser.isAdmin && isLocalConfigured" class="add-synchronizer-button btn btn-primary ml-auto" (click)="addNewSynchronizer()">Add Synch<i class="plus-icon fas fa-plus"></i></button>
             </div>
-            <table id="edit-sync-table">
+            <table>
                 <tr>
                     <th>Label</th>
                     <th>Service URL Backend</th>
@@ -51,19 +51,17 @@
                     <div class="input-group mb-1">
                         <div class="mb-1">
                             <label for="add_id" class="form-label">Id</label>
-                            <input type="text" class="form-control" id="add_id" [value]="currentSync.id" onkeydown="return false" disabled>
+                            <input type="text" class="form-control" id="add_id" value="auto" onkeydown="return false" disabled>
                         </div>
                         <div class="mb-1 ml-auto">
                             <label for="add_service_url_backend" class="form-label">Service URL Backend</label>
-                            <div class="input-group" id="add_service_url_backend-input-group"> 
-                                <input type="text" class="form-control" id="add_service_url_backend" [value]="currentSync.serviceUrlBackend" onkeydown="return false">
-                                <i id="add_service_url_backend-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
-                                <ul class="dropdown-menu" aria-labelledby="add_service_url_backend-dropdown">
-                                    <li *ngFor="let serviceUrl of serviceUrlBackendList; let k = index">
-                                        <a class="dropdown-item" (click)="setNewFormServiceUrlBackend(k)">{{serviceUrl}}</a>
-                                    </li>
-                                </ul> 
-                            </div>  
+                            <input type="text" class="form-control" id="add_service_url_backend" [value]="currentSync.serviceUrlBackend" onkeydown="return false">
+                            <i id="add_service_url_backend-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
+                            <ul class="dropdown-menu" aria-labelledby="add_service_url_backend-dropdown">
+                                <li *ngFor="let serviceUrl of serviceUrlBackendList; let k = index">
+                                    <a class="dropdown-item" (click)="setNewFormServiceUrlBackend(k)">{{serviceUrl}}</a>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                     <div class="input-group mb-1">
@@ -86,27 +84,25 @@
                         </div>
                         <div class="mb-1 ml-auto">
                             <label for="add_service_password" class="form-label">Service Password</label>
-                            <input type="text" class="form-control" id="add_service_password" [value]="currentSync.servicePassword">
+                            <input type="password" class="form-control" id="add_service_password" autocomplete="current-password" [value]="currentSync.servicePassword">
                             <small id="servicePasswordHelp" class="form-text">Length: 1 - 60 characters</small>
+                            <i class="fas fa-eye" id="toggleAddPassword" (click)="toggleAddPasswordVisibility()"></i>
                         </div>
                     </div>
                     <div class="input-group mb-1">
                         <div class="mb-1">
                             <label for="add_schedule" class="form-label">Schedule</label>
                             <input type="text" class="form-control" id="add_schedule" [value]="currentSync.schedule">
-                            <!-- COMPLETE CRON FORMAT: Seconds Minutes Hours Day-of-Month Month Day-of-Week Year -->
                             <small id="scheduleHelp" class="form-text">Insert a valid CRON string. Valid characters: 0-9 * , - / ? and SPACE</small>
                         </div>
                         <div class="mb-1 ml-auto copy_product_div">
                             <label for="add_copy_product" id="copy_product_label" class="form-label">Copy product</label>
-                            <div class="input-group mb-1">
-                                <input type="text" class="form-control" id="add_copy_product" [value]="currentSync.copyProduct" onkeydown="return false">
-                                <i id="add_copy_product-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
-                                <ul class="dropdown-menu" aria-labelledby="sync-dropdown">
-                                    <li><a class="dropdown-item" (click)="setCopyProduct('true')">true</a></li>
-                                    <li><a class="dropdown-item" (click)="setCopyProduct('false')">false</a></li>
-                                </ul>
-                            </div>
+                            <input type="text" class="form-control" id="add_copy_product" [value]="currentSync.copyProduct" onkeydown="return false">
+                            <i id="add_copy_product-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
+                            <ul class="dropdown-menu" aria-labelledby="sync-dropdown">
+                                <li><a class="dropdown-item" (click)="setCopyProduct('true')">true</a></li>
+                                <li><a class="dropdown-item" (click)="setCopyProduct('false')">false</a></li>
+                            </ul>
                         </div>
                     </div>
                     <div class="input-group mb-1">
@@ -117,14 +113,12 @@
                         </div>
                         <div class="mb-1 ml-auto">
                             <label for="add_request" class="form-label">Request</label>
-                            <div class="input-group mb-1">
-                                <input type="text" class="form-control" id="add_request" [value]="currentSync.request" onkeydown="return false">
-                                <i id="add_request-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
-                                    <ul class="dropdown-menu" aria-labelledby="sync-dropdown">
-                                        <li><a class="dropdown-item" (click)="setNewFormRequest('start')">start</a></li>
-                                        <li><a class="dropdown-item" (click)="setNewFormRequest('stop')">stop</a></li>
-                                    </ul>
-                            </div>
+                            <input type="text" class="form-control" id="add_request" [value]="currentSync.request" onkeydown="return false">
+                            <i id="add_request-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
+                                <ul class="dropdown-menu" aria-labelledby="sync-dropdown">
+                                    <li><a class="dropdown-item" (click)="setNewFormRequest('start')">start</a></li>
+                                    <li><a class="dropdown-item" (click)="setNewFormRequest('stop')">stop</a></li>
+                                </ul>
                         </div>
                     </div>
                     <div class="input-group mb-1">
@@ -135,15 +129,13 @@
                         </div>
                         <div class="mb-1 ml-auto">
                             <label for="add_target_collection" class="form-label">Target Collection</label>
-                            <div class="input-group mb-1">
-                                <input type="text" class="form-control" id="add_target_collection" [value]="currentSync.targetCollection" onkeydown="return false">
-                                <i id="add_target_collection-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
-                                <ul class="dropdown-menu" aria-labelledby="sync-dropdown">
-                                    <li *ngFor="let collection of collectionsList[tempServiceUrlBackendNumber]; let k = index">
-                                        <a class="dropdown-item" (click)="setTargetCollection(k)">{{collection}}</a>
-                                    </li>
-                                </ul>
-                            </div>
+                            <input type="text" class="form-control" id="add_target_collection" [value]="currentSync.targetCollection" onkeydown="return false">
+                            <i id="add_target_collection-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
+                            <ul class="dropdown-menu" aria-labelledby="sync-dropdown">
+                                <li *ngFor="let collection of collectionsList[tempServiceUrlBackendNumber]; let k = index">
+                                    <a class="dropdown-item" (click)="setTargetCollection(k)">{{collection}}</a>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                     <div class="input-group mb-1">
@@ -220,8 +212,9 @@
                         </div>
                         <div class="mb-1 ml-auto">
                             <label for="edit_service_password" class="form-label">Service Password</label>
-                            <input type="text" class="form-control" id="edit_service_password" [value]="currentSync.servicePassword">
+                            <input type="password" class="form-control" id="edit_service_password" placeholder="unchanged" autocomplete="current-password" [value]="currentSync.servicePassword">
                             <small id="servicePasswordHelp" class="form-text">Length: 1 - 60 characters</small>
+                            <i class="fas fa-eye" id="toggleEditPassword" (click)="toggleEditPasswordVisibility()"></i>
                         </div>
                     </div>
                     <div class="input-group mb-1">
@@ -232,14 +225,12 @@
                         </div>
                         <div class="mb-1 ml-auto copy_product_div">
                             <label for="edit_copy_product" class="form-label">Copy product</label>
-                            <div class="input-group mb-1">
-                                <input type="text" class="form-control" id="edit_copy_product" [value]="currentSync.copyProduct" onkeydown="return false">
-                                <i id="edit_copy_product-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
-                                    <ul class="dropdown-menu" aria-labelledby="sync-dropdown">
-                                        <li><a class="dropdown-item" (click)="editCopyProduct('true')">true</a></li>
-                                        <li><a class="dropdown-item" (click)="editCopyProduct('false')">false</a></li>
-                                    </ul>
-                            </div>
+                            <input type="text" class="form-control" id="edit_copy_product" [value]="currentSync.copyProduct" onkeydown="return false">
+                            <i id="edit_copy_product-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
+                                <ul class="dropdown-menu" aria-labelledby="sync-dropdown">
+                                    <li><a class="dropdown-item" (click)="editCopyProduct('true')">true</a></li>
+                                    <li><a class="dropdown-item" (click)="editCopyProduct('false')">false</a></li>
+                                </ul>
                         </div>
                     </div>
                     <div class="input-group mb-1">
@@ -250,14 +241,12 @@
                         </div>
                         <div class="mb-1 ml-auto">
                             <label for="edit_request" class="form-label">Request</label>
-                            <div class="input-group mb-1">
-                                <input type="text" class="form-control" id="edit_request" [value]="currentSync.request" onkeydown="return false">
-                                <i id="edit_request-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
-                                    <ul class="dropdown-menu" aria-labelledby="sync-dropdown">
-                                        <li><a class="dropdown-item" (click)="setNewFormRequest('start')">start</a></li>
-                                        <li><a class="dropdown-item" (click)="setNewFormRequest('stop')">stop</a></li>
-                                    </ul> 
-                            </div>
+                            <input type="text" class="form-control" id="edit_request" [value]="currentSync.request" onkeydown="return false">
+                            <i id="edit_request-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
+                                <ul class="dropdown-menu" aria-labelledby="sync-dropdown">
+                                    <li><a class="dropdown-item" (click)="setNewFormRequest('start')">start</a></li>
+                                    <li><a class="dropdown-item" (click)="setNewFormRequest('stop')">stop</a></li>
+                                </ul> 
                         </div>
                     </div>
                     <div class="input-group mb-1">
@@ -268,15 +257,13 @@
                         </div>
                         <div class="mb-1 ml-auto">
                             <label for="edit_target_collection" class="form-label">Target Collection</label>
-                            <div class="input-group mb-1">
-                                <input type="text" class="form-control" id="edit_target_collection" [value]="currentSync.targetCollection" onkeydown="return false">
-                                <i id="edit_target_collection-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
-                                <ul class="dropdown-menu" aria-labelledby="sync-dropdown">
-                                    <li *ngFor="let collection of collectionsList[tempServiceUrlBackendNumber]; let k = index">
-                                        <a class="dropdown-item" (click)="setTargetCollection(k)">{{collection}}</a>
-                                    </li>
-                                </ul>
-                            </div>
+                            <input type="text" class="form-control" id="edit_target_collection" [value]="currentSync.targetCollection" onkeydown="return false">
+                            <i id="edit_target_collection-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
+                            <ul class="dropdown-menu" aria-labelledby="sync-dropdown">
+                                <li *ngFor="let collection of collectionsList[tempServiceUrlBackendNumber]; let k = index">
+                                    <a class="dropdown-item" (click)="setTargetCollection(k)">{{collection}}</a>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                     <div class="input-group mb-1">

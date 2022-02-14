@@ -10,14 +10,14 @@ import { AppConfig } from '../services/app.config';
 declare var $: any;
 
 const regexPatterns = {
-  add_username: "^.{1,60}$",
-  add_password: "^.{1,60}$",
+  add_service_username: "^.{1,60}$",
+  add_service_password: "^.{1,60}$",
   add_service_url: "^[^\ \,\;]{1,256}$",
   add_service_type: "^.{1,60}$",
   add_centre: "^.{1,60}$",
 
-  edit_username: "^.{1,60}$",
-  edit_password: "",
+  edit_service_username: "^.{1,60}$",
+  edit_service_password: "",
   edit_service_url: "^[^\ \,\;]{1,256}$",
   edit_service_type: "^.{1,60}$",
   edit_centre: "^.{1,60}$"
@@ -218,8 +218,8 @@ export class EditServicesComponent implements OnInit, OnDestroy {
       }
       //console.log("ADD SERVICE SUBMITTED");
       let body = {
-        username: (<HTMLInputElement>document.getElementById("add_username")).value,
-        password: (<HTMLInputElement>document.getElementById('add_password')).value,
+        username: (<HTMLInputElement>document.getElementById("add_service_username")).value,
+        password: (<HTMLInputElement>document.getElementById('add_service_password')).value,
         service_url: (<HTMLInputElement>document.getElementById('add_service_url')).value,
         service_type: tempServiceTypeId,
         centre: tempCentreId,
@@ -297,17 +297,17 @@ export class EditServicesComponent implements OnInit, OnDestroy {
     }
     if (valid) {
       let body: any;
-      if ((<HTMLInputElement>document.getElementById('edit_password')).value == '') {
+      if ((<HTMLInputElement>document.getElementById('edit_service_password')).value == '') {
         body = {
-          username: (<HTMLInputElement>document.getElementById("edit_username")).value,
+          username: (<HTMLInputElement>document.getElementById("edit_service_username")).value,
           service_url: (<HTMLInputElement>document.getElementById('edit_service_url')).value,
           service_type: tempServiceTypeId,
           centre: tempCentreId,
         };       
       } else {
         body = {
-          username: (<HTMLInputElement>document.getElementById("edit_username")).value,
-          password: (<HTMLInputElement>document.getElementById('edit_password')).value,
+          username: (<HTMLInputElement>document.getElementById("edit_service_username")).value,
+          password: (<HTMLInputElement>document.getElementById('edit_service_password')).value,
           service_url: (<HTMLInputElement>document.getElementById('edit_service_url')).value,
           service_type: tempServiceTypeId,
           centre: tempCentreId,
@@ -323,6 +323,26 @@ export class EditServicesComponent implements OnInit, OnDestroy {
     } else {
 
     }
+  }
+
+  public toggleAddPasswordVisibility() {
+    const togglePassword = document.querySelector('#toggleAddPassword');
+    const passwordInput = document.querySelector('#add_service_password');
+    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordInput.setAttribute('type', type);
+    // toggle the eye slash icon
+    const eye = passwordInput.getAttribute('type') === 'password' ? 'far fa-eye' : 'far fa-eye-slash';
+    togglePassword.setAttribute('class', eye);
+  }
+
+  public toggleEditPasswordVisibility() {
+    const togglePassword = document.querySelector('#toggleEditPassword');
+    const passwordInput = document.querySelector('#edit_service_password');
+    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordInput.setAttribute('type', type);
+    // toggle the eye slash icon
+    const eye = passwordInput.getAttribute('type') === 'password' ? 'far fa-eye' : 'far fa-eye-slash';
+    togglePassword.setAttribute('class', eye);
   }
 
   refreshPage() {

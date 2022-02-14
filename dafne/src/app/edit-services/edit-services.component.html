@@ -58,44 +58,51 @@
             </div>
             <div class="modal-body">
                 <form id="addServiceForm">
-                    <div class="mb-1">
-                        <label for="add_username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="add_username" [value]="service.username">
-                        <small id="usernameHelp" class="form-text">Length: 1 - 60 characters</small>
-                    </div>
-                    <div class="mb-1">
-                        <label for="add_password" class="form-label">Password</label>
-                        <input type="text" class="form-control" id="add_password" [value]="service.password">
-                        <small id="passwordHelp" class="form-text">Length: 1 - 60 characters</small>
-                    </div>
-                    <div class="mb-1">
-                        <label for="add_service_url" class="form-label">Service URL</label>
-                        <input type="text" class="form-control" id="add_service_url" [value]="service.service_url">
-                        <small id="serviceUrlHelp" class="form-text">Length: 1 - 256 characters. Invalid characters: , ; and SPACE</small>
-                    </div>
-                    <div class="mb-1">
-                        <label for="add_service_type" class="form-label">Service type</label>
-                        <div class="input-group" id="service-type-input-group"> 
+                    <div class="input-group mb-1">
+                        <div class="mb-1">
+                            <label for="add_id" class="form-label">Id</label>
+                            <input type="text" class="form-control" id="add_id" value="auto" onkeydown="return false" disabled>
+                        </div>
+                        <div class="mb-1 ml-auto">
+                            <label for="add_service_type" class="form-label">Service type</label>
                             <input type="text" class="form-control" id="add_service_type" [value]="service.service_type" onkeydown="return false">
                             <i id="service-type-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
                             <ul class="dropdown-menu" aria-labelledby="service-type-dropdown">
                                 <li *ngFor="let serviceType of serviceTypesList; let k = index">
                                     <a class="dropdown-item" (click)="setNewFormServiceType(k+1)">{{serviceType.service_type}}</a>
                                 </li>
-                            </ul> 
-                        </div>                        
+                            </ul>
+                        </div>
                     </div>
-                    <div class="mb-1">
-                        <label for="add_centre" class="form-label">Centre</label>
-                        <div class="input-group" id="centre-input-group">
+                    <div class="input-group mb-1">
+                        <div class="mb-1">
+                            <label for="add_service_username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="add_service_username" [value]="service.username">
+                            <small id="usernameHelp" class="form-text">Length: 1 - 60 characters</small>
+                        </div>
+                        <div class="mb-1 ml-auto">
+                            <label for="add_service_password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="add_service_password" autocomplete="current-password" [value]="service.password">
+                            <small id="passwordHelp" class="form-text">Length: 1 - 60 characters</small>
+                            <i class="fas fa-eye" id="toggleAddPassword" (click)="toggleAddPasswordVisibility()"></i>
+                        </div>
+                    </div>
+                    <div class="input-group mb-1">
+                        <div class="mb-1">
+                            <label for="add_service_url" class="form-label">Service URL</label>
+                            <input type="text" class="form-control" id="add_service_url" [value]="service.service_url">
+                            <small id="serviceUrlHelp" class="form-text">Length: 1 - 256 characters. Invalid characters: , ; and SPACE</small>
+                        </div>
+                        <div class="mb-1 ml-auto">
+                            <label for="add_centre" class="form-label">Centre</label>
                             <input type="text" class="form-control" id="add_centre" [value]="service.centre" onkeydown="return false">
                             <i id="centre-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
                             <ul class="dropdown-menu" aria-labelledby="centre-dropdown">
                                 <li *ngFor="let centre of centreList">
                                     <a class="dropdown-item" (click)="setNewFormCentre(centre.id)">{{centre.name}}</a>
                                 </li>
-                            </ul> 
-                        </div>    
+                            </ul>
+                        </div>
                     </div>
                     <div class="row" >
                         <button type="button" class="btn btn-secondary ml-auto m-3" data-bs-dismiss="modal" aria-label="Close">Close</button>
@@ -116,44 +123,51 @@
             </div>
             <div class="modal-body">
                 <form id="editServiceForm">
-                    <div class="mb-1">
-                        <label for="edit_username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="edit_username" [value]="service.username">
-                        <small id="usernameHelp" class="form-text">Length: 1 - 60 characters</small>
-                    </div>
-                    <div class="mb-1">
-                        <label for="edit_password" class="form-label">Password</label>
-                        <input type="text" class="form-control" id="edit_password" [value]="service.password">
-                        <small id="usernameHelp" class="form-text">Length: 1 - 60 characters</small>
-                    </div>
-                    <div class="mb-1">
-                        <label for="edit_service_url" class="form-label">Service URL</label>
-                        <input type="text" class="form-control" id="edit_service_url" [value]="service.service_url">
-                        <small id="serviceUrlHelp" class="form-text">Length: 1 - 256 characters. Invalid characters: , ; and SPACE</small>
-                    </div>
-                    <div class="mb-1">
-                        <label for="edit_service_type" class="form-label">Service type</label>
-                        <div class="input-group" id="service-type-input-group"> 
+                    <div class="input-group mb-1">
+                        <div class="mb-1">
+                            <label for="add_id" class="form-label">Id</label>
+                            <input type="text" class="form-control" id="add_id" value="auto" onkeydown="return false" disabled>
+                        </div>
+                        <div class="mb-1 ml-auto">
+                            <label for="edit_service_type" class="form-label">Service type</label>
                             <input type="text" class="form-control" id="edit_service_type" [value]="service.service_type" onkeydown="return false">
                             <i id="service-type-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
                             <ul class="dropdown-menu" aria-labelledby="service-type-dropdown">
                                 <li *ngFor="let serviceType of serviceTypesList; let k = index">
                                     <a class="dropdown-item" (click)="setNewFormServiceType(k+1)">{{serviceType.service_type}}</a>
                                 </li>
-                            </ul> 
-                        </div>                        
+                            </ul>
+                        </div>
                     </div>
-                    <div class="mb-1">
-                        <label for="edit_centre" class="form-label">Centre</label>
-                        <div class="input-group" id="centre-input-group">
+                    <div class="input-group mb-1">
+                        <div class="mb-1">
+                            <label for="edit_service_username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="edit_service_username" [value]="service.username">
+                            <small id="usernameHelp" class="form-text">Length: 1 - 60 characters</small>
+                        </div>
+                        <div class="mb-1 ml-auto">
+                            <label for="edit_service_password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="edit_service_password" autocomplete="current-password" placeholder="unchanged" [value]="service.password">
+                            <small id="usernameHelp" class="form-text">Length: 1 - 60 characters</small>
+                            <i class="fas fa-eye" id="toggleEditPassword" (click)="toggleEditPasswordVisibility()"></i>
+                        </div>
+                    </div>
+                    <div class="input-group mb-1">
+                        <div class="mb-1">
+                            <label for="edit_service_url" class="form-label">Service URL</label>
+                            <input type="text" class="form-control" id="edit_service_url" [value]="service.service_url">
+                            <small id="serviceUrlHelp" class="form-text">Length: 1 - 256 characters. Invalid characters: , ; and SPACE</small>
+                        </div>
+                        <div class="mb-1 ml-auto">
+                            <label for="edit_centre" class="form-label">Centre</label>
                             <input type="text" class="form-control" id="edit_centre" [value]="service.centre" onkeydown="return false">
                             <i id="centre-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
                             <ul class="dropdown-menu" aria-labelledby="centre-dropdown">
                                 <li *ngFor="let centre of centreList">
                                     <a class="dropdown-item" (click)="setNewFormCentre(centre.id)">{{centre.name}}</a>
                                 </li>
-                            </ul> 
-                        </div>    
+                            </ul>
+                        </div>
                     </div>
                     <div class="row" >
                         <button type="button" class="btn btn-secondary ml-auto m-3" data-bs-dismiss="modal" aria-label="Close">Close</button>

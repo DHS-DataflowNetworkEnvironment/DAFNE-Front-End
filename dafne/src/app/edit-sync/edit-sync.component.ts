@@ -230,7 +230,6 @@ export class EditSyncComponent implements OnInit, OnDestroy {
 
   public addNewSynchronizer() {
     this.currentSync = new Synchronizer();
-    this.currentSync.id = -1;
     this.currentSync.label = "";
     this.currentSync.serviceUrlBackend = "";
     this.currentSync.serviceUrl = "";
@@ -381,13 +380,6 @@ export class EditSyncComponent implements OnInit, OnDestroy {
     });
     }
   }
-
-
-  refreshPage() {
-    this.getSynchronizers();
-    this.router.navigate(['edit-synchronizers'], { skipLocationChange: true });
-  }
-
   
   parseJsonDate = (jsonDate)  => {
     try {
@@ -440,4 +432,28 @@ export class EditSyncComponent implements OnInit, OnDestroy {
     this.currentSync.targetCollection = this.collectionsList[id]; // To Be Corrected..
   }
 
+  public toggleAddPasswordVisibility() {
+    const togglePassword = document.querySelector('#toggleAddPassword');
+    const passwordInput = document.querySelector('#add_service_password');
+    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordInput.setAttribute('type', type);
+    // toggle the eye slash icon
+    const eye = passwordInput.getAttribute('type') === 'password' ? 'far fa-eye' : 'far fa-eye-slash';
+    togglePassword.setAttribute('class', eye);
+  }
+
+  public toggleEditPasswordVisibility() {
+    const togglePassword = document.querySelector('#toggleEditPassword');
+    const passwordInput = document.querySelector('#edit_service_password');
+    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordInput.setAttribute('type', type);
+    // toggle the eye slash icon
+    const eye = passwordInput.getAttribute('type') === 'password' ? 'far fa-eye' : 'far fa-eye-slash';
+    togglePassword.setAttribute('class', eye);
+  }
+
+  refreshPage() {
+    this.getSynchronizers();
+    this.router.navigate(['edit-synchronizers'], { skipLocationChange: true });
+  }
 }
