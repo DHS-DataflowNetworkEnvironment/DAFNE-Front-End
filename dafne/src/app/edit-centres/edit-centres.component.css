@@ -123,15 +123,15 @@ input, i {
     margin-bottom: 20px;
     transition: opacity .4s ease-out;
 }
-#add-color-picker {
+#add_color-picker {
     -webkit-box-shadow:inset 0px 0px 0px 1px #000;
     -moz-box-shadow:inset 0px 0px 0px 1px #000;
     box-shadow:inset 0px 0px 0px 1px #000;
 }
-#add-local {
+#add_local, #edit_local {
     appearance: none;
 }
-#add-local:checked:after {
+#add_local:checked:after, #edit_local:checked:after {
 	content: '\2714';
 	color: var(--checked-color);
     font-size: 2rem;
@@ -142,13 +142,12 @@ input, i {
 #add_latitude, #add_longitude, #edit_latitude, #edit_longitude {
     width: 225px;
 }
-#add-color-picker, #edit-color-picker {
+#add_color-picker, #edit_color-picker {
     width: 35px;
 }
 #add_color, #edit_color {
     width: 190px;
 }
-
 /* Hide arrows in lat-lon inputs */
 /* Chrome, Safari, Edge, Opera */
 #addCentreForm input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
