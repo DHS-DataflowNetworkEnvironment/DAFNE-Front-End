@@ -30,6 +30,7 @@ import { EditServicesComponent } from './edit-services/edit-services.component';
 import { EditSyncComponent } from './edit-sync/edit-sync.component';
 import { DpDatePickerModule } from 'ng2-date-picker';
 import { AppConfig } from './services/app.config';
+import { ServiceAvailabilityComponent } from './MAIN_VIEW_ITEMS/service-availability/service-availability.component';
 
 export function initializeApp(appConfig: AppConfig,
   spinner: SpinnerComponent) {
@@ -60,7 +61,8 @@ export function initializeApp(appConfig: AppConfig,
     SpinnerComponent,
     EditCentresComponent,
     EditServicesComponent,
-    EditSyncComponent
+    EditSyncComponent,
+    ServiceAvailabilityComponent
   ],
   imports: [
     BrowserModule,

@@ -558,7 +558,7 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
         sf = sf * s;
         tx = p.mouseX * (1-s) + tx * s;
         ty = p.mouseY * (1-s) + ty * s;
-    }
+      }
 
       function wheelZoom(e) {
         applyScale(e.deltaY < 0 ? 1.1 : 0.9);

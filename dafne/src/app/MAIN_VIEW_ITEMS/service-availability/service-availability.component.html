@@ -1,0 +1,67 @@
+<div id="chart-title">Service Availability</div>
+<div id="main-column-container">
+    <!-- Filter header -->
+    <div id="filters-form-container">
+        <form id="filters-form">
+            <div id="filters-form-row">
+                <div class="date-picker">
+                    <label class="form-label">Start Date:</label>
+                    <dp-date-picker class="" theme="dp-material" id="filter-start-date" name="filter-start-date"
+                        [(ngModel)]="startDate" (ngModelChange)="onStartDateChanged($event)" [config]="startDatePickerConfig" placeholder="YYYY-MM-DD">
+                    </dp-date-picker>
+                </div>
+                <div class="date-picker">
+                    <label class="form-label">Stop Date:</label>
+                    <dp-date-picker class="" theme="dp-material" id="filter-stop-date" name="filter-stop-date"
+                        [(ngModel)]="stopDate" (ngModelChange)="onStopDateChanged($event)" [config]="stopDatePickerConfig" placeholder="YYYY-MM-DD">
+                    </dp-date-picker>
+                </div>
+                <button type="submit" class="btn btn-primary col-1" id="filter-submit-button" (click)="onFilterSubmit()">Filter</button>
+            </div>
+        </form>
+    </div>
+    <div id="main-row-container">
+        <!-- Center list -->
+<!--         <section id="target-id-list-container">
+            <ul id="target-id-local">
+                <li id="target-id-local-title" style="color: white">Local:</li>
+                <li [ngStyle]="{'color': serviceLocalCentre.color}">{{serviceLocalCentre.name}}</li>
+                <li id="target-id-remote-title" class="mt-2" style="color: white">Remotes:</li>
+            </ul>
+            <ul *ngFor="let item of serviceRemoteCentreList | uniqueCentreFilter; let i = index;" id="target-id-list">
+                <li [ngStyle]='{color: item.color}'>
+                    {{item.name}}
+                </li>
+            </ul>
+        </section> -->
+        <!-- Charts -->
+        <div id="p5ServiceAvailabilityCanvas-column-div">
+            <div id="p5ServiceAvailabilityCanvas"></div>
+            <i class="fa fa-grip-lines" id="table-toggle-button" aria-hidden="false" (click)="toggleTable()"></i>
+        </div>
+        <!-- Selectors -->
+        <section id="selectors-container">
+            <h2>CHART</h2>
+            <button (click)="chartChangeTo('Bar Chart')">Bar Chart</button>
+            <button (click)="chartChangeTo('Calendar Chart')">Calendar Chart</button>
+        </section>
+    </div>
+</div>
+
+<!-- Data Table -->
+<div class="data-table-container" id="data-table-container">
+    <div id="export-div">
+        <label for="export-button">Click to export data in csv format</label>
+        <button id="export-button" (click)="saveAsCSV()">Export</button>
+    </div>
+    <div id="table-div">
+        <table id="data-table">
+            <thead>
+                <th style="color: white">Centre</th>
+                <th *ngFor="let availability of serviceAvailabilityList">{{availability.date.slice(0,4)}}&#10;{{availability.date.slice(5)}}</th>
+            </thead>
+            <td style="color: var(--main-text-color)">Dhus_1</td>
+            <td style="color: var(--main-text-color)" *ngFor="let availability of serviceAvailabilityList">{{availability.percentage}}</td>
+        </table>
+    </div>
+</div>

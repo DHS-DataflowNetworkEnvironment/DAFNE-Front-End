@@ -8,6 +8,7 @@ import { AuthGuard } from './util/auth.guard';
 import { EditCentresComponent } from './edit-centres/edit-centres.component';
 import { EditServicesComponent } from './edit-services/edit-services.component';
 import { EditSyncComponent } from './edit-sync/edit-sync.component';
+import { ServiceAvailabilityComponent } from './MAIN_VIEW_ITEMS/service-availability/service-availability.component';
 
 const routes: Routes = [
   // Main routes
@@ -17,6 +18,7 @@ const routes: Routes = [
       // Auxiliary routes
       { path: 'network-component/:mapType', outlet: 'centralBodyRouter', component: NetworkViewComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always'},
       { path: 'p5chart-component', outlet: 'centralBodyRouter', component: P5chartComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always'},
+      { path: 'service-availability', outlet: 'centralBodyRouter', component: ServiceAvailabilityComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always'},
       { path: '', outlet: 'centralBodyRouter', component: NetworkViewComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always'}
     ]
   },
