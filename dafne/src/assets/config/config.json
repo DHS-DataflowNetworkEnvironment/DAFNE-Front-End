@@ -5,6 +5,14 @@
         "textSize": 12,
         "iconSize": 30
     },
+    "availabilityColors": [
+        {"threshold": 0.0, "color": "#ee0000"},
+        {"threshold": 75.0, "color": "#6d4400"},
+        {"threshold": 95.0, "color": "#373d00"},
+        {"threshold": 98.0, "color": "#185e00"},
+        {"threshold": 99.0, "color": "#00781d"},
+        {"threshold": 100.0, "color": "#00781d"}        
+    ],
     "dataRefreshTime": 300000,
     "apiUrl": "<back-end-url>",
     "version": "2.0.0",

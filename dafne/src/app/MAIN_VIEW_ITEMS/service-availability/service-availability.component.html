@@ -21,19 +21,6 @@
         </form>
     </div>
     <div id="main-row-container">
-        <!-- Center list -->
-<!--         <section id="target-id-list-container">
-            <ul id="target-id-local">
-                <li id="target-id-local-title" style="color: white">Local:</li>
-                <li [ngStyle]="{'color': serviceLocalCentre.color}">{{serviceLocalCentre.name}}</li>
-                <li id="target-id-remote-title" class="mt-2" style="color: white">Remotes:</li>
-            </ul>
-            <ul *ngFor="let item of serviceRemoteCentreList | uniqueCentreFilter; let i = index;" id="target-id-list">
-                <li [ngStyle]='{color: item.color}'>
-                    {{item.name}}
-                </li>
-            </ul>
-        </section> -->
         <!-- Charts -->
         <div id="p5ServiceAvailabilityCanvas-column-div">
             <div id="p5ServiceAvailabilityCanvas"></div>
@@ -44,6 +31,12 @@
             <h2>CHART</h2>
             <button (click)="chartChangeTo('Bar Chart')">Bar Chart</button>
             <button (click)="chartChangeTo('Calendar Chart')">Calendar Chart</button>
+            <hr>
+            <h2>THRESHOLDS</h2>
+            <ng-template ngFor let-color [ngForOf]="availabilityColors" let-i="index">
+                <!-- <div *ngIf="i>0" class="color-threshold" [ngStyle]="{'background-color': color.color}">&gt; {{color.threshold}}% &lt;= {{availabilityColors[i-1].threshold}}% </div> -->
+                <div *ngIf="i>0" class="color-threshold" [ngStyle]="{'background-color': availabilityColors[availabilityColors.length-1-i].color}">&gt;<span *ngIf="i==availabilityColors.length - 1">=</span> {{availabilityColors[availabilityColors.length-1-i].threshold}}% &lt;= {{availabilityColors[availabilityColors.length-i].threshold}}%</div>
+            </ng-template>
         </section>
     </div>
 </div>
@@ -57,11 +50,32 @@
     <div id="table-div">
         <table id="data-table">
             <thead>
-                <th style="color: white">Centre</th>
-                <th *ngFor="let availability of serviceAvailabilityList">{{availability.date.slice(0,4)}}&#10;{{availability.date.slice(5)}}</th>
+                <th style="color: white">{{localCentre.name}}</th>
+                <ng-template ngFor let-availability [ngForOf]="requestedServiceAvailabilityList" let-i="index">
+                    <th>{{availability.date.slice(0,4)}}&#10;{{availability.date.slice(5)}}</th>
+                </ng-template>
             </thead>
-            <td style="color: var(--main-text-color)">Dhus_1</td>
-            <td style="color: var(--main-text-color)" *ngFor="let availability of serviceAvailabilityList">{{availability.percentage}}</td>
+            <tr>
+                <td style="color: var(--main-text-color)">TotalRequests</td>
+                <ng-template ngFor let-availability [ngForOf]="requestedServiceAvailabilityList" let-i="index">
+                    <td *ngIf="availability.percentage == -1" style="color: var(--windows-title-color)">N/A</td>
+                    <td *ngIf="availability.percentage != -1" style="color: var(--main-text-color)">{{availability.totalRequests}}</td>
+                </ng-template>
+            </tr>
+            <tr>
+                <td style="color: var(--main-text-color)">SuccessResponses</td>
+                <ng-template ngFor let-availability [ngForOf]="requestedServiceAvailabilityList" let-i="index">
+                    <td *ngIf="availability.percentage == -1" style="color: var(--windows-title-color)">N/A</td>
+                    <td *ngIf="availability.percentage != -1" style="color: var(--main-text-color)">{{availability.successResponses}}</td>
+                </ng-template>
+            </tr>
+            <tr>
+                <td style="color: var(--main-text-color)">Availability</td>
+                <ng-template ngFor let-availability [ngForOf]="requestedServiceAvailabilityList" let-i="index">
+                    <td *ngIf="availability.percentage == -1" style="color: var(--windows-title-color)">N/A</td>
+                    <td *ngIf="availability.percentage != -1" [ngStyle]="{'color': getPercentageColorHex(availability.percentage)}">{{availability.percentage.toFixed(2)}}%</td>
+                </ng-template>
+            </tr>
         </table>
     </div>
 </div>

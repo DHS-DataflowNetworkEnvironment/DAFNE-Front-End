@@ -336,4 +336,18 @@ export class AuthenticationService {
         }
     ));
   }
+
+  getServiceAvailability(id: number, body: object) {
+    return this.http.post<any>(
+      AppConfig.settings.apiUrl + `/centres/${id}/service/availability`,
+      body,
+      httpOptions
+    )
+    .pipe(
+    catchError(err => {
+        console.error(err);
+        return throwError(err);
+        }
+    ));
+  }
 }

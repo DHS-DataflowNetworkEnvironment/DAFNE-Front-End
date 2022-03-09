@@ -1,7 +1,9 @@
 import { Component, OnInit, ElementRef } from '@angular/core';
+import { AuthenticationService } from '../../services/authentication.service';
 import { AlertComponent } from '../../alert/alert.component';
 import { IDatePickerConfig } from 'ng2-date-picker';
 import { Availability } from '../../models/availability';
+import { AppConfig } from '../../services/app.config';
 import * as p5 from 'p5';
 
 @Component({
@@ -13,19 +15,26 @@ export class ServiceAvailabilityComponent implements OnInit {
 
   public p5Chart;
 
-  public tempDaysNumber: number = 0;
-  public daysNumber: number = 30; /// THIS VALUE HAS TO BE TAKEN FROM A GET!!!!!!!!!!!
-  public millisPerDay = 86400000;
-  public maxDays = 29;
+  public localCentre = {
+    id: -1,
+    name: "",
+    color: "#ffffff"
+  };
+
+  public availabilityDaysNumber: number = 0;
+  public requestedDaysNumber: number = 0;
+  public millisPerDay: number = 86400000;
+  public maxDays: number = 29;
+  public totalCalendarDaysNumber: number = 35;
   public millisPerMaxPeriod = this.millisPerDay * this.maxDays;
 
-  public today = new Date();
+  public today = new Date(); /* TO BE SIMPLIFIED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
   public dd = String(this.today.getDate()).padStart(2, '0');
   public mm = String(this.today.getMonth() + 1).padStart(2, '0');
   public yyyy = this.today.getFullYear();
   public todayDate: string = this.yyyy + '-' + this.mm + '-' + this.dd;
 
-  public initialStartDayMillis = Date.parse(this.todayDate) - (this.maxDays * this.millisPerDay);
+  public initialStartDayMillis = Date.parse(this.todayDate) - this.millisPerMaxPeriod;
   public startDateTemp = new Date(this.initialStartDayMillis);
   public ddStart = String(this.startDateTemp.getDate()).padStart(2, '0');
   public mmStart = String(this.startDateTemp.getMonth() + 1).padStart(2, '0');
@@ -86,26 +95,53 @@ export class ServiceAvailabilityComponent implements OnInit {
       {date: "2022-02-17", successResponses: 132, totalRequests: 144, percentage: 100},
       {date: "2022-02-18", successResponses: 132, totalRequests: 144, percentage: 100}
     ]
-  };    //// 
+  };
+  public serviceAvailabilityList: Array<Availability> = [];
+  public requestedServiceAvailabilityList: Array<Availability> = [];
+  /* public expandedServiceAvailabilityList: Array<Availability> = new Array(this.totalCalendarDaysNumber).fill({
+    date: "",
+    successResponses: -1,
+    totalRequests: -1,
+    percentage: -1
+  }); */
 
-  //public serviceAvailabilityList: Array<Availability> = this.fakeServiceAvailabilityJson.values;
-  public serviceAvailabilityList: Array<Availability>;
   public dayOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  public weekdayShift: number = 0;
+  public unrecordedDaysShift: number = 0;
+  public rowNumber = 5;
 
+  public availabilityColors;
 
   constructor(
+    public authenticationService: AuthenticationService,
     private el: ElementRef,
     private alert: AlertComponent,
-  ) { }
+  ) {
+    this.availabilityColors = AppConfig.settings.availabilityColors;
+  }
 
   ngOnInit(): void {
-    this.init_P5();
+    this.authenticationService.getAllCentres().subscribe(
+      (res: object) => {
+        /* Get Local Centre */
+        if (Object.values(res).filter((x) => x.local == true)[0]) {
+          this.localCentre = Object.values(res).filter((x) => x.local == true)[0];
+        } else {
+          this.localCentre = {
+            id: -1,
+            name: "No Local",
+            color: "#ffffff"
+          };
+        }
+        this.init_P5();
+      }
+    );
   }
 
   onStartDateChanged(date) {
     let tempMillisDate = (Date.parse(date) + this.millisPerMaxPeriod);
     if (Date.parse(this.stopDate) > tempMillisDate) {
-      this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 15 days");
+      this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 30 days");
       let tempDate = new Date(tempMillisDate);
       let dd = String(tempDate.getDate()).padStart(2, '0');
       let mm = String(tempDate.getMonth() + 1).padStart(2, '0');
@@ -121,7 +157,7 @@ export class ServiceAvailabilityComponent implements OnInit {
   onStopDateChanged(date) {
     let tempMillisDate = (Date.parse(date) - this.millisPerMaxPeriod);
     if (Date.parse(this.startDate) < tempMillisDate) {
-      this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 15 days");
+      this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 30 days");
       let tempDate = new Date(tempMillisDate);
       let dd = String(tempDate.getDate()).padStart(2, '0');
       let mm = String(tempDate.getMonth() + 1).padStart(2, '0');
@@ -138,54 +174,74 @@ export class ServiceAvailabilityComponent implements OnInit {
     let tempStopDate = new Date(this.stopDate);
     let tempStartDate = new Date(this.startDate);
     let tempTimeDifference = tempStopDate.getTime() - tempStartDate.getTime();
-    //console.log("Time difference: " + tempTimeDifference);
-    
-    this.tempDaysNumber = tempTimeDifference / (1000 * 3600 * 24) + 1;
-    //this.sectionRadians = (2 * Math.PI) / this.daysNumber;
-    //console.log("Days difference: " + tempDaysNumber);
-  
-    for (var i = 0; i < this.tempDaysNumber; i++) {
-      //console.log("Date " + i + " - " + new Date(tempStartDate.getTime() + i*(1000*3600*24)));
-      let tempFilteredDate = new Date(tempStartDate.getTime() + i*(1000*3600*24));
-      let tempdd = String(tempFilteredDate.getDate()).padStart(2, '0');
-      let tempmm = String(tempFilteredDate.getMonth() + 1).padStart(2, '0');
-      let tempyyyy = tempFilteredDate.getFullYear();
-      let tempFilteredDateString: string = tempyyyy + '-' + tempmm + '-' + tempdd;
-      //console.log("TempFilteredDate: " + tempFilteredDateString);
 
-/*       let body: object = {
-        "mission":this.bodyMission,
-        "productType":this.productType,
-        "startDate":tempFilteredDateString,
-        "stopDate":tempFilteredDateString
-      }; */
-      //console.log("FILTER Body: " + JSON.stringify(body, null, 2));
-/*       this.completenessDailyGetDone[i] = false;   
-      this.getDailyCompleteness(body, i); */
+    let body: object = {
+      "startDate": this.startDate.concat("T00:00:00"),
+      "stopDate": this.stopDate.concat("T23:59:59")
     }
+    if (this.localCentre.id == -1) {
+      this.alert.showErrorAlert("No Local Centre Found", "Please check if a local centre has been configured");
+      return;
+    }
+    this.authenticationService.getServiceAvailability(this.localCentre.id, body).subscribe(
+      (res) => {
+        if (res.centreId == this.localCentre.id) {
+          //console.log("Res: " + JSON.stringify(res, null, 2));
+          this.availabilityDaysNumber = res.values.length;
+          this.requestedDaysNumber = tempTimeDifference / (1000 * 3600 * 24) + 1;
+         /*  this.expandedServiceAvailabilityList.fill({
+            date: "",
+            successResponses: -1,
+            totalRequests: -1,
+            percentage: -1
+          }); */
+          for (var i = 0; i < this.requestedDaysNumber; i++) {
+            this.requestedServiceAvailabilityList[i] = {
+              date: new Date(Date.parse(this.startDate) + (i * this.millisPerDay)).toISOString().slice(0,10),
+              successResponses: -1,
+              totalRequests: -1,
+              percentage: -1
+            }
+          }
+          
+          //this.serviceAvailabilityList = this.fakeServiceAvailabilityJson.values;
+          this.serviceAvailabilityList = res.values;
 
-    /* CHECK!!!!  ---->  Fill the Array on filter submit */
-    this.serviceAvailabilityList = this.fakeServiceAvailabilityJson.values;
-    this.p5Chart.windowResized();
+          /* Calculate week-day shift and unrecorder days shift*/
+          this.weekdayShift = (tempStartDate.getDay() == 0 ? 6 : tempStartDate.getDay() - 1);
+          this.rowNumber = (this.weekdayShift == 6 ? 6 : 5);
+          this.unrecordedDaysShift = this.requestedDaysNumber - this.availabilityDaysNumber;
+          //console.log("Weekday shift: " + this.weekdayShift);
+          //console.log("Undefined shift: " + this.unrecordedDaysShift);
+          //console.log("Requested days: " + this.requestedDaysNumber);
+
+          for (var i = 0; i < this.requestedDaysNumber; i++) {
+            for (var k = 0; k < this.availabilityDaysNumber; k++) {
+              if (this.serviceAvailabilityList[k].date == this.requestedServiceAvailabilityList[i].date) {
+                this.requestedServiceAvailabilityList[i] = this.serviceAvailabilityList[k];
+              }
+            }
+            //console.log("ReqServAvList[" + i + "].date : " + this.requestedServiceAvailabilityList[i].date);
+            //console.log("ReqServAvList[" + i + "].percentage : " + this.requestedServiceAvailabilityList[i].percentage);
+          }
+          this.p5Chart.windowResized();
+        }
+      }
+    );
   }
 
   toggleTable() {
-    //if (getComputedStyle(document.getElementById("data-table-container")).visibility == 'collapse') {
     if (document.getElementById("data-table-container").style.display == "none") {
       /* Show */
       document.getElementById("main-column-container").style.height = "calc(100vh - 9rem - 12rem)";
       document.getElementById("p5ServiceAvailabilityCanvas-column-div").style.height = "calc(100vh - 25.5rem)";
-      /* document.getElementById("p5ServiceAvailabilityCanvas").style.height = "100%"; */
       document.getElementById("data-table-container").style.display = "block";
-      
       //this.p5Chart.windowResized();
     } else {
       /* Hide */
       document.getElementById("main-column-container").style.height = "calc(100vh - 9rem)";
-      document.getElementById("p5ServiceAvailabilityCanvas-column-div").style.height = "calc(100vh - 13.5rem)"; 
-      /* document.getElementById("p5ServiceAvailabilityCanvas").style.height = "100%";  */
+      document.getElementById("p5ServiceAvailabilityCanvas-column-div").style.height = "calc(100vh - 13.5rem)";
       document.getElementById("data-table-container").style.display = "none";
-      
       //this.p5Chart.windowResized();
     }
   }
@@ -229,11 +285,11 @@ export class ServiceAvailabilityComponent implements OnInit {
 
     this.p5Chart = new p5(p => {
       let blankXDim = 140;
-      let blankYDim = 140;
+      let blankYDim = 160;
       let xCenter = canvasWidth / 2;
       let yCenter = canvasHeight / 2;
       let pieExtDiameter = (canvasWidth > canvasHeight) ? canvasHeight - blankYDim : canvasWidth - blankXDim;
-      let pieExtRadius = pieExtDiameter / 2;
+      //let pieExtRadius = pieExtDiameter / 2;
       let chartXDim = canvasWidth - blankXDim;
       let chartYDim = canvasHeight - blankYDim;
       let chartXDim2 = chartXDim / 2;
@@ -241,15 +297,16 @@ export class ServiceAvailabilityComponent implements OnInit {
       let nLines = 4;
 
       let dayXDim = canvasWidth / 10;
-      let dayYDim = canvasHeight / 8;
+      let dayYDim = canvasHeight / (this.rowNumber+2);
 
       let backgroundColor = p.color('#12222f');
       let labelBackgroundColor = p.color('#12222fcc')
       let lineColor = p.color('#aaaaaa');
-      let valuesColor = p.color(200);
+      //let valuesColor = p.color(200);
 
+      let valueFontSize = 16;
       let dateFontSize = 12;
-      let valueFontSize = 10;
+      let textFontSize = 10;
 
       let barGapScale = 30.0;
       let sectionScaleSingle = 1.4;
@@ -259,10 +316,9 @@ export class ServiceAvailabilityComponent implements OnInit {
       let tx = 0;
       let ty = 0;
 
-      let expNum = 1.056975;
-      let serviceAvailabilityListScaled: Array<number> = [];
-      //let expandedServiceAvailabilityList = Array.apply(null, Array(35)).map(function () {});
-      let expandedServiceAvailabilityList: Array<Availability> = Array.apply(null, Array(35)).map(function () {});
+      /* Var needed for logaritmic colouring: */
+      //let expNum = 1.056975;
+      //let serviceAvailabilityListScaled: Array<number> = []; 
 
       p.setup = () => {
         canvasSpace = p.createCanvas(canvasWidth, canvasHeight).parent('p5ServiceAvailabilityCanvas');
@@ -279,9 +335,9 @@ export class ServiceAvailabilityComponent implements OnInit {
         p.windowResized();
         p.translate(tx, ty);
 
-        for (var i = 0; i < this.daysNumber; i++) {
+        /* for (var i = 0; i < this.daysNumber; i++) {  
           serviceAvailabilityListScaled[i] = expNum ** this.serviceAvailabilityList[i].percentage;
-        }
+        } */
 
         if (this.chartType == this.selectorText[0]) {
           p.fillBarChart();
@@ -317,6 +373,8 @@ export class ServiceAvailabilityComponent implements OnInit {
         ty = 0;
       }
 
+      
+
       p.windowResized = () => {
         canvasWidth = canvas.clientWidth;
         canvasHeight = canvas.clientHeight;
@@ -326,19 +384,19 @@ export class ServiceAvailabilityComponent implements OnInit {
         xCenter = canvasWidth / 2;
         yCenter = canvasHeight / 2;
         pieExtDiameter = (canvasWidth > canvasHeight) ? canvasHeight - blankYDim : canvasWidth - blankXDim;
-        pieExtRadius = pieExtDiameter / 2;
+        //pieExtRadius = pieExtDiameter / 2;
         chartXDim = (canvasWidth - blankXDim);
         chartYDim = (canvasHeight - blankYDim);
         chartXDim2 = chartXDim / 2;
         chartYDim2 = chartYDim / 2;
         dayXDim = canvasWidth / 10;
-        dayYDim = canvasHeight / 8;
+        dayYDim = canvasHeight / (this.rowNumber+2);
       };
 
       p.fillBarChart = () => {
-        for (var i = 0; i < this.daysNumber; i++) {
-          let sectionXCenter = xCenter - chartXDim2 + chartXDim / (2 * this.daysNumber) + i * chartXDim / this.daysNumber;
-          let sectionXFilledDim = (chartXDim / this.daysNumber) / sectionScaleSingle;
+        for (var i = 0; i < this.requestedDaysNumber; i++) {
+          let sectionXCenter = xCenter - chartXDim2 + chartXDim / (2 * this.requestedDaysNumber) + i * chartXDim / this.requestedDaysNumber;
+          let sectionXFilledDim = (chartXDim / this.requestedDaysNumber) / sectionScaleSingle;
           let sectionXFilledDim2 = sectionXFilledDim / 2;
           let barGap = sectionXFilledDim / barGapScale;
 
@@ -347,8 +405,12 @@ export class ServiceAvailabilityComponent implements OnInit {
           p.fill(lineColor);
           p.noStroke();
           p.textSize(dateFontSize);
-          /* Rotate Dates */
-          let tempText = this.serviceAvailabilityList[i].date;
+
+          /* Rotate Dates */          
+          let tempText
+          tempText = this.requestedServiceAvailabilityList[i].date;
+          //console.log("BAR DATE [" + (i+this.weekdayShift) + "] : " + this.expandedServiceAvailabilityList[i + this.weekdayShift].date);
+          
           let tempRadium = (sectionXFilledDim - (2 * barGap) - dateFontSize);
           let angle = 0;
           if (tempRadium > p.textWidth(tempText)) tempRadium = p.textWidth(tempText);
@@ -366,20 +428,21 @@ export class ServiceAvailabilityComponent implements OnInit {
           p.rotate(-angle);
           p.text(tempText, 0, 0);
           p.pop();
-
-          
           p.noFill();
           p.stroke(lineColor);
-          p.line(xCenter - chartXDim2 + (i + 1) * chartXDim / this.daysNumber, yCenter + chartYDim2 + 5, xCenter - chartXDim2 + (i + 1) * chartXDim / this.daysNumber, yCenter + chartYDim2);
+          p.line(xCenter - chartXDim2 + (i + 1) * chartXDim / this.requestedDaysNumber, yCenter + chartYDim2 + 5, xCenter - chartXDim2 + (i + 1) * chartXDim / this.requestedDaysNumber, yCenter + chartYDim2);
+
           /* Bars */
           p.rectMode(p.CORNER);
-          p.fill(255 - serviceAvailabilityListScaled[i], serviceAvailabilityListScaled[i], 0);
-          p.noStroke();
-          p.rect(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2, sectionXFilledDim, -((this.serviceAvailabilityList[i].percentage < 0 ? 0 : this.serviceAvailabilityList[i].percentage) * chartYDim / maxValue));
-/*           p.fill(lineColor)
-          p.textSize(valueFontSize);
-          p.text(this.serviceAvailabilityList[i].percentage + "%", sectionXCenter, yCenter + chartYDim2 - (this.serviceAvailabilityList[i].percentage * chartYDim / maxValue) - valueFontSize / 2);
- */          
+          // Logaritmic color version:
+          //p.fill(255 - serviceAvailabilityListScaled[i - this.undefinedDaysShift], serviceAvailabilityListScaled[i - this.undefinedDaysShift], 0);
+          // Threshold color version:
+          
+          if (this.requestedServiceAvailabilityList[i].percentage != -1) {
+            p.fill(this.getPercentageColorInts(this.requestedServiceAvailabilityList[i].percentage));
+            p.noStroke();
+            p.rect(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2, sectionXFilledDim, -((this.requestedServiceAvailabilityList[i].percentage < 0 ? 0 : this.requestedServiceAvailabilityList[i].percentage) * chartYDim / maxValue));
+          }
         } 
         /* Scheme */
         p.rectMode(p.CENTER);
@@ -402,41 +465,75 @@ export class ServiceAvailabilityComponent implements OnInit {
           p.text(p.int(maxValue / (nLines / (i + 1))) + "%", xCenter - chartXDim2 - 15, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines + 1);
           p.stroke(lineColor);
           p.line(xCenter - chartXDim2 - 5, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines, xCenter - chartXDim2, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines)
-          //p.line(xCenter - chartXDim2 - 5, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines, xCenter + chartXDim2, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines)
+        }
+        /* Draw threshold lines */
+        for (var i = 1; i < this.availabilityColors.length; i++) {
+          p.stroke(this.getPercentageColorInts(this.availabilityColors[i].threshold));
+          p.line(xCenter - chartXDim2, yCenter + chartYDim2 - (this.availabilityColors[i].threshold * chartYDim / 100), xCenter + chartXDim2, yCenter + chartYDim2 - (this.availabilityColors[i].threshold * chartYDim / 100));
         }
       }
 
-      p.fillCalendarChart = () => {
-        /* Calculate week-day shift */
-        let weekdayShift = 3;
-        for (var i = 0; i < 30; i++) {
-          expandedServiceAvailabilityList[weekdayShift+i] = this.serviceAvailabilityList[i];
-        }
-        
+      p.fillCalendarChart = () => {        
         p.rectMode(p.CENTER);
         p.textAlign(p.CENTER, p.CENTER);
+        
         for (var i = 0; i < 7; i++) {
           p.fill(200);
-          p.text(this.dayOfWeek[i], xCenter - 3*dayXDim + i * dayXDim, yCenter - 2.6*dayYDim);
-          for (var k = 0; k < 5; k++) {
-            if (expandedServiceAvailabilityList[i+k*7] == null) {
+          p.noStroke();
+          p.textSize(dateFontSize);
+          p.text(this.dayOfWeek[i], xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2*dayYDim - dayYDim/1.5);
+          for (var k = 0; k < this.rowNumber; k++) {
+            if ((i+k*7) < this.weekdayShift || (i+k*7) >= (this.weekdayShift + this.requestedDaysNumber)) {
               p.stroke(70);
               p.fill(20);
-              p.rect(xCenter - 3*dayXDim + i * dayXDim, yCenter - 2*dayYDim + k * dayYDim, dayXDim, dayYDim);
+              p.rect(xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2*dayYDim + k * dayYDim, dayXDim, dayYDim);
             } else {
-              p.stroke(255);
-              p.fill(255 - serviceAvailabilityListScaled[(i+k*7)-weekdayShift], serviceAvailabilityListScaled[(i+k*7)-weekdayShift], 0);
-              p.rect(xCenter - 3*dayXDim + i * dayXDim, yCenter - 2*dayYDim + k * dayYDim, dayXDim, dayYDim);
-              p.stroke(200);
-              p.fill(0,150);
-              p.rect(xCenter - 3*dayXDim + i * dayXDim, yCenter - 2*dayYDim + k * dayYDim - dayYDim/4.0, dayXDim / 1.2, dayYDim / 3, 5);
-              p.rect(xCenter - 3*dayXDim + i * dayXDim, yCenter - 2*dayYDim + k * dayYDim + dayYDim/4.0, dayXDim / 2.0, dayYDim / 3, 5);
-              p.fill(200);
-              p.noStroke();
-              p.text(expandedServiceAvailabilityList[i+k*7].date, xCenter - 3*dayXDim + i * dayXDim, yCenter - 2 * dayYDim + k * dayYDim + 1 - dayYDim/4.0);
-              p.text(expandedServiceAvailabilityList[i+k*7].percentage, xCenter - 3*dayXDim + i * dayXDim, yCenter - 2 * dayYDim + k * dayYDim + 1 + dayYDim/4.0);
+              if (this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].percentage == -1) {
+                p.stroke(70);
+                p.fill(20);
+                p.rect(xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2*dayYDim + k * dayYDim, dayXDim, dayYDim);
+                //p.stroke(200);
+                p.noStroke();
+                p.fill(labelBackgroundColor);
+                p.rect(xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2*dayYDim + k * dayYDim - dayYDim/4.0, dayXDim / 1.2, dayYDim / 4, 5);
+                p.fill(200);
+                p.noStroke();
+                //console.log("RECHECK DATE["+(i+k*7)+"] : " + this.expandedServiceAvailabilityList[i+k*7].date);
+                p.textSize(dateFontSize);
+                p.text(this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].date, xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2 * dayYDim + k * dayYDim + 1 - dayYDim/4.0);
+                p.fill(100);
+                p.textSize(textFontSize);
+                p.text("Availability:", xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2 * dayYDim + k * dayYDim + 1);
+                p.textSize(valueFontSize);
+                p.text("N/A", xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2 * dayYDim + k * dayYDim + 1 + dayYDim/4.0);
+              }
             }
-            
+          }
+        }
+        for (var i = 0; i < 7; i++) {
+          for (var k = 0; k < this.rowNumber; k++) {
+            if ((i+k*7) >= this.weekdayShift && (i+k*7) < (this.weekdayShift + this.requestedDaysNumber)) {
+              if (this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].percentage != -1 ) {
+                p.stroke(255);
+                // Logaritmic color version:
+                //p.fill(255 - serviceAvailabilityListScaled[(i+k*7)-this.weekdayShift - this.undefinedDaysShift], serviceAvailabilityListScaled[(i+k*7)-this.weekdayShift - this.undefinedDaysShift], 0);
+                // Threshold color version:
+                p.fill(this.getPercentageColorInts(this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].percentage));
+                p.rect(xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2*dayYDim + k * dayYDim, dayXDim, dayYDim);
+                //p.stroke(200);
+                p.noStroke();
+                p.fill(0,100);
+                p.rect(xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2*dayYDim + k * dayYDim - dayYDim/4.0, dayXDim / 1.2, dayYDim / 4, 5);
+                p.fill(200);
+                p.noStroke();
+                p.textSize(dateFontSize);
+                p.text(this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].date, xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2 * dayYDim + k * dayYDim + 1 - dayYDim/4.0);
+                p.textSize(textFontSize);
+                p.text("Availability:", xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2 * dayYDim + k * dayYDim + 1);
+                p.textSize(valueFontSize);
+                p.text(this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].percentage.toFixed(2)+"%", xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2 * dayYDim + k * dayYDim + 1 + dayYDim/4.0);
+              }
+            }
           }
         }
       }
@@ -446,5 +543,41 @@ export class ServiceAvailabilityComponent implements OnInit {
       }
 
     }, this.el.nativeElement);
+  }
+
+  /* Function to convert [r, g, b] colors to html string: "#rrggbb" */
+  rgbConvertToString(col: [number, number, number]) {
+    let color: string = "#" + col[0].toString(16).padStart(2, '0') + col[1].toString(16).padStart(2, '0') + col[2].toString(16).padStart(2, '0');
+    return color;
+  }
+
+  /* Function to convert #rrggbb colors to array: [r, g, b] */
+  rgbConvertToArray(col: string) {
+    if (col.length != 7) {
+      return [100, 200, 250];
+    }
+    if (col.charAt(0) != '#') return [200, 0, 0];
+    var r = parseInt(col.slice(1, 3), 16);
+    var g = parseInt(col.slice(3, 5), 16);
+    var b = parseInt(col.slice(5, 7), 16);
+    let color = [r, g, b];
+    return color;
+  }
+
+  getPercentageColorHex(perc: number) {
+    for (var i = 0; i < this.availabilityColors.length - 1; i++) {
+      if (perc > this.availabilityColors[i].threshold && perc <= this.availabilityColors[i+1].threshold) {
+        return this.availabilityColors[i].color;
+      }
+    }
+    return "#000000";
+  }
+  getPercentageColorInts(perc: number) {
+    for (var i = 0; i < this.availabilityColors.length - 1; i++) {
+      if (perc > this.availabilityColors[i].threshold && perc <= this.availabilityColors[i+1].threshold) {
+        return this.rgbConvertToArray(this.availabilityColors[i].color);
+      }
+    }
+    return [0, 0, 0];
   }
 }
