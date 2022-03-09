@@ -26,21 +26,14 @@ export class ServiceAvailabilityComponent implements OnInit {
   public requestedDaysNumber: number = 0;
   public millisPerDay: number = 86400000;
   public maxDays: number = 29;
-  public totalCalendarDaysNumber: number = 35;
   public millisPerMaxPeriod = this.millisPerDay * this.maxDays;
 
-  public today = new Date(); /* TO BE SIMPLIFIED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
-  public dd = String(this.today.getDate()).padStart(2, '0');
-  public mm = String(this.today.getMonth() + 1).padStart(2, '0');
-  public yyyy = this.today.getFullYear();
-  public todayDate: string = this.yyyy + '-' + this.mm + '-' + this.dd;
+  public today = new Date();
+  public todayDate: string = this.today.toISOString().slice(0, 10);
 
   public initialStartDayMillis = Date.parse(this.todayDate) - this.millisPerMaxPeriod;
   public startDateTemp = new Date(this.initialStartDayMillis);
-  public ddStart = String(this.startDateTemp.getDate()).padStart(2, '0');
-  public mmStart = String(this.startDateTemp.getMonth() + 1).padStart(2, '0');
-  public yyyyStart = this.startDateTemp.getFullYear();
-  public startDate: string = this.yyyyStart + '-' + this.mmStart + '-' + this.ddStart;
+  public startDate: string = this.startDateTemp.toISOString().slice(0, 10);
 
   public stopDate = this.todayDate;
   public startDatePickerConfig: IDatePickerConfig = {
@@ -67,7 +60,6 @@ export class ServiceAvailabilityComponent implements OnInit {
 
   public dayOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   public weekdayShift: number = 0;
-  public unrecordedDaysShift: number = 0;
   public rowNumber = 5;
 
   public availabilityColors;
@@ -104,10 +96,11 @@ export class ServiceAvailabilityComponent implements OnInit {
     if (Date.parse(this.stopDate) > tempMillisDate) {
       this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 30 days");
       let tempDate = new Date(tempMillisDate);
-      let dd = String(tempDate.getDate()).padStart(2, '0');
+      /* let dd = String(tempDate.getDate()).padStart(2, '0');
       let mm = String(tempDate.getMonth() + 1).padStart(2, '0');
       let yyyy = tempDate.getFullYear();
-      this.stopDate = yyyy + '-' + mm + '-' + dd;
+      this.stopDate = yyyy + '-' + mm + '-' + dd; */
+      this.stopDate = tempDate.toISOString().slice(0, 10);
     }
     if (Date.parse(date) > Date.parse(this.stopDate)) {
       this.alert.showErrorAlert("Check Date Range", "Start date cannot be later than stop date");
@@ -120,10 +113,11 @@ export class ServiceAvailabilityComponent implements OnInit {
     if (Date.parse(this.startDate) < tempMillisDate) {
       this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 30 days");
       let tempDate = new Date(tempMillisDate);
-      let dd = String(tempDate.getDate()).padStart(2, '0');
+      /* let dd = String(tempDate.getDate()).padStart(2, '0');
       let mm = String(tempDate.getMonth() + 1).padStart(2, '0');
       let yyyy = tempDate.getFullYear();
-      this.startDate = yyyy + '-' + mm + '-' + dd;
+      this.startDate = yyyy + '-' + mm + '-' + dd; */
+      this.startDate = tempDate.toISOString().slice(0, 10);
     }
     if (Date.parse(date) < Date.parse(this.startDate)) {
       this.alert.showErrorAlert("Check Date Range", "Stop date cannot be earlier than start date");
@@ -157,13 +151,11 @@ export class ServiceAvailabilityComponent implements OnInit {
               percentage: -1
             }
           }
-          
           this.serviceAvailabilityList = res.values;
 
-          /* Calculate week-day shift and unrecorder days shift*/
+          /* Calculate week-day shift */
           this.weekdayShift = (tempStartDate.getDay() == 0 ? 6 : tempStartDate.getDay() - 1);
           this.rowNumber = (this.weekdayShift == 6 ? 6 : 5);
-          this.unrecordedDaysShift = this.requestedDaysNumber - this.availabilityDaysNumber;
 
           for (var i = 0; i < this.requestedDaysNumber; i++) {
             for (var k = 0; k < this.availabilityDaysNumber; k++) {
@@ -210,7 +202,6 @@ export class ServiceAvailabilityComponent implements OnInit {
         }
         r < (table.childElementCount - 1) ? csvContent += '\n' : null;
       }
-      //let tempCompleteCsvMissionName = this.missionFiltered.acronym + this.platformNumber;
       this.csvService.exportToCsv(
         'DAFNE-Service-Availability_Centre('
         + this.localCentre.name
@@ -366,7 +357,7 @@ export class ServiceAvailabilityComponent implements OnInit {
           /* Bars */
           p.rectMode(p.CORNER);          
           if (this.requestedServiceAvailabilityList[i].percentage != -1) {
-            p.fill(this.getPercentageColorInts(this.requestedServiceAvailabilityList[i].percentage));
+            p.fill(this.getAvailabilityIntsColorFromPerc(this.requestedServiceAvailabilityList[i].percentage));
             p.noStroke();
             p.rect(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2, sectionXFilledDim, -((this.requestedServiceAvailabilityList[i].percentage < 0 ? 0 : this.requestedServiceAvailabilityList[i].percentage) * chartYDim / maxValue));
           }
@@ -395,7 +386,7 @@ export class ServiceAvailabilityComponent implements OnInit {
         }
         /* Draw threshold lines */
         for (var i = 1; i < this.availabilityColors.length; i++) {
-          p.stroke(this.getPercentageColorInts(this.availabilityColors[i].threshold));
+          p.stroke(this.getAvailabilityIntsColorFromPerc(this.availabilityColors[i].threshold));
           p.line(xCenter - chartXDim2, yCenter + chartYDim2 - (this.availabilityColors[i].threshold * chartYDim / 100), xCenter + chartXDim2, yCenter + chartYDim2 - (this.availabilityColors[i].threshold * chartYDim / 100));
         }
       }
@@ -440,7 +431,7 @@ export class ServiceAvailabilityComponent implements OnInit {
             if ((i+k*7) >= this.weekdayShift && (i+k*7) < (this.weekdayShift + this.requestedDaysNumber)) {
               if (this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].percentage != -1 ) {
                 p.stroke(255);
-                p.fill(this.getPercentageColorInts(this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].percentage));
+                p.fill(this.getAvailabilityIntsColorFromPerc(this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].percentage));
                 p.rect(xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2*dayYDim + k * dayYDim, dayXDim, dayYDim);
                 p.noStroke();
                 p.fill(0,100);
@@ -485,7 +476,7 @@ export class ServiceAvailabilityComponent implements OnInit {
     return color;
   }
 
-  getPercentageColorHex(perc: number) {
+  getAvailabilityHexColorFromPerc(perc: number) {
     for (var i = 0; i < this.availabilityColors.length - 1; i++) {
       if (perc > this.availabilityColors[i].threshold && perc <= this.availabilityColors[i+1].threshold) {
         return this.availabilityColors[i].color;
@@ -493,7 +484,7 @@ export class ServiceAvailabilityComponent implements OnInit {
     }
     return "#000000";
   }
-  getPercentageColorInts(perc: number) {
+  getAvailabilityIntsColorFromPerc(perc: number) {
     for (var i = 0; i < this.availabilityColors.length - 1; i++) {
       if (perc > this.availabilityColors[i].threshold && perc <= this.availabilityColors[i+1].threshold) {
         return this.rgbConvertToArray(this.availabilityColors[i].color);

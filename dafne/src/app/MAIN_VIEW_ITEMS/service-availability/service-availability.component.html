@@ -73,7 +73,7 @@
                 <td style="color: var(--main-text-color)">Availability</td>
                 <ng-template ngFor let-availability [ngForOf]="requestedServiceAvailabilityList" let-i="index">
                     <td *ngIf="availability.percentage == -1" style="color: var(--windows-title-color)">N/A</td>
-                    <td *ngIf="availability.percentage != -1" [ngStyle]="{'color': getPercentageColorHex(availability.percentage)}">{{availability.percentage.toFixed(2)}}%</td>
+                    <td *ngIf="availability.percentage != -1" [ngStyle]="{'color': getAvailabilityHexColorFromPerc(availability.percentage)}">{{availability.percentage.toFixed(2)}}%</td>
                 </ng-template>
             </tr>
         </table>
