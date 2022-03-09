@@ -4,6 +4,7 @@ import { AlertComponent } from '../../alert/alert.component';
 import { IDatePickerConfig } from 'ng2-date-picker';
 import { Availability } from '../../models/availability';
 import { AppConfig } from '../../services/app.config';
+import { CsvDataService } from '../../services/csv-data.service';
 import * as p5 from 'p5';
 
 @Component({
@@ -61,49 +62,8 @@ export class ServiceAvailabilityComponent implements OnInit {
   public chartType: string = this.selectorText[0];
   public doResetZoom: boolean = false;
 
-  public fakeServiceAvailabilityJson = {
-    centreId: 0,
-    values: [
-      {date: "2022-01-20", successResponses: 132, totalRequests: 144, percentage: 100},
-      {date: "2022-01-21", successResponses: 132, totalRequests: 144, percentage: 100},
-      {date: "2022-01-22", successResponses: 132, totalRequests: 144, percentage: 65},
-      {date: "2022-01-23", successResponses: 132, totalRequests: 144, percentage: 74},
-      {date: "2022-01-24", successResponses: 132, totalRequests: 144, percentage: 98},
-      {date: "2022-01-25", successResponses: 132, totalRequests: 144, percentage: 96},
-      {date: "2022-01-26", successResponses: 132, totalRequests: 144, percentage: 98},
-      {date: "2022-01-27", successResponses: 132, totalRequests: 144, percentage: 100},
-      {date: "2022-01-28", successResponses: 132, totalRequests: 144, percentage: 98},
-      {date: "2022-01-29", successResponses: 132, totalRequests: 144, percentage: 80},
-      {date: "2022-01-30", successResponses: 132, totalRequests: 144, percentage: 77},
-      {date: "2022-01-31", successResponses: 132, totalRequests: 144, percentage: 100},
-      {date: "2022-02-01", successResponses: 132, totalRequests: 144, percentage: 97},
-      {date: "2022-02-02", successResponses: 132, totalRequests: 144, percentage: 92},
-      {date: "2022-02-03", successResponses: 132, totalRequests: 144, percentage: 100},
-      {date: "2022-02-04", successResponses: 132, totalRequests: 144, percentage: 100},
-      {date: "2022-02-05", successResponses: 132, totalRequests: 144, percentage: 88},
-      {date: "2022-02-06", successResponses: 132, totalRequests: 144, percentage: 57},
-      {date: "2022-02-07", successResponses: 132, totalRequests: 144, percentage: 100},
-      {date: "2022-02-08", successResponses: 132, totalRequests: 144, percentage: 97},
-      {date: "2022-02-09", successResponses: 132, totalRequests: 144, percentage: 94},
-      {date: "2022-02-10", successResponses: 132, totalRequests: 144, percentage: 100},
-      {date: "2022-02-11", successResponses: 132, totalRequests: 144, percentage: 100},
-      {date: "2022-02-12", successResponses: 132, totalRequests: 144, percentage: 92},
-      {date: "2022-02-13", successResponses: 132, totalRequests: 144, percentage: 88},
-      {date: "2022-02-14", successResponses: 132, totalRequests: 144, percentage: 100},
-      {date: "2022-02-15", successResponses: 132, totalRequests: 144, percentage: 99},
-      {date: "2022-02-16", successResponses: 132, totalRequests: 144, percentage: 94},
-      {date: "2022-02-17", successResponses: 132, totalRequests: 144, percentage: 100},
-      {date: "2022-02-18", successResponses: 132, totalRequests: 144, percentage: 100}
-    ]
-  };
   public serviceAvailabilityList: Array<Availability> = [];
   public requestedServiceAvailabilityList: Array<Availability> = [];
-  /* public expandedServiceAvailabilityList: Array<Availability> = new Array(this.totalCalendarDaysNumber).fill({
-    date: "",
-    successResponses: -1,
-    totalRequests: -1,
-    percentage: -1
-  }); */
 
   public dayOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   public weekdayShift: number = 0;
@@ -114,6 +74,7 @@ export class ServiceAvailabilityComponent implements OnInit {
 
   constructor(
     public authenticationService: AuthenticationService,
+    private csvService: CsvDataService,
     private el: ElementRef,
     private alert: AlertComponent,
   ) {
@@ -186,15 +147,8 @@ export class ServiceAvailabilityComponent implements OnInit {
     this.authenticationService.getServiceAvailability(this.localCentre.id, body).subscribe(
       (res) => {
         if (res.centreId == this.localCentre.id) {
-          //console.log("Res: " + JSON.stringify(res, null, 2));
           this.availabilityDaysNumber = res.values.length;
           this.requestedDaysNumber = tempTimeDifference / (1000 * 3600 * 24) + 1;
-         /*  this.expandedServiceAvailabilityList.fill({
-            date: "",
-            successResponses: -1,
-            totalRequests: -1,
-            percentage: -1
-          }); */
           for (var i = 0; i < this.requestedDaysNumber; i++) {
             this.requestedServiceAvailabilityList[i] = {
               date: new Date(Date.parse(this.startDate) + (i * this.millisPerDay)).toISOString().slice(0,10),
@@ -204,16 +158,12 @@ export class ServiceAvailabilityComponent implements OnInit {
             }
           }
           
-          //this.serviceAvailabilityList = this.fakeServiceAvailabilityJson.values;
           this.serviceAvailabilityList = res.values;
 
           /* Calculate week-day shift and unrecorder days shift*/
           this.weekdayShift = (tempStartDate.getDay() == 0 ? 6 : tempStartDate.getDay() - 1);
           this.rowNumber = (this.weekdayShift == 6 ? 6 : 5);
           this.unrecordedDaysShift = this.requestedDaysNumber - this.availabilityDaysNumber;
-          //console.log("Weekday shift: " + this.weekdayShift);
-          //console.log("Undefined shift: " + this.unrecordedDaysShift);
-          //console.log("Requested days: " + this.requestedDaysNumber);
 
           for (var i = 0; i < this.requestedDaysNumber; i++) {
             for (var k = 0; k < this.availabilityDaysNumber; k++) {
@@ -221,8 +171,6 @@ export class ServiceAvailabilityComponent implements OnInit {
                 this.requestedServiceAvailabilityList[i] = this.serviceAvailabilityList[k];
               }
             }
-            //console.log("ReqServAvList[" + i + "].date : " + this.requestedServiceAvailabilityList[i].date);
-            //console.log("ReqServAvList[" + i + "].percentage : " + this.requestedServiceAvailabilityList[i].percentage);
           }
           this.p5Chart.windowResized();
         }
@@ -252,7 +200,7 @@ export class ServiceAvailabilityComponent implements OnInit {
   }
 
   saveAsCSV() {
-    /* if (this.completenessDataList.length > 0) {
+    if (this.requestedServiceAvailabilityList.length > 0) {
       var csvContent: string = '';
       var table = document.getElementById('data-table');
       for (var r = 0; r < table.childElementCount; r++) {
@@ -262,19 +210,17 @@ export class ServiceAvailabilityComponent implements OnInit {
         }
         r < (table.childElementCount - 1) ? csvContent += '\n' : null;
       }
-      let tempCompleteCsvMissionName = this.missionFiltered.acronym + this.platformNumber;
+      //let tempCompleteCsvMissionName = this.missionFiltered.acronym + this.platformNumber;
       this.csvService.exportToCsv(
-        'DAFNE-Mission('
-        + tempCompleteCsvMissionName
-        + ')_Product('
-        + this.productType 
+        'DAFNE-Service-Availability_Centre('
+        + this.localCentre.name
         + ')_From('
         + table.children[0].children[1].innerHTML
         + ')_To('
         + table.children[0].children[table.children[0].childElementCount - 1].innerHTML
         + ').csv', csvContent
       );
-    } */
+    }
   }
 
   init_P5() {
@@ -288,8 +234,6 @@ export class ServiceAvailabilityComponent implements OnInit {
       let blankYDim = 160;
       let xCenter = canvasWidth / 2;
       let yCenter = canvasHeight / 2;
-      let pieExtDiameter = (canvasWidth > canvasHeight) ? canvasHeight - blankYDim : canvasWidth - blankXDim;
-      //let pieExtRadius = pieExtDiameter / 2;
       let chartXDim = canvasWidth - blankXDim;
       let chartYDim = canvasHeight - blankYDim;
       let chartXDim2 = chartXDim / 2;
@@ -302,7 +246,6 @@ export class ServiceAvailabilityComponent implements OnInit {
       let backgroundColor = p.color('#12222f');
       let labelBackgroundColor = p.color('#12222fcc')
       let lineColor = p.color('#aaaaaa');
-      //let valuesColor = p.color(200);
 
       let valueFontSize = 16;
       let dateFontSize = 12;
@@ -315,10 +258,6 @@ export class ServiceAvailabilityComponent implements OnInit {
       let sf = 1.0;
       let tx = 0;
       let ty = 0;
-
-      /* Var needed for logaritmic colouring: */
-      //let expNum = 1.056975;
-      //let serviceAvailabilityListScaled: Array<number> = []; 
 
       p.setup = () => {
         canvasSpace = p.createCanvas(canvasWidth, canvasHeight).parent('p5ServiceAvailabilityCanvas');
@@ -334,10 +273,6 @@ export class ServiceAvailabilityComponent implements OnInit {
         p.background(backgroundColor);
         p.windowResized();
         p.translate(tx, ty);
-
-        /* for (var i = 0; i < this.daysNumber; i++) {  
-          serviceAvailabilityListScaled[i] = expNum ** this.serviceAvailabilityList[i].percentage;
-        } */
 
         if (this.chartType == this.selectorText[0]) {
           p.fillBarChart();
@@ -383,8 +318,6 @@ export class ServiceAvailabilityComponent implements OnInit {
         canvasHeight = canvas.clientHeight * sf;
         xCenter = canvasWidth / 2;
         yCenter = canvasHeight / 2;
-        pieExtDiameter = (canvasWidth > canvasHeight) ? canvasHeight - blankYDim : canvasWidth - blankXDim;
-        //pieExtRadius = pieExtDiameter / 2;
         chartXDim = (canvasWidth - blankXDim);
         chartYDim = (canvasHeight - blankYDim);
         chartXDim2 = chartXDim / 2;
@@ -408,9 +341,7 @@ export class ServiceAvailabilityComponent implements OnInit {
 
           /* Rotate Dates */          
           let tempText
-          tempText = this.requestedServiceAvailabilityList[i].date;
-          //console.log("BAR DATE [" + (i+this.weekdayShift) + "] : " + this.expandedServiceAvailabilityList[i + this.weekdayShift].date);
-          
+          tempText = this.requestedServiceAvailabilityList[i].date;          
           let tempRadium = (sectionXFilledDim - (2 * barGap) - dateFontSize);
           let angle = 0;
           if (tempRadium > p.textWidth(tempText)) tempRadium = p.textWidth(tempText);
@@ -433,11 +364,7 @@ export class ServiceAvailabilityComponent implements OnInit {
           p.line(xCenter - chartXDim2 + (i + 1) * chartXDim / this.requestedDaysNumber, yCenter + chartYDim2 + 5, xCenter - chartXDim2 + (i + 1) * chartXDim / this.requestedDaysNumber, yCenter + chartYDim2);
 
           /* Bars */
-          p.rectMode(p.CORNER);
-          // Logaritmic color version:
-          //p.fill(255 - serviceAvailabilityListScaled[i - this.undefinedDaysShift], serviceAvailabilityListScaled[i - this.undefinedDaysShift], 0);
-          // Threshold color version:
-          
+          p.rectMode(p.CORNER);          
           if (this.requestedServiceAvailabilityList[i].percentage != -1) {
             p.fill(this.getPercentageColorInts(this.requestedServiceAvailabilityList[i].percentage));
             p.noStroke();
@@ -492,13 +419,11 @@ export class ServiceAvailabilityComponent implements OnInit {
                 p.stroke(70);
                 p.fill(20);
                 p.rect(xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2*dayYDim + k * dayYDim, dayXDim, dayYDim);
-                //p.stroke(200);
                 p.noStroke();
                 p.fill(labelBackgroundColor);
                 p.rect(xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2*dayYDim + k * dayYDim - dayYDim/4.0, dayXDim / 1.2, dayYDim / 4, 5);
                 p.fill(200);
                 p.noStroke();
-                //console.log("RECHECK DATE["+(i+k*7)+"] : " + this.expandedServiceAvailabilityList[i+k*7].date);
                 p.textSize(dateFontSize);
                 p.text(this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].date, xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2 * dayYDim + k * dayYDim + 1 - dayYDim/4.0);
                 p.fill(100);
@@ -515,12 +440,8 @@ export class ServiceAvailabilityComponent implements OnInit {
             if ((i+k*7) >= this.weekdayShift && (i+k*7) < (this.weekdayShift + this.requestedDaysNumber)) {
               if (this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].percentage != -1 ) {
                 p.stroke(255);
-                // Logaritmic color version:
-                //p.fill(255 - serviceAvailabilityListScaled[(i+k*7)-this.weekdayShift - this.undefinedDaysShift], serviceAvailabilityListScaled[(i+k*7)-this.weekdayShift - this.undefinedDaysShift], 0);
-                // Threshold color version:
                 p.fill(this.getPercentageColorInts(this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].percentage));
                 p.rect(xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2*dayYDim + k * dayYDim, dayXDim, dayYDim);
-                //p.stroke(200);
                 p.noStroke();
                 p.fill(0,100);
                 p.rect(xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2*dayYDim + k * dayYDim - dayYDim/4.0, dayXDim / 1.2, dayYDim / 4, 5);
