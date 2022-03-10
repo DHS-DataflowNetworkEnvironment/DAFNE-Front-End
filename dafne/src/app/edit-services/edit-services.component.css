@@ -72,7 +72,6 @@ table, th, td {
 .modal-content {
     background-color: var(--title-bg-color);
     color: var(--main-text-color);
-    /* width: 400px; */
 }
 .modal-header {
     border-bottom: 1px solid var(--table-border-color);

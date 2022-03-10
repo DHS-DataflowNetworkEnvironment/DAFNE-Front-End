@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { EditSyncComponent } from './edit-sync.component';
 
 describe('EditSyncComponent', () => {

@@ -19,7 +19,6 @@ export class DataSourceInfoComponent implements OnInit {
   }
 
   getDataSourcesInfo() {
-    //console.log("Calling getDataSourcesInfo()")
     this.authenticationService.getAllCentres().subscribe(
       (res: object) => {
         if (Object.values(res).filter((x) => x.local == true)[0]) {
@@ -27,7 +26,6 @@ export class DataSourceInfoComponent implements OnInit {
         } else {
           this.localId = -1;
         }
-        //console.log("LOCAL_ID: " + this.localId);
         this.authenticationService.getDataSourcesInfo(this.localId).subscribe(
           (res: object) => {
             this.dataSourcesList = res;

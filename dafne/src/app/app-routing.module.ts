@@ -11,11 +11,11 @@ import { EditSyncComponent } from './edit-sync/edit-sync.component';
 import { ServiceAvailabilityComponent } from './MAIN_VIEW_ITEMS/service-availability/service-availability.component';
 
 const routes: Routes = [
-  // Main routes
+  /* Main routes */
   { path: 'dafne-login', component: LoginComponent, runGuardsAndResolvers: 'always'},
   { path: 'gui', component: MainViewComponent, canActivate: [AuthGuard] , runGuardsAndResolvers: 'always'
     , children: [
-      // Auxiliary routes
+      /* Auxiliary routes */
       { path: 'network-component/:mapType', outlet: 'centralBodyRouter', component: NetworkViewComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always'},
       { path: 'p5chart-component', outlet: 'centralBodyRouter', component: P5chartComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always'},
       { path: 'service-availability', outlet: 'centralBodyRouter', component: ServiceAvailabilityComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always'},
@@ -25,7 +25,6 @@ const routes: Routes = [
   { path: 'edit-centres', component: EditCentresComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always' },
   { path: 'edit-services', component: EditServicesComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always' },
   { path: 'edit-synchronizers', component: EditSyncComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always' },
-  //{ path: 'network-component/:mapType', outlet: 'centralBodyRouter', component: NetworkViewComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always'},
   { path: '', redirectTo: 'gui', pathMatch: 'full'},
   { path: '**', redirectTo: 'gui'}
 ];

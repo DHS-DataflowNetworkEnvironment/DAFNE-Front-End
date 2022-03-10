@@ -96,10 +96,6 @@ export class ServiceAvailabilityComponent implements OnInit {
     if (Date.parse(this.stopDate) > tempMillisDate) {
       this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 30 days");
       let tempDate = new Date(tempMillisDate);
-      /* let dd = String(tempDate.getDate()).padStart(2, '0');
-      let mm = String(tempDate.getMonth() + 1).padStart(2, '0');
-      let yyyy = tempDate.getFullYear();
-      this.stopDate = yyyy + '-' + mm + '-' + dd; */
       this.stopDate = tempDate.toISOString().slice(0, 10);
     }
     if (Date.parse(date) > Date.parse(this.stopDate)) {
@@ -113,10 +109,6 @@ export class ServiceAvailabilityComponent implements OnInit {
     if (Date.parse(this.startDate) < tempMillisDate) {
       this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 30 days");
       let tempDate = new Date(tempMillisDate);
-      /* let dd = String(tempDate.getDate()).padStart(2, '0');
-      let mm = String(tempDate.getMonth() + 1).padStart(2, '0');
-      let yyyy = tempDate.getFullYear();
-      this.startDate = yyyy + '-' + mm + '-' + dd; */
       this.startDate = tempDate.toISOString().slice(0, 10);
     }
     if (Date.parse(date) < Date.parse(this.startDate)) {
@@ -176,13 +168,11 @@ export class ServiceAvailabilityComponent implements OnInit {
       document.getElementById("main-column-container").style.height = "calc(100vh - 9rem - 12rem)";
       document.getElementById("p5ServiceAvailabilityCanvas-column-div").style.height = "calc(100vh - 25.5rem)";
       document.getElementById("data-table-container").style.display = "block";
-      //this.p5Chart.windowResized();
     } else {
       /* Hide */
       document.getElementById("main-column-container").style.height = "calc(100vh - 9rem)";
       document.getElementById("p5ServiceAvailabilityCanvas-column-div").style.height = "calc(100vh - 13.5rem)";
       document.getElementById("data-table-container").style.display = "none";
-      //this.p5Chart.windowResized();
     }
   }
 
@@ -419,7 +409,6 @@ export class ServiceAvailabilityComponent implements OnInit {
                 p.text(this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].date, xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2 * dayYDim + k * dayYDim + 1 - dayYDim/4.0);
                 p.fill(100);
                 p.textSize(textFontSize);
-                //p.text("Availability:", xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2 * dayYDim + k * dayYDim + 1);
                 p.textSize(valueFontSize);
                 p.text("N/A", xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2 * dayYDim + k * dayYDim + 1 + dayYDim/5.5);
               }
@@ -441,7 +430,6 @@ export class ServiceAvailabilityComponent implements OnInit {
                 p.textSize(dateFontSize);
                 p.text(this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].date, xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2 * dayYDim + k * dayYDim + 1 - dayYDim/4.0);
                 p.textSize(textFontSize);
-                //p.text("Availability:", xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2 * dayYDim + k * dayYDim + 1);
                 p.textSize(valueFontSize);
                 p.text(this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].percentage.toFixed(2)+"%", xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2 * dayYDim + k * dayYDim + 1 + dayYDim/5.5);
               }

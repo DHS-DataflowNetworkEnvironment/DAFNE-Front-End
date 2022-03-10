@@ -59,10 +59,10 @@ export class EditSyncComponent implements OnInit, OnDestroy {
   };
   public tempSyncIdToDelete = -1;
   public tempSyncUrlToDelete = '';
-  public serviceUrlBackendList = []; //: Array<string>;
+  public serviceUrlBackendList = [];
   public collectionsList = [[]];
   public syncBackendLength: number;
-  public syncBackendLengthArray = [] //: Array<number>;
+  public syncBackendLengthArray = [];
   public tempServiceUrlBackendNumber: number;
 
   public localCentre = {
@@ -104,7 +104,7 @@ export class EditSyncComponent implements OnInit, OnDestroy {
         this.getLocalCentre();
         this.getSynchronizers();
         this.subscription = dataRefresh.subscribe(n => {
-          // get data after Init every x milliseconds:
+          // get data after Init every dataRefreshTime milliseconds:
           this.messageService.showSpinner(false);
           this.getLocalCentre();
           this.getSynchronizers();
@@ -158,7 +158,6 @@ export class EditSyncComponent implements OnInit, OnDestroy {
   getSynchronizers() {
     this.authenticationService.getSynchronizers().subscribe(
       (res: object) => {
-        //console.log("GET SYNC - Res: " + JSON.stringify(res, null, 2));
         this.syncBackendLength = Object.keys(res).length;
         this.syncBackendLengthArray = Array.from(Array(this.syncBackendLength).keys());
         
@@ -167,14 +166,10 @@ export class EditSyncComponent implements OnInit, OnDestroy {
           this.serviceUrlBackendList[i] = res[i].serviceUrl;  // Backend serviceUrl..
           for (var k = 0; k < this.syncList[i].length; k++) {
             this.syncList[i][k].ServiceUrlBackend = res[i].serviceUrl;
-            //console.log("SYNC_LIST[" + i + "]["+ k +"] - SERVICE URL BE: " + this.syncList[i][k].ServiceUrlBackend); 
           }
           this.collectionsList.push([]);
-          if (res[i].collection == undefined) {
-            //this.collectionsList[i].push();
-          } else {
+          if (res[i].collection != undefined) {
             res[i].collections.forEach((item, index) => {
-              //console.log("Pushing Collection item: " + item + " at pos: " + index);
               this.collectionsList[i].push(item.Name);
             });
           }
@@ -191,7 +186,6 @@ export class EditSyncComponent implements OnInit, OnDestroy {
       if (this.serviceUrlBackendList[i] == service_url_backend) {
         this.tempServiceUrlBackendNumber = i;
         tempSync = this.syncList[i].filter(a => a.Id === id)[0];
-        //console.log("TempSync: " + JSON.stringify(tempSync, null, 2));
       }
     }
     
@@ -200,7 +194,7 @@ export class EditSyncComponent implements OnInit, OnDestroy {
     this.currentSync.serviceUrlBackend = service_url_backend; // serviceUrlBackend..
     this.currentSync.serviceUrl = tempSync.ServiceUrl; // serviceUrlSync..
     this.currentSync.serviceLogin = tempSync.ServiceLogin;
-    this.currentSync.servicePassword = ''; //tempSync.ServicePassword;
+    this.currentSync.servicePassword = '';
     this.currentSync.copyProduct = tempSync.CopyProduct;
     this.currentSync.schedule = tempSync.Schedule;
     this.currentSync.pageSize = tempSync.PageSize;
@@ -249,11 +243,9 @@ export class EditSyncComponent implements OnInit, OnDestroy {
   }
 
   public deleteSynchronizer(id: number, service_url_backend: string) {
-    //this.tempSyncIdToDelete = id;
     for (var i = 0; i < this.serviceUrlBackendList.length; i++) {
       if (this.serviceUrlBackendList[i] == service_url_backend) {
         this.tempDeleteSync = this.syncList[i].filter(a => a.Id === id)[0];
-        //console.log("DELETE CURRENT SYNC: " + JSON.stringify(this.tempDeleteSync, null, 2));
       }
     }
     this.tempSyncUrlToDelete = service_url_backend;
@@ -266,9 +258,7 @@ export class EditSyncComponent implements OnInit, OnDestroy {
     };
     this.authenticationService.deleteSynchronizer(this.tempDeleteSync.Id, body).subscribe(
       (res: string) => {
-        //this.tempSyncIdToDelete = -1;
         this.tempSyncUrlToDelete = '';
-        /* Refresh page: */
         this.refreshPage();
       }
     )
@@ -276,7 +266,6 @@ export class EditSyncComponent implements OnInit, OnDestroy {
 
 
   public deleteSynchronizerCanceled() {
-    //this.tempSyncIdToDelete = -1;
     this.tempSyncUrlToDelete = '';
   }
 
@@ -333,7 +322,6 @@ export class EditSyncComponent implements OnInit, OnDestroy {
 
 
   setNewFormServiceUrlBackend(idx: number) {
-    //console.log("Selected ServiceUrlBackendId: " + idx);
     this.currentSync.serviceUrlBackend = this.serviceUrlBackendList[idx];
   }
 
@@ -350,7 +338,6 @@ export class EditSyncComponent implements OnInit, OnDestroy {
       
     });
     if (valid) {
-      /* console.log("ADD SYNC SUBMITTED"); */
       let serviceUrl = (<HTMLInputElement>document.getElementById("add_service_url_backend")).value;
       let synch = {
         "Label":  (<HTMLInputElement>document.getElementById("add_label")).value,
@@ -405,7 +392,6 @@ export class EditSyncComponent implements OnInit, OnDestroy {
       "Label":  tempStartSync.Label,
       "ServiceUrl": tempStartSync.ServiceUrl,
       "ServiceLogin": tempStartSync.ServiceLogin,
-      /* "ServicePassword": tempStartSync.ServicePassword, */
       "RemoteIncoming": tempStartSync.RemoteIncoming,
       "Schedule": tempStartSync.Schedule,
       "PageSize": tempStartSync.PageSize,
@@ -429,7 +415,7 @@ export class EditSyncComponent implements OnInit, OnDestroy {
   }
 
   setTargetCollection(id: number) {
-    this.currentSync.targetCollection = this.collectionsList[id]; // To Be Corrected..
+    this.currentSync.targetCollection = this.collectionsList[id];
   }
 
   public toggleAddPasswordVisibility() {

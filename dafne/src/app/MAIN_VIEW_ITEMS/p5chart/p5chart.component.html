@@ -19,7 +19,6 @@
                 <div>
                     <label class="form-label">Platform N.:</label>
                     <select id="platform-number-select" class="form-select" (change)="onPlatformNumberChange($event)">
-                        <!-- <option [value]="platformNumber" *ngFor="let platformNumber of platformNumberList">{{platformNumber}}</option> -->
                         <option [value]="platformNumber" *ngFor="let platformNumber of missionFiltered.platform">{{platformNumber}}</option>
                     </select>
                 </div>
