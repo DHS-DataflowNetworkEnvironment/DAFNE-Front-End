@@ -18,12 +18,9 @@
 /* Filters view */
 #filters-form-container {
     background-color: var(--windows-bg-color);
-    /* flex-shrink: 1; */
     height: 3rem;
     line-height: 2rem;
-    /* margin: 0.5rem 1rem; */
     margin: 0.5rem auto;
-    /* padding: 0 1rem; */
 
     -webkit-box-shadow: 0px 0px 20px 0px rgba(0,0,0,0.5);
     -moz-box-shadow: 0px 0px 20px 0px rgba(0,0,0,0.5);
@@ -36,7 +33,6 @@
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    /* justify-content: space-between; */
     justify-content: center;
 }
 #filters-form #mission-select, #product-type-select, #platform-number-select {
@@ -58,9 +54,6 @@
     font-size: 0.75rem;
 }
 #filter-submit-button {
-    /* font-size: 0.75rem; */
-    /* height: 2rem; */
-
     font-size: 1.0rem;
     height: 2rem;
     text-align: center;
