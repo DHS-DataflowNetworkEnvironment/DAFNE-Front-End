@@ -18,11 +18,11 @@
 /* Filters view */
 #filters-form-container {
     background-color: var(--windows-bg-color);
-    flex-shrink: 1;
+    /* flex-shrink: 1; */
     height: 3rem;
     line-height: 2rem;
-    margin: 0.5rem 1rem;
-    padding: 0 1rem;
+    margin: 0.5rem auto;
+    /* width: 30rem; */
 
     -webkit-box-shadow: 0px 0px 20px 0px rgba(0,0,0,0.5);
     -moz-box-shadow: 0px 0px 20px 0px rgba(0,0,0,0.5);
@@ -45,18 +45,16 @@
     font-size: 0.75rem;
     text-align: right;
     margin-right: 0.5rem;
-    margin-left: 2rem;
-}
-#filters-form select {
-    background-color: var(--modal-bg-color);
-    border-color: var(--title-bg-color);
-    color: var(--main-text-color);
-    font-size: 0.75rem;
+    margin-left: 1rem;
 }
 #filter-submit-button {
-    font-size: 0.75rem;
+    font-size: 1.0rem;
     height: 2rem;
-    margin-left: 6rem;
+    text-align: center;
+    line-height: 1rem;
+    margin-left: 4rem;
+    padding-left: 2rem;
+    padding-right: 4rem;
 }
 ::ng-deep dp-date-picker.dp-material .dp-picker-input {
     background-color: var(--modal-bg-color) !important;
@@ -123,37 +121,6 @@
     flex-direction: row;
     background-color: var(--main-bg-color);
     color: var(--main-text-color);
-}
-
-/* Centres List */
-#target-id-list-container {
-    flex-shrink: 0;
-    margin-top: 1rem;
-    overflow-y: auto;
-}
-#target-id-local {
-    list-style-type:none;
-    margin: 0;
-    padding: 0 1rem;
-    font-size: 0.75rem;
-}
-#target-id-list {
-    list-style-type:none;
-    margin: 0;
-    padding: 0 1rem;
-    font-size: 0.75rem;
-}
-#target-id-local-title {
-    border-bottom: 1px solid #fff;
-}
-#target-id-remote-title {
-    border-bottom: 1px solid #fff;    
-}
-
-/* Central container */
-#central-container {
-    flex-grow: 1;
-    flex-shrink: 1;
 }
 
 /* Charts */

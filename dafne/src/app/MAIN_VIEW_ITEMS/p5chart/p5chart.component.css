@@ -18,11 +18,12 @@
 /* Filters view */
 #filters-form-container {
     background-color: var(--windows-bg-color);
-    flex-shrink: 1;
+    /* flex-shrink: 1; */
     height: 3rem;
     line-height: 2rem;
-    margin: 0.5rem 1rem;
-    padding: 0 1rem;
+    /* margin: 0.5rem 1rem; */
+    margin: 0.5rem auto;
+    /* padding: 0 1rem; */
 
     -webkit-box-shadow: 0px 0px 20px 0px rgba(0,0,0,0.5);
     -moz-box-shadow: 0px 0px 20px 0px rgba(0,0,0,0.5);
@@ -35,7 +36,8 @@
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    justify-content: space-between;
+    /* justify-content: space-between; */
+    justify-content: center;
 }
 #filters-form #mission-select, #product-type-select, #platform-number-select {
     font-size: 0.75rem;
@@ -46,6 +48,8 @@
     font-size: 0.75rem;
     text-align: right;
     margin-right: 0.5rem;
+
+    margin-left: 1rem;
 }
 #filters-form select {
     background-color: var(--modal-bg-color);
@@ -54,8 +58,16 @@
     font-size: 0.75rem;
 }
 #filter-submit-button {
-    font-size: 0.75rem;
+    /* font-size: 0.75rem; */
+    /* height: 2rem; */
+
+    font-size: 1.0rem;
     height: 2rem;
+    text-align: center;
+    line-height: 1rem;
+    margin-left: 4rem;
+    padding-left: 2rem;
+    padding-right: 4rem;
 }
 ::ng-deep dp-date-picker.dp-material .dp-picker-input {
     background-color: var(--modal-bg-color) !important;
