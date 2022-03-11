@@ -1,10 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators, FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthenticationService } from '../services/authentication.service';
 import { Router } from '@angular/router';
 import { ToastComponent } from '../toast/toast.component';
-import { AlertComponent } from '../alert/alert.component';
-
 
 @Component({
   selector: 'app-login',
@@ -21,7 +19,6 @@ export class LoginComponent implements OnInit {
     private formBuilder: FormBuilder,
     private authenticationService: AuthenticationService,
     private toast: ToastComponent,
-    private alert: AlertComponent,
     private router: Router) { }
 
   ngOnInit(): void {
@@ -34,13 +31,11 @@ export class LoginComponent implements OnInit {
   get f() { return this.loginForm.controls; }
 
   submit() {
-
 		this.submitted = true;
 
 		this.authenticationService.login(this.loginForm.value.username, this.loginForm.value.password)
 			.subscribe(
-				data => {
-          //this.alert.showSuccessAlert('Login successful');		
+				data => {	
           this.toast.showSuccessToast('Login','Login successful with role: ' + this.authenticationService.currentUser.role);
           console.log("Login successful with role: " + this.authenticationService.currentUser.role);
           this.router.navigate(['/dafne'], { skipLocationChange: false });
@@ -65,5 +60,4 @@ export class LoginComponent implements OnInit {
           }
 				});
 	}
-
 }

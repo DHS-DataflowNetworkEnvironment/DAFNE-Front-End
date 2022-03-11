@@ -104,10 +104,8 @@ export class EditServicesComponent implements OnInit, OnDestroy {
   getAllServiceTypes() {
     this.authenticationService.getAllServiceTypes().subscribe(
       (res: []) => {
-        //console.log("ALL SERVICE TYPES: " + JSON.stringify(res));
         res.sort(this.GetSortOrder('id'));
         this.serviceTypesList = res;
-        //console.log("SORTED: " + JSON.stringify(this.serviceTypesList));
       }
     );
   }
@@ -138,7 +136,6 @@ export class EditServicesComponent implements OnInit, OnDestroy {
   getServiceType(index: number, id: number): any {
     this.authenticationService.getServiceType(id).subscribe(
       (res: {id: number, createdAt: string, updatedAt: string, service_type: string}) => {
-        /* console.log("Service type for service " + index + " is: " + res.service_type); */
         /* Converting service-type IDs to Names from service-type List */
         this.serviceList[index].service_type = res.service_type;
       }
@@ -175,7 +172,6 @@ export class EditServicesComponent implements OnInit, OnDestroy {
     return undefined;
   }
 
-  /* Function called by addCentre button */
   public addNewService() {
     this.service.username = '';
     this.service.password = '';
@@ -199,24 +195,20 @@ export class EditServicesComponent implements OnInit, OnDestroy {
     
     if (valid) {
       let tempCentreId = this.centreList.filter(a => a.name == (<HTMLInputElement>document.getElementById('add_centre')).value)[0].id;
-      //console.log("EDIT SERVICES - Trying to add Centre Id: " + tempCentreId);
       let tempServiceTypeId = this.serviceTypesList.filter(a => a.service_type == (<HTMLInputElement>document.getElementById('add_service_type')).value)[0].id;
       if (tempServiceTypeId != this.serviceTypesList.filter(a => a.service_type == 'DHuS Back-End')[0].id) {
         for (var i = 0; i < this.serviceList.length; i++) {
           if (tempCentreId == this.centreList.filter(a => a.name == this.serviceList[i].centre)[0].id) {
-            //console.log("EDIT SERVICES - Centre already in list");
             if (
               this.serviceTypesList.filter(a => a.service_type == this.serviceList[i].service_type)[0].id == this.serviceTypesList.filter(a => a.service_type == 'DHuS Front-End')[0].id ||
               this.serviceTypesList.filter(a => a.service_type == this.serviceList[i].service_type)[0].id == this.serviceTypesList.filter(a => a.service_type == 'DHuS Single Instance')[0].id
             ) {
-              //console.log("EDIT SERVICES - Service configuration not accepted!");
               valid = false;
               this.alert.showErrorAlert("Service Configuration Error", "You cannot setup two services associated to the same Centre with Single Instance or Front-End service types");
             }
           }
         }
       }
-      //console.log("ADD SERVICE SUBMITTED");
       let body = {
         username: (<HTMLInputElement>document.getElementById("add_service_username")).value,
         password: (<HTMLInputElement>document.getElementById('add_service_password')).value,
@@ -226,7 +218,6 @@ export class EditServicesComponent implements OnInit, OnDestroy {
       };
       this.authenticationService.addNewService(body).subscribe(
         (res: string) => {
-          /* Refresh page: */
           this.refreshPage();
         }
       );
@@ -235,7 +226,6 @@ export class EditServicesComponent implements OnInit, OnDestroy {
     }
   }
 
-  /* Function called by delete button in any service */
   public deleteService(id: number) { 
     this.tempServiceIdToDelete = id;
     this.tempServiceUrlToDelete = this.serviceList.filter(a => a.id == id)[0].service_url;
@@ -246,7 +236,6 @@ export class EditServicesComponent implements OnInit, OnDestroy {
     this.authenticationService.deleteService(this.tempServiceIdToDelete).subscribe(
       (res: string) => {
         this.tempServiceIdToDelete = -1;
-        /* Refresh page: */
         this.refreshPage();
       }
     )
@@ -256,11 +245,10 @@ export class EditServicesComponent implements OnInit, OnDestroy {
     this.tempServiceIdToDelete = -1;
   }
 
-  /* Function called by edit button in any service */
   public editService(id: number) {
     this.service.id = this.serviceList.filter(a => a.id === id)[0].id;
     this.service.username = this.serviceList.filter(a => a.id === id)[0].username;
-    this.service.password = ''; //this.serviceList.filter(a => a.id === id)[0].password;
+    this.service.password = '';
     this.service.service_url = this.serviceList.filter(a => a.id === id)[0].service_url;
     this.service.service_type = this.serviceList.filter(a => a.id === id)[0].service_type;
     this.service.centre = this.serviceList.filter(a => a.id === id)[0].centre;
@@ -278,17 +266,14 @@ export class EditServicesComponent implements OnInit, OnDestroy {
       }
     });
     let tempCentreId = this.centreList.filter(a => a.name == (<HTMLInputElement>document.getElementById('edit_centre')).value)[0].id;
-    //console.log("EDIT SERVICE - Trying to edit Centre Id: " + tempCentreId);
     let tempServiceTypeId = this.serviceTypesList.filter(a => a.service_type == (<HTMLInputElement>document.getElementById('edit_service_type')).value)[0].id;
     if (tempServiceTypeId != this.serviceTypesList.filter(a => a.service_type == 'DHuS Back-End')[0].id) {
       for (var i = 0; i < this.serviceList.length; i++) {
         if (tempCentreId == this.centreList.filter(a => a.name == this.serviceList[i].centre)[0].id) {
-          //console.log("EDIT SERVICE - Centre already in list");
           if (
             this.serviceTypesList.filter(a => a.service_type == this.serviceList[i].service_type)[0].id == this.serviceTypesList.filter(a => a.service_type == 'DHuS Front-End')[0].id ||
             this.serviceTypesList.filter(a => a.service_type == this.serviceList[i].service_type)[0].id == this.serviceTypesList.filter(a => a.service_type == 'DHuS Single Instance')[0].id
           ) {
-            //console.log("EDIT SERVICE - Service configuration not accepted!");
             valid = false;
             this.alert.showErrorAlert("Service Configuration Error", "You cannot setup two services associated to the same Centre with Single Instance or Front-End service types");
           }

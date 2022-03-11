@@ -13,7 +13,6 @@
     background-color: var(--main-bg-color);
     color: var(--main-text-color);
     width: 100%;
-    /* height: calc(100vh - 9rem - 12rem); */
 }
 
 /* Filters view */
@@ -128,13 +127,11 @@
     flex-direction: row;
     background-color: var(--main-bg-color);
     color: var(--main-text-color);
-    /* overflow-y: auto; */
 }
 
 /* Centres List */
 #target-id-list-container {
     flex-shrink: 0;
-    /* width: 13rem; */
     margin-top: 1rem;
     overflow-y: auto;
 }
@@ -199,7 +196,6 @@
     overflow-y: auto;
 }
 #selectors-container h2 {
-    /* margin-top: 2.5rem; */
     font-size: 1rem;
     text-align: center;
 }
@@ -250,7 +246,6 @@ caption, th, td {
 }
 table, th, td {
     border: 1px solid var(--table-border-color);
-    /* border-collapse: collapse; */
 }
 th {
     background-color: var(--table-header-bg-color);

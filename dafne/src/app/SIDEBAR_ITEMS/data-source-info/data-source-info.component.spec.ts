@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { DataSourceInfoComponent } from './data-source-info.component';
 
 describe('DataSourceInfoComponent', () => {

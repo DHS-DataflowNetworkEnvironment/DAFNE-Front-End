@@ -12,14 +12,14 @@ declare var $: any;
 const regexPatterns = {
   add_name: "^.{1,60}$",
   add_description: "",
-  add_latitude: "^[+-]?(([0]*90([.][0]*)?)|(([0]*[0-8]?[0-9])([.][0-9]*)?))$", //"^[+-]?([0-9]*[.])?[0-9]+$", // from -90.0 to +90.0
-  add_longitude: "^[+-]?(([0]*180([.][0]*)?)|(([0]*[0-1]?[0-7]?[0-9])([.][0-9]*)?))$", // "^[+-]?([0-9]*[.])?[0-9]+$", // from -180.0 to +180.0
+  add_latitude: "^[+-]?(([0]*90([.][0]*)?)|(([0]*[0-8]?[0-9])([.][0-9]*)?))$", // from -90.0 to +90.0
+  add_longitude: "^[+-]?(([0]*180([.][0]*)?)|(([0]*[0-1]?[0-7]?[0-9])([.][0-9]*)?))$", // from -180.0 to +180.0
   add_color: "^#(?:[0-9a-f]{6})$",
 
   edit_name: "^.{1,60}$",
   edit_description: "",
-  edit_latitude: "^[+-]?(([0]*90([.][0]*)?)|(([0]*[0-8]?[0-9])([.][0-9]*)?))$", //"^[+-]?([0-9]*[.])?[0-9]+$",
-  edit_longitude: "^[+-]?(([0]*180([.][0]*)?)|(([0]*[0-1]?[0-7]?[0-9])([.][0-9]*)?))$", //"^[+-]?([0-9]*[.])?[0-9]+$",
+  edit_latitude: "^[+-]?(([0]*90([.][0]*)?)|(([0]*[0-8]?[0-9])([.][0-9]*)?))$",
+  edit_longitude: "^[+-]?(([0]*180([.][0]*)?)|(([0]*[0-1]?[0-7]?[0-9])([.][0-9]*)?))$",
   edit_color: "^#(?:[0-9a-f]{6})$"
 };
 
@@ -67,7 +67,7 @@ export class EditCentresComponent implements OnInit, OnDestroy {
     this.getCentresData();
     
     this.subscription = dataRefresh.subscribe(n => {
-      // get data after Init every x milliseconds:
+      // get data after Init every dataRefreshTime milliseconds:
       this.messageService.showSpinner(false);
       this.getCentresData();
     });
@@ -118,7 +118,6 @@ export class EditCentresComponent implements OnInit, OnDestroy {
   }
 
   public addNewCentre() {
-    /* TODO: On second ADD should clean values.. */
     this.tempCentre.name = '';
     this.tempCentre.description = '';
     this.tempCentre.latitude = '0.0';
@@ -138,7 +137,6 @@ export class EditCentresComponent implements OnInit, OnDestroy {
       }
     });
     if (valid) {
-      /* console.log("ADD CENTRE SUBMITTED"); */
       let body = {
         name: (<HTMLInputElement>document.getElementById("add_name")).value,
         latitude: (<HTMLInputElement>document.getElementById('add_latitude')).value,
@@ -150,7 +148,6 @@ export class EditCentresComponent implements OnInit, OnDestroy {
       };
       this.authenticationService.addNewCentre(body).subscribe(
         (res: string) => {
-          /* console.log("CENTRE ADDED: " + res); */
           this.refreshPage();
         }
       );
@@ -159,7 +156,6 @@ export class EditCentresComponent implements OnInit, OnDestroy {
   }
 
   public deleteCentre(id: number) {
-    /* console.log("Deleting centre with ID: " + id); */
     this.tempCentreIdToDelete = id;
     this.tempCentreNameToDelete = this.centreList.filter(a => a.id == id)[0].name;
     this.tempCentreColorToDelete = this.centreList.filter(a => a.id == id)[0].color;
@@ -168,12 +164,9 @@ export class EditCentresComponent implements OnInit, OnDestroy {
   }
 
   public deleteCentreConfirmed() {
-    /* console.log("DELETE CENTRE SUBMITTED"); */
     this.authenticationService.deleteCentre(this.tempCentreIdToDelete).subscribe(
       (res: string) => {
-        /* console.log("CENTRE DELETED: " + res); */
         this.tempCentreIdToDelete = -1;
-        /* Refresh page: */
         this.refreshPage();
       }
     )
@@ -206,7 +199,6 @@ export class EditCentresComponent implements OnInit, OnDestroy {
       }
     });
     if (valid) {
-      /* console.log("EDIT CENTRE SUBMITTED from ID: " + id); */
       let body = {
         name: (<HTMLInputElement>document.getElementById("edit_name")).value,
         latitude: (<HTMLInputElement>document.getElementById('edit_latitude')).value,
@@ -218,7 +210,6 @@ export class EditCentresComponent implements OnInit, OnDestroy {
       };
       this.authenticationService.updateCentre(id, body).subscribe(
         (res: string) => {
-          /* console.log("CENTRE UPDATED: " + res); */
           this.refreshPage();
         }
       )
@@ -241,7 +232,6 @@ export class EditCentresComponent implements OnInit, OnDestroy {
     this.authenticationService.getAllCentres().subscribe(
       (res: object) => {
         this.centreList = res;
-        /* Check if there is a Local Centre */
         if (Object.values(res).filter((x) => x.local === true)[0]) {
           this.messageService.setLocalPresent(true);
         } else {

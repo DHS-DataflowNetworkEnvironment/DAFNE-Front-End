@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { ServiceAvailabilityComponent } from './service-availability.component';
 
 describe('ServiceAvailabilityComponent', () => {

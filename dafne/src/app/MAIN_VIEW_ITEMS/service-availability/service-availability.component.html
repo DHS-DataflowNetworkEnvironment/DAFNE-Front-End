@@ -34,7 +34,6 @@
             <hr>
             <h2>LEGEND</h2>
             <ng-template ngFor let-color [ngForOf]="availabilityColors" let-i="index">
-                <!-- <div *ngIf="i>0" class="color-threshold" [ngStyle]="{'background-color': color.color}">&gt; {{color.threshold}}% &lt;= {{availabilityColors[i-1].threshold}}% </div> -->
                 <div *ngIf="i>0" class="color-threshold" [ngStyle]="{'background-color': availabilityColors[availabilityColors.length-1-i].color}">&gt;<span *ngIf="i==availabilityColors.length - 1">=</span> {{availabilityColors[availabilityColors.length-1-i].threshold}}% &lt;= {{availabilityColors[availabilityColors.length-i].threshold}}%</div>
             </ng-template>
         </section>

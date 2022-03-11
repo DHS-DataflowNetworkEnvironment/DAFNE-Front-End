@@ -13,7 +13,6 @@
 /* Centres List */
 #target-id-list-div {
     position: absolute;
-    /* width: 13rem; */
     height: calc(100vh - 14rem);
     overflow-y: auto;
 }

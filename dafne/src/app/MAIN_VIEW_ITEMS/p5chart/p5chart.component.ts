@@ -50,23 +50,17 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
   public bodyMission: string;
 
   public today = new Date();
-  public dd = String(this.today.getDate()).padStart(2, '0');
-  public mm = String(this.today.getMonth() + 1).padStart(2, '0');
-  public yyyy = this.today.getFullYear();
-  public todayDate: string = this.yyyy + '-' + this.mm + '-' + this.dd;
+  public todayDate: string = this.today.toISOString().slice(0, 10);
 
   public millisPerDay = 86400000;
   public maxDays = 14;
   public millisPerMaxPeriod = this.millisPerDay * this.maxDays;
 
-  public initialStartDayMillis = Date.parse(this.todayDate) - (14 * this.millisPerDay); //(this.maxDays * this.millisPerDay);
-  public startDateTemp = new Date(this.initialStartDayMillis); //'2021-09-15';
-  public ddStart = String(this.startDateTemp.getDate()).padStart(2, '0');
-  public mmStart = String(this.startDateTemp.getMonth() + 1).padStart(2, '0');
-  public yyyyStart = this.startDateTemp.getFullYear();
-  public startDate: string = this.yyyyStart + '-' + this.mmStart + '-' + this.ddStart;
+  public initialStartDayMillis = Date.parse(this.todayDate) - (this.maxDays * this.millisPerDay);
+  public startDateTemp = new Date(this.initialStartDayMillis);
+  public startDate: string = this.startDateTemp.toISOString().slice(0, 10);
 
-  public stopDate = this.todayDate; //'2021-09-30';
+  public stopDate = this.todayDate;
   public startDatePickerConfig: IDatePickerConfig = {
     format: "YYYY-MM-DD",
     firstDayOfWeek: "mo",
@@ -101,7 +95,6 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {
     this.navigationSubscription = this.router.events.subscribe((e: any) => {
       if (e instanceof NavigationEnd) {
-        // Set default values and re-fetch any data you need.
         this.centreNumber = 0;
         this.serviceAllCentreList = [];
         this.getServices();
@@ -122,9 +115,6 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // avoid memory leaks here by cleaning up after ourselves. If we  
-    // don't then we will continue to run our initialiseInvites()   
-    // method on every navigationEnd event.
     if (this.navigationSubscription) {  
        this.navigationSubscription.unsubscribe();
     }
@@ -135,7 +125,6 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
       (res: any) => {
         /* Filter services with service_type != Back-End */
         this.serviceList = res.filter(a => a.service_type != 3);
-        //console.log("GET_SERVICES serviceList filtered: " + JSON.stringify(this.serviceList, null, 2));
         
         for (var i = 0; i < this.serviceList.length; i++) {
             this.getServiceType(i, this.serviceList[i].service_type);
@@ -148,7 +137,6 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
   getServiceType(index: number, id: number): any {
     this.authenticationService.getServiceType(id).subscribe(
       (res: {id: number, createdAt: string, updatedAt: string, service_type: string}) => {
-        // console.log("Service type for service " + index + " is: " + res.service_type);
         /* Converting service-type IDs to Names from service-type List */
         this.serviceList[index].service_type = res.service_type;
       }
@@ -159,21 +147,16 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
     this.authenticationService.getAllCentres().subscribe(
       (res: object) => {
         this.allCentreList = res;
-        //console.log("GET_CENTRES_DATA - AllCentreList: " + JSON.stringify(this.allCentreList, null, 2));
         
         /* Sort allCentreList by ID */
         this.allCentreList.sort(this.getSortOrder("id"));
         for (var i = 0; i < this.serviceList.length; i++) {
 
           /* Change Centre.IDs to Centre.Names into serviceList[].name */
-          //console.log("GET_CENTRES_DATA - PRE - ServiceList["+i+"].centre: " + this.serviceList[i].centre);
           this.serviceList[i].centre = this.allCentreList.filter(a => a.id == this.serviceList[i].centre)[0].name;
-          //console.log("GET_CENTRES_DATA - POST - ServiceList["+i+"].centre: " + this.serviceList[i].centre);
-          //console.log("GET_CENTRES_DATA - POST - ServiceList["+i+"].service_type: " + this.serviceList[i].service_type);
           
           /* Copy service centres one by one into tempServiceCentre */
           let tempServiceCentre = this.allCentreList.filter(a => a.name == this.serviceList[i].centre)[0];
-          //console.log("GET_CENTRES_DATA - TempCentre["+i+"]: " + JSON.stringify(tempServiceCentre, null, 2));
 
           /* Copy tempServiceCentre first into a complete list... */
           this.serviceAllCentreList.push(tempServiceCentre);
@@ -184,23 +167,18 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
         /* Sort serviceAllCentreList by IDs and then set Local first */
         this.serviceAllCentreList.sort(this.getSortOrder("id"));
         this.setLocalFirst(this.serviceAllCentreList);
-        //console.log("SERVICE ALL CENTRE LIST Sorted by Local: " + JSON.stringify(this.serviceAllCentreList, null, 2));
         
         /* Sort serviceRemoteCentreList[] by ID */
         this.serviceRemoteCentreList.sort(this.getSortOrder("id"));
-        //console.log("Service All Centre List: " + JSON.stringify(this.serviceAllCentreList, null, 2));
-        //console.log("Service Local Centre: " + JSON.stringify(this.serviceLocalCentre, null, 2));
-        //console.log("Service Remote Centre List: " + JSON.stringify(this.serviceRemoteCentreList, null, 2));
         
         /* Get complete Centre List (also those without a service..) and copy into 'remoteCentreList[]' */
         this.remoteCentreList = Object.values(res).filter((x) => x.local === null);
-        //console.log("Remote Centre List: " + JSON.stringify(this.remoteCentreList, null, 4));
 
         /* Get the local Centre and copy into 'localCentre' */
         if (Object.values(res).filter((x) => x.local === true)[0]) {
           this.localCentre = Object.values(res).filter((x) => x.local === true)[0];
         } else {
-          /* If there's no local configured set a blank one... Is It OK? */
+          /* If there's no local configured set a blank one. */
           this.localCentre = {
             id: 0,
             name: '',
@@ -213,26 +191,23 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
           };
         }
         
-        // comment out to get completeness on page load:
+        // uncomment to get completeness on page load:
         //this.onFilterSubmit();
       }
     );
   }
 
   onMissionChange(mission) {
-    //console.log("On Mission Change: " + mission.target.value);
     this.missionFiltered = this.totalMissionList.filter(a => a.name == mission.target.value)[0];
     this.productTypeFiltered = this.missionFiltered.productType[0];
     this.platformNumberFiltered = this.missionFiltered.platform[0];
   }
 
   onProductTypeChange(product_type) {
-    //console.log("On Product Type Change: " + product_type.target.value);
     this.productTypeFiltered = product_type.target.value;
   }
 
   onPlatformNumberChange(platform_number) {
-    //console.log("On Platform Number Change: " + platform_number.target.value);
     this.platformNumberFiltered = platform_number.target.value;
     if (this.platformNumberFiltered == 'A+B' || this.platformNumberFiltered == '---') {
       this.platformNumberFiltered = '';
@@ -249,24 +224,14 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
       this.platformNumber = this.platformNumberFiltered;
     }
     this.bodyMission = this.missionFiltered.acronym + this.platformNumber;
-    //console.log("Completeness - startDate: " + this.startDate);
     let tempStopDate = new Date(this.stopDate);
     let tempStartDate = new Date(this.startDate);
     let tempTimeDifference = tempStopDate.getTime() - tempStartDate.getTime();
-    //console.log("Time difference: " + tempTimeDifference);
-    
     this.tempDaysNumber = tempTimeDifference / (1000 * 3600 * 24) + 1;
-    //this.sectionRadians = (2 * Math.PI) / this.daysNumber;
-    //console.log("Days difference: " + tempDaysNumber);
   
     for (var i = 0; i < this.tempDaysNumber; i++) {
-      //console.log("Date " + i + " - " + new Date(tempStartDate.getTime() + i*(1000*3600*24)));
       let tempFilteredDate = new Date(tempStartDate.getTime() + i*(1000*3600*24));
-      let tempdd = String(tempFilteredDate.getDate()).padStart(2, '0');
-      let tempmm = String(tempFilteredDate.getMonth() + 1).padStart(2, '0');
-      let tempyyyy = tempFilteredDate.getFullYear();
-      let tempFilteredDateString: string = tempyyyy + '-' + tempmm + '-' + tempdd;
-      //console.log("TempFilteredDate: " + tempFilteredDateString);
+      let tempFilteredDateString: string = tempFilteredDate.toISOString().slice(0, 10);
 
       let body: object = {
         "mission":this.bodyMission,
@@ -274,7 +239,6 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
         "startDate":tempFilteredDateString,
         "stopDate":tempFilteredDateString
       };
-      //console.log("FILTER Body: " + JSON.stringify(body, null, 2));
       this.completenessDailyGetDone[i] = false;   
       this.getDailyCompleteness(body, i);
     }
@@ -283,16 +247,13 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
   getDailyCompleteness(body, index) {
     this.authenticationService.getCompleteness(body).subscribe(
       (res: object) => {
-        //console.log("GET Completeness Values: " + JSON.stringify(res, null, 4));
         if (res) {
           this.completenessDailyDataList[index] = res;
           this.completenessDailyGetDone[index] = true;
-          //console.log("Daily Completeness " + index + " : " + JSON.stringify(this.completenessDailyDataList[index][0], null, 2));
           this.sumDailyCompleteness();
         } else {
           this.completenessDailyDataList[index] = [];
         }
-        /* this.centreNumber = this.serviceAllCentreList.length; */
       }
     );
   }
@@ -305,15 +266,12 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
         return;
       }
     }
-    //console.log("tempGetRady: " + tempGetReady);
     let tempJsonCompleteness:object[] = [];
     for (var i = 0; i < this.tempDaysNumber; i++) {
       tempJsonCompleteness.push(this.completenessDailyDataList[i][0]);
     }
-    //console.log("CompletenessDataList: " + JSON.stringify(tempJsonCompleteness, null, 2));
     this.completenessDataList = tempJsonCompleteness;
     /* Sort completeness by ID and then set Local first*/
-    //console.log("GET Completeness Values PRE SORT: " + JSON.stringify(this.completenessDataList, null, 4));
     for (var i = 0; i < this.completenessDataList.length; i++) {
       this.completenessDataList[i].values.sort(this.getSortOrder("id"));
       this.setLocalFirst(this.completenessDataList[i].values);
@@ -328,10 +286,7 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
     if (Date.parse(this.stopDate) > tempMillisDate) {
       this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 15 days");
       let tempDate = new Date(tempMillisDate);
-      let dd = String(tempDate.getDate()).padStart(2, '0');
-      let mm = String(tempDate.getMonth() + 1).padStart(2, '0');
-      let yyyy = tempDate.getFullYear();
-      this.stopDate = yyyy + '-' + mm + '-' + dd;
+      this.stopDate = tempDate.toISOString().slice(0, 10);
     }
     if (Date.parse(date) > Date.parse(this.stopDate)) {
       this.alert.showErrorAlert("Check Date Range", "Start date cannot be later than stop date");
@@ -344,41 +299,13 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
     if (Date.parse(this.startDate) < tempMillisDate) {
       this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 15 days");
       let tempDate = new Date(tempMillisDate);
-      let dd = String(tempDate.getDate()).padStart(2, '0');
-      let mm = String(tempDate.getMonth() + 1).padStart(2, '0');
-      let yyyy = tempDate.getFullYear();
-      this.startDate = yyyy + '-' + mm + '-' + dd;
+      this.startDate = tempDate.toISOString().slice(0, 10);
     }
     if (Date.parse(date) < Date.parse(this.startDate)) {
       this.alert.showErrorAlert("Check Date Range", "Stop date cannot be earlier than start date");
       this.startDate = date;
     }
   }
-
-  /* getCompleteness(body) {
-    this.authenticationService.getCompleteness(body).subscribe(
-      (res: object) => {
-        //console.log("GET Completeness Values: " + JSON.stringify(res, null, 4));
-        if (res) {
-          this.completenessDataList = res;
-
-          //console.log("GET Completeness Values PRE SORT: " + JSON.stringify(this.completenessDataList, null, 4));
-          for (var i = 0; i < this.completenessDataList.length; i++) {
-            this.completenessDataList[i].values.sort(this.getSortOrder("id"));
-            this.setLocalFirst(this.completenessDataList[i].values);
-          }
-          //console.log("GET Completeness Values POST SORT: " + JSON.stringify(this.completenessDataList, null, 2));
-          this.daysNumber = this.completenessDataList.length;
-          this.sectionRadians = (2 * Math.PI) / this.daysNumber;
-        } else {
-          this.completenessDataList = [];
-          this.daysNumber = 0;
-          this.sectionRadians = 0; // or (2 * Math.PI) ?;
-        }
-        this.centreNumber = this.serviceAllCentreList.length;
-      }
-    );
-  } */
 
   /* Function to sort arrays of object: */    
   getSortOrder(prop) {    
@@ -442,19 +369,16 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   toggleTable() {
-    //if (getComputedStyle(document.getElementById("data-table-container")).visibility == 'collapse') {
     if (document.getElementById("data-table-container").style.display == "none") {
       /* Show */
       document.getElementById("main-column-container").style.height = "calc(100vh - 9rem - 12rem)";
       document.getElementById("p5Canvas-column-div").style.height = "calc(100vh - 25.5rem)";
-      /* document.getElementById("p5Canvas").style.height = "100%"; */
       document.getElementById("data-table-container").style.display = "block";
       this.p5Chart.windowResized();
     } else {
       /* Hide */
       document.getElementById("main-column-container").style.height = "calc(100vh - 9rem)";
-      document.getElementById("p5Canvas-column-div").style.height = "calc(100vh - 13.5rem)"; 
-      /* document.getElementById("p5Canvas").style.height = "100%";  */
+      document.getElementById("p5Canvas-column-div").style.height = "calc(100vh - 13.5rem)";
       document.getElementById("data-table-container").style.display = "none";
       this.p5Chart.windowResized();
     }
@@ -503,8 +427,6 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
       let barTextLimit = 20;
 
       let sf = 1.0;
-      //let mx = 0;
-      //let my = 0;
       let tx = 0;
       let ty = 0;
 
@@ -516,7 +438,6 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
         p.textFont('NotesESA-Reg');
         
         canvasSpace.mouseWheel(e => wheelZoom(e));
-        //anvasSpace.mousePressed(e => doPan(e));
         canvasSpace.doubleClicked(resetZoom);
       };
 
@@ -524,8 +445,6 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
         p.background(backgroundColor);
         p.windowResized();
         p.translate(tx, ty);
-        //p.scale(sf);
-        /* p.text("W: "+canvasWidth+" - H: "+canvasHeight, 100, 10); */
         if (this.chartType == this.selectorText[0]) {
           p.calcValMax();
           p.fillSunburstSingleChart();
@@ -768,9 +687,7 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
             }
             let sinOfAngle = sinOfAngleTemp * (p.textWidth(tempText) / 2);
             
-            p.push();
-            //console.log("Value " + k + " : " +this.completenessDataList[i].values[k].value);
-          
+            p.push();          
             p.translate(sectionXCenter - sectionXFilledDim2 + k * sectionXFilledDim / this.centreNumber + (sectionXFilledDim / (this.centreNumber * 2)), yCenter + chartYDim2 - ((this.completenessDataList[i].values[k].value < 0 ? 0 : this.completenessDataList[i].values[k].value) * chartYDim / (maxSumValue+1)) - valueFontSize/2 - sinOfAngle - dateFontSize / 4);
             if (angle > p.PI / 2) angle = p.PI / 2;
             if (angle < 0) angle = 0;
