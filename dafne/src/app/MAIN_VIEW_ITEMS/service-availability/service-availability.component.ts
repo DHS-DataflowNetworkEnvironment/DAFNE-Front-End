@@ -143,6 +143,7 @@ export class ServiceAvailabilityComponent implements OnInit {
         if (res.centreId == this.localCentre.id) {
           this.availabilityDaysNumber = res.values.length;
           this.requestedDaysNumber = tempTimeDifference / (1000 * 3600 * 24) + 1;
+          this.requestedServiceAvailabilityList = [];
           for (var i = 0; i < this.requestedDaysNumber; i++) {
             this.requestedServiceAvailabilityList[i] = {
               date: new Date(Date.parse(this.startDate) + (i * this.millisPerDay)).toISOString().slice(0,10),
@@ -155,7 +156,11 @@ export class ServiceAvailabilityComponent implements OnInit {
 
           /* Calculate week-day shift */
           this.weekdayShift = (tempStartDate.getDay() == 0 ? 6 : tempStartDate.getDay() - 1);
-          this.rowNumber = (this.weekdayShift == 6 ? 6 : 5);
+          if (this.weekdayShift == 6 && this.requestedDaysNumber == 30) {
+            this.rowNumber = 6;
+          } else {
+            this.rowNumber = 5;
+          }          
 
           for (var i = 0; i < this.requestedDaysNumber; i++) {
             for (var k = 0; k < this.availabilityDaysNumber; k++) {
