@@ -833,23 +833,27 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
           p.fill(lineColor);
           p.noStroke();
           p.textSize(dateFontSize);
-          p.text(this.completenessDataList[i].date, sectionXCenter[i], yCenter + chartYDim2 + 15);
-          p.text("( " + sumDayValue[i] + " )", sectionXCenter[i], yCenter + chartYDim2 + 30);
-          p.noFill();
-          p.stroke(lineColor);
-          p.strokeWeight(1);
-          p.line(sectionXCenter[i] + sectionXDim[i] / 2, yCenter + chartYDim2 + 5, sectionXCenter[i] + sectionXDim[i] / 2, yCenter + chartYDim2);
-
+          if (sumDayValue[i] > 0) {
+            p.text(this.completenessDataList[i].date, sectionXCenter[i], yCenter + chartYDim2 + 15);
+            p.text("( " + sumDayValue[i] + " )", sectionXCenter[i], yCenter + chartYDim2 + 30);
+            p.noFill();
+            p.stroke(lineColor);
+            p.strokeWeight(1);
+            p.line(sectionXCenter[i] + sectionXDim[i] / 2, yCenter + chartYDim2 + 5, sectionXCenter[i] + sectionXDim[i] / 2, yCenter + chartYDim2);
+          }
+          
           /* xAxis High Text */
-          p.textAlign(p.CENTER, p.CENTER);
-          p.fill(lineColor);
-          p.noStroke();
-          p.textSize(dateFontSize);
-          p.text(((sumDayValue[i] != sumPeriodValue) ? (p.nf(sumDayValue[i] * 100 / (sumPeriodValue+1), 1, 1)) : 100) + "%", sectionXCenter[i], yCenter - chartYDim2 - 30);
-          p.noFill();
-          p.stroke(lineColor);
-          p.strokeWeight(1);
-          p.line(sectionXCenter[i] + sectionXDim[i] / 2, yCenter - chartYDim2 - 20, sectionXCenter[i] + sectionXDim[i] / 2, yCenter - chartYDim2 - 15);
+          if (sumDayValue[i] > 0) {
+            p.textAlign(p.CENTER, p.CENTER);
+            p.fill(lineColor);
+            p.noStroke();
+            p.textSize(dateFontSize);
+            p.text(((sumDayValue[i] != sumPeriodValue) ? (p.nf(sumDayValue[i] * 100 / (sumPeriodValue+1), 1, 1)) : 100) + "%", sectionXCenter[i], yCenter - chartYDim2 - 30);
+            p.noFill();
+            p.stroke(lineColor);
+            p.strokeWeight(1);
+            p.line(sectionXCenter[i] + sectionXDim[i] / 2, yCenter - chartYDim2 - 20, sectionXCenter[i] + sectionXDim[i] / 2, yCenter - chartYDim2 - 15);
+          }
 
           /* Bars */
           p.rectMode(p.CORNER);
@@ -858,7 +862,7 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
             for (var j = k + 1; j < this.centreNumber; j++) {
               if (this.completenessDataList[i].values[j].value > 0) barHeight += this.completenessDataList[i].values[j].value;
             }
-            barHeight = chartYDim * barHeight / (sumDayValue[i]+1);
+            barHeight = barHeight * chartYDim / (sumDayValue[i]);
             p.fill(this.serviceAllCentreList[k].color);
             p.stroke(backgroundColor);
             p.strokeWeight(1);
@@ -869,13 +873,13 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
             for (var j = k + 1; j < this.centreNumber; j++) {
               if (this.completenessDataList[i].values[j].value > 0) barHeight += this.completenessDataList[i].values[j].value;
             }
-            barHeight = chartYDim * barHeight / (sumDayValue[i]+1);
+            barHeight = barHeight * chartYDim / (sumDayValue[i]);
             p.fill((((this.completenessDataList[i].values[k].value < 0 ? 0 : this.completenessDataList[i].values[k].value) * chartYDim / (sumDayValue[i]+1)) <= barTextLimit && k == 0) ? lineColor : (barHeight > barTextLimit ? '#000000' : lineColor));
             p.noStroke();
             p.textSize(valueFontSize);
             p.textAlign(p.CENTER, p.TOP);
-            p.text((this.completenessDataList[i].values[k].value < 0 ? "NaN" : (((this.completenessDataList[i].values[k].value < 0 ? 0 : this.completenessDataList[i].values[k].value) * chartYDim / maxSumValue) > barTextLimit) ? this.completenessDataList[i].values[k].value : this.completenessDataList[i].values[k].value + p.char(0x21b4)),
-                    sectionXCenter[i] + ((((this.completenessDataList[i].values[k].value < 0 ? 0 : this.completenessDataList[i].values[k].value) * chartYDim / (sumDayValue[i]+1)) > barTextLimit) ? 0 : 0),
+            p.text((this.completenessDataList[i].values[k].value < 0 ? "NaN" : ((this.completenessDataList[i].values[k].value * chartYDim / (sumDayValue[i]+1)) > barTextLimit) ? this.completenessDataList[i].values[k].value : this.completenessDataList[i].values[k].value + p.char(0x21b4)),
+                    sectionXCenter[i], // + ((((this.completenessDataList[i].values[k].value < 0 ? 0 : this.completenessDataList[i].values[k].value) * chartYDim / (sumDayValue[i]+1)) > barTextLimit) ? 0 : 0),     /* Should move right if overlapping? */
                     yCenter + chartYDim2 - barHeight + ((((this.completenessDataList[i].values[k].value < 0 ? 0 : this.completenessDataList[i].values[k].value) * chartYDim / (sumDayValue[i]+1)) > barTextLimit) ? dateFontSize / 4 : -dateFontSize)
                   );
           }
