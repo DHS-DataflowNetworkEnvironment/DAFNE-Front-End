@@ -57,6 +57,7 @@ export class ServiceAvailabilityComponent implements OnInit {
 
   public serviceAvailabilityList: Array<Availability> = [];
   public requestedServiceAvailabilityList: Array<Availability> = [];
+  public averageServiceAvailability: number = -1;
 
   public dayOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   public weekdayShift: number = 0;
@@ -136,6 +137,8 @@ export class ServiceAvailabilityComponent implements OnInit {
           this.availabilityDaysNumber = res.values.length;
           this.requestedDaysNumber = tempTimeDifference / (1000 * 3600 * 24) + 1;
           this.requestedServiceAvailabilityList = [];
+          this.averageServiceAvailability = res.values[0].average;
+          
           for (var i = 0; i < this.requestedDaysNumber; i++) {
             this.requestedServiceAvailabilityList[i] = {
               date: new Date(Date.parse(this.startDate) + (i * this.millisPerDay)).toISOString().slice(0,10),
@@ -232,6 +235,7 @@ export class ServiceAvailabilityComponent implements OnInit {
       let backgroundColor = p.color('#12222f');
       let labelBackgroundColor = p.color('#12222fcc')
       let lineColor = p.color('#aaaaaa');
+      let averageLineColor = p.color('#ffdf70');
 
       let valueFontSize = 20;
       let dateFontSize = 12;
@@ -364,7 +368,14 @@ export class ServiceAvailabilityComponent implements OnInit {
         p.stroke(lineColor);
         p.line(xCenter - chartXDim2, yCenter + chartYDim2, xCenter - chartXDim2, yCenter - chartYDim2);
         p.line(xCenter - chartXDim2, yCenter + chartYDim2, xCenter + chartXDim2, yCenter + chartYDim2);
-        /* Zero text */
+        /* Average Line */
+        if (this.averageServiceAvailability >= 0) {
+          p.stroke(averageLineColor);
+          p.line(xCenter - chartXDim2, yCenter + chartYDim2 - this.averageServiceAvailability * chartYDim / maxValue, xCenter + chartXDim2, yCenter + chartYDim2 - this.averageServiceAvailability * chartYDim / maxValue);
+          p.textSize(textFontSize);
+          p.textAlign(p.RIGHT, p.CENTER);
+        }
+          /* Zero text */
         p.fill(lineColor);
         p.noStroke();
         p.text("0%", xCenter - chartXDim2 - 10, yCenter + chartYDim2);

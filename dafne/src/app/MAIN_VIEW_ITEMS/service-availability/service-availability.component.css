@@ -104,10 +104,18 @@
     background-color: black !important;
 }
 
+/* Legend */
 .color-threshold {
     text-align: center;
     font-size: 12px;
     color: white;
+}
+
+.average-legend {
+    text-align: center;
+    font-size: 12px;
+    background-color: #ffdf70;
+    color: var(--main-bg-color);
 }
 
 
@@ -201,6 +209,9 @@
 }
 table {
     width: 100%;
+}
+table tr td:first-child{
+    padding: 0 0.5rem;
 }
 caption, th, td {
     text-align: center;
