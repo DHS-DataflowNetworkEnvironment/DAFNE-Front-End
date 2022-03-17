@@ -137,7 +137,11 @@ export class ServiceAvailabilityComponent implements OnInit {
           this.availabilityDaysNumber = res.values.length;
           this.requestedDaysNumber = tempTimeDifference / (1000 * 3600 * 24) + 1;
           this.requestedServiceAvailabilityList = [];
-          this.averageServiceAvailability = res.values[0].average;
+          if (this.availabilityDaysNumber > 0) {
+            this.averageServiceAvailability = res.values[0].average;
+          } else {
+            this.averageServiceAvailability = -1;
+          }
           
           for (var i = 0; i < this.requestedDaysNumber; i++) {
             this.requestedServiceAvailabilityList[i] = {
