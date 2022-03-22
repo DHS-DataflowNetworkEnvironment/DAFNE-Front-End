@@ -33,12 +33,11 @@ import { AppConfig } from './services/app.config';
 import { ServiceAvailabilityComponent } from './MAIN_VIEW_ITEMS/service-availability/service-availability.component';
 import { ServAvailabilityComponent } from './SIDEBAR_ITEMS/serv-availability/serv-availability.component';
 
-export function initializeApp(appConfig: AppConfig,
-  spinner: SpinnerComponent) {
-
+export function initializeApp(
+  appConfig: AppConfig
+) {
     return () => appConfig.load();
-
-  }
+}
 
 
 @NgModule({

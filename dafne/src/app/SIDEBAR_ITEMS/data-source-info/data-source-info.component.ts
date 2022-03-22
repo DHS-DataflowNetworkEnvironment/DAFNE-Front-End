@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AuthenticationService } from '../../services/authentication.service';
+import { MessageService } from '../../services/message.service';
 
 declare var $: any;
 
@@ -8,14 +9,28 @@ declare var $: any;
   templateUrl: './data-source-info.component.html',
   styleUrls: ['./data-source-info.component.css']
 })
-export class DataSourceInfoComponent implements OnInit {
+export class DataSourceInfoComponent implements OnInit, OnDestroy {
+  private autorefreshSubscription;
   public dataSourcesList;
   private localId: number = -1;
 
-  constructor(private authenticationService: AuthenticationService) { }
+  constructor(
+    private authenticationService: AuthenticationService,
+    private messageService: MessageService
+  ) { 
+    this.autorefreshSubscription = this.messageService.invokeAutoRefresh.subscribe(() => {
+      this.ngOnInit();
+    });
+  }
 
   ngOnInit(): void {
     this.getDataSourcesInfo();
+  }
+
+  ngOnDestroy(): void {
+    if (this.autorefreshSubscription != undefined) {
+      this.autorefreshSubscription.unsubscribe();
+    }
   }
 
   getDataSourcesInfo() {

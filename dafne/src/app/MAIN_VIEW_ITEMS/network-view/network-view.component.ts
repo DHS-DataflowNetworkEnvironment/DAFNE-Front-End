@@ -7,7 +7,6 @@ import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { AppConfig } from '../../services/app.config';
 import { AuthenticationService } from '../../services/authentication.service';
 import { MessageService } from '../../services/message.service';
-import { interval, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-network-view',
@@ -15,7 +14,8 @@ import { interval, Subscription } from 'rxjs';
   styleUrls: ['./network-view.component.css']
 })
 export class NetworkViewComponent implements AfterViewInit, OnDestroy {
-  navigationSubscription;
+  private autorefreshSubscription;
+  private navigationSubscription;
   private pageRefreshed: boolean = true;
   public mapTitle = 'Network View - Active Data Sources';
   private mapType = 'homeView';
@@ -34,9 +34,6 @@ export class NetworkViewComponent implements AfterViewInit, OnDestroy {
   };
   private localId: number;
 
-  public dataRefreshTime = AppConfig.settings.dataRefreshTime;
-  subscription: Subscription;
-
   constructor(
     private activatedroute: ActivatedRoute,
     private authenticationService: AuthenticationService,
@@ -49,6 +46,13 @@ export class NetworkViewComponent implements AfterViewInit, OnDestroy {
           this.pageRefreshed = true;
           this.ngOnInit();
         }
+      }
+    });
+
+    this.autorefreshSubscription = this.messageService.invokeAutoRefresh.subscribe(() => {    
+      if (this.pageRefreshed == false) {
+        this.pageRefreshed = true;
+        this.ngOnInit();
       }
     });
   }
@@ -76,21 +80,15 @@ export class NetworkViewComponent implements AfterViewInit, OnDestroy {
   };
 
   ngOnInit(): any {
-    const dataRefresh = interval(this.dataRefreshTime);
     if (this.sub != undefined) {
       this.sub.unsubscribe();
     }
-    if (this.subscription != undefined) {
-      this.subscription.unsubscribe();
-    }
+
     this.messageService.showSpinner(true);
     this.sub = this.activatedroute.paramMap.subscribe(params => {
       var tempMapType = params.get('mapType');
       this.mapType = (tempMapType != null) ? tempMapType : 'homeView';
       if (this.mapType != this.mapTypePrec) {
-      }
-      if (this.subscription) {
-        this.subscription.unsubscribe();
       }
       this.mapTypePrec = this.mapType;
       if (this.mapType == 'homeView') {
@@ -98,31 +96,16 @@ export class NetworkViewComponent implements AfterViewInit, OnDestroy {
         this.INITIAL_VIEW_STATE = this.HOME_INITIAL_VIEW_STATE;
         this.showArcs = false;
         this.getAllCentres();
-        this.subscription = dataRefresh.subscribe(n => {
-          // get data after Init every dataRefreshTime milliseconds:
-          this.messageService.showSpinner(false);
-          this.getAllCentres();          
-        });
       } else if (this.mapType == 'dhsConnected') {
         this.mapTitle = 'Network View - Connected Data Sources';
         this.INITIAL_VIEW_STATE = this.ACTIVE_INITIAL_VIEW_STATE;
         this.showArcs = true;
         this.getDHSConnected();
-        this.subscription = dataRefresh.subscribe(n => {
-          // get data after Init every dataRefreshTime milliseconds:
-          this.messageService.showSpinner(false);
-          this.getDHSConnected();
-        });
       } else if (this.mapType == 'dataSourcesInfo') {
         this.mapTitle = 'Network View - Active Data Sources';
         this.INITIAL_VIEW_STATE = this.ACTIVE_INITIAL_VIEW_STATE;
         this.showArcs = true;
         this.getActiveDataSource();
-        this.subscription = dataRefresh.subscribe(n => {
-          // get data after Init every dataRefreshTime milliseconds:
-          this.messageService.showSpinner(false);
-          this.getActiveDataSource();
-        });
       }
     });
   }
@@ -142,8 +125,8 @@ export class NetworkViewComponent implements AfterViewInit, OnDestroy {
     if (this.sub != undefined) {
       this.sub.unsubscribe();
     }
-    if (this.subscription != undefined) {
-      this.subscription.unsubscribe();
+    if (this.autorefreshSubscription != undefined) {
+      this.autorefreshSubscription.unsubscribe();
     }
   }
 

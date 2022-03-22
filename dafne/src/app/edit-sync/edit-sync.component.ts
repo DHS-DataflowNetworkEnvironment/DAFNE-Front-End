@@ -4,8 +4,6 @@ import { Synchronizer } from '../models/synchronizer';
 import { AuthenticationService } from '../services/authentication.service';
 import { AlertComponent } from '../alert/alert.component';
 import { MessageService } from '../services/message.service';
-import { interval, Subscription } from 'rxjs';
-import { AppConfig } from '../services/app.config';
 
 declare var $: any;
 
@@ -47,7 +45,8 @@ const regexPatterns = {
   styleUrls: ['./edit-sync.component.css']
 })
 export class EditSyncComponent implements OnInit, OnDestroy {
-  navigationSubscription;
+  private autorefreshSubscription;
+  private navigationSubscription;
   private pageRefreshed: boolean = true;
   public isLocalConfigured = false;
   public syncList = [];
@@ -70,9 +69,6 @@ export class EditSyncComponent implements OnInit, OnDestroy {
     color: "#ffffff"
   };
 
-  public dataRefreshTime = AppConfig.settings.dataRefreshTime;
-  subscription: Subscription;
-
   constructor(
     public authenticationService: AuthenticationService,
     private router: Router,
@@ -87,14 +83,15 @@ export class EditSyncComponent implements OnInit, OnDestroy {
         }
       }
     });
+
+    this.autorefreshSubscription = this.messageService.invokeAutoRefresh.subscribe(() => {
+      this.messageService.showSpinner(false);
+      this.getLocalCentre();
+      this.getSynchronizers();
+    });
   }
 
   ngOnInit(): void {
-    if (this.subscription != undefined) {
-      this.subscription.unsubscribe();
-    }
-    const dataRefresh = interval(this.dataRefreshTime);
-
     this.messageService.localCurrentMessage.subscribe(message => {
       if (message == false) {
         this.isLocalConfigured = false;       
@@ -103,12 +100,6 @@ export class EditSyncComponent implements OnInit, OnDestroy {
         this.isLocalConfigured = true;
         this.getLocalCentre();
         this.getSynchronizers();
-        this.subscription = dataRefresh.subscribe(n => {
-          // get data after Init every dataRefreshTime milliseconds:
-          this.messageService.showSpinner(false);
-          this.getLocalCentre();
-          this.getSynchronizers();
-        });
       }      
     });
 
@@ -124,8 +115,8 @@ export class EditSyncComponent implements OnInit, OnDestroy {
     if (this.navigationSubscription != undefined) {
       this.navigationSubscription.unsubscribe();
     }
-    if (this.subscription != undefined) {
-      this.subscription.unsubscribe();
+    if (this.autorefreshSubscription != undefined) {
+      this.autorefreshSubscription.unsubscribe();
     }
   }
 

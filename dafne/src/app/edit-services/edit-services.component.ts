@@ -4,8 +4,6 @@ import { AuthenticationService } from '../services/authentication.service';
 import { Router, NavigationEnd } from '@angular/router';
 import { AlertComponent } from '../alert/alert.component';
 import { MessageService } from '../services/message.service';
-import { interval, Subscription } from 'rxjs';
-import { AppConfig } from '../services/app.config';
 
 declare var $: any;
 
@@ -29,7 +27,8 @@ const regexPatterns = {
   styleUrls: ['./edit-services.component.css']
 })
 export class EditServicesComponent implements OnInit, OnDestroy {
-  navigationSubscription;
+  private autorefreshSubscription;
+  private navigationSubscription;
   private pageRefreshed: boolean = true;
   public serviceList: any;
   public centreList: any;
@@ -38,9 +37,6 @@ export class EditServicesComponent implements OnInit, OnDestroy {
   public tempServiceUrlToDelete = '';
   
   public serviceTypesList;
-
-  public dataRefreshTime = AppConfig.settings.dataRefreshTime;
-  subscription: Subscription;
 
   constructor(
     public authenticationService: AuthenticationService,
@@ -56,24 +52,18 @@ export class EditServicesComponent implements OnInit, OnDestroy {
         }
       }
     });
-  }
 
-  ngOnInit(): void {
-    if (this.subscription != undefined) {
-      this.subscription.unsubscribe();
-    }
-    const dataRefresh = interval(this.dataRefreshTime);
-
-    this.messageService.showSpinner(true);
-    this.getAllServiceTypes();
-    this.getServices();
-
-    this.subscription = dataRefresh.subscribe(n => {
-      // get data after Init every x milliseconds:
+    this.autorefreshSubscription = this.messageService.invokeAutoRefresh.subscribe(() => {
       this.messageService.showSpinner(false);
       this.getAllServiceTypes();
       this.getServices();
     });
+  }
+
+  ngOnInit(): void {
+    this.messageService.showSpinner(true);
+    this.getAllServiceTypes();
+    this.getServices();
 
     let inputs = document.querySelectorAll('input.form-control');
     inputs.forEach((input) => {
@@ -87,8 +77,8 @@ export class EditServicesComponent implements OnInit, OnDestroy {
     if (this.navigationSubscription != undefined) {
       this.navigationSubscription.unsubscribe();
     }
-    if (this.subscription != undefined) {
-      this.subscription.unsubscribe();
+    if (this.autorefreshSubscription != undefined) {
+      this.autorefreshSubscription.unsubscribe();
     }
   }
   
