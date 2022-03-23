@@ -255,11 +255,15 @@ export class EditServicesComponent implements OnInit, OnDestroy {
         this.alert.showErrorAlert("Form value error", "You entered an invalid value into '" + this.findLableForControl(input).innerHTML + "' field.");
       }
     });
-    let tempCentreId = this.centreList.filter(a => a.name == (<HTMLInputElement>document.getElementById('edit_centre')).value)[0].id;
+    let tempCentreId = this.centreList.filter(a => a.name == (<HTMLInputElement>document.getElementById('edit_centre')).value)[0].id;    
     let tempServiceTypeId = this.serviceTypesList.filter(a => a.service_type == (<HTMLInputElement>document.getElementById('edit_service_type')).value)[0].id;
+    let tempServiceId = id;
+    
     if (tempServiceTypeId != this.serviceTypesList.filter(a => a.service_type == 'DHuS Back-End')[0].id) {
       for (var i = 0; i < this.serviceList.length; i++) {
-        if (tempCentreId == this.centreList.filter(a => a.name == this.serviceList[i].centre)[0].id) {
+        if (tempCentreId == this.centreList.filter(a => a.name == this.serviceList[i].centre)[0].id 
+          && this.serviceList[i].id != tempServiceId
+        ) {
           if (
             this.serviceTypesList.filter(a => a.service_type == this.serviceList[i].service_type)[0].id == this.serviceTypesList.filter(a => a.service_type == 'DHuS Front-End')[0].id ||
             this.serviceTypesList.filter(a => a.service_type == this.serviceList[i].service_type)[0].id == this.serviceTypesList.filter(a => a.service_type == 'DHuS Single Instance')[0].id
