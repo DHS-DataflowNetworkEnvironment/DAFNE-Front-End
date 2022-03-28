@@ -463,8 +463,10 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
         }
 
         if (p.mouseIsPressed) {
-          tx -= p.pmouseX - p.mouseX;
-          ty -= p.pmouseY - p.mouseY;
+          if (p.mouseButton === p.CENTER) {
+            tx -= p.pmouseX - p.mouseX;
+            ty -= p.pmouseY - p.mouseY;
+          }
         }
         
         if (this.doResetZoom) {
