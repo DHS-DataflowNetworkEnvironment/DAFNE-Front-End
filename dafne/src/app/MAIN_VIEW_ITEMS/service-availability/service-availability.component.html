@@ -52,7 +52,7 @@
             <thead>
                 <th style="color: white">{{localCentre.name}}</th>
                 <ng-template ngFor let-availability [ngForOf]="requestedServiceAvailabilityList" let-i="index">
-                    <th>{{availability.date.slice(0,4)}}<div>{{availability.date.slice(5)}}</div></th>
+                    <th>{{availability.date}}</th>
                 </ng-template>
             </thead>
             <tr>
