@@ -223,6 +223,7 @@ th {
     background-color: var(--table-header-bg-color);
 }
 
+
 /* Responsiveness */
 @media screen and (max-width: 767px) {
     #chart-title {
