@@ -58,21 +58,21 @@
             <tr>
                 <td style="color: var(--main-text-color)">TotalRequests</td>
                 <ng-template ngFor let-availability [ngForOf]="requestedServiceAvailabilityList" let-i="index">
-                    <td *ngIf="availability.percentage == -1" style="color: var(--windows-title-color)">N/A</td>
+                    <td *ngIf="availability.percentage == -1" style="color: var(--windows-title-color)">NaN</td>
                     <td *ngIf="availability.percentage != -1" style="color: var(--main-text-color)">{{availability.totalRequests}}</td>
                 </ng-template>
             </tr>
             <tr>
                 <td class="first-column" style="color: var(--main-text-color)">SuccessResponses</td>
                 <ng-template ngFor let-availability [ngForOf]="requestedServiceAvailabilityList" let-i="index">
-                    <td *ngIf="availability.percentage == -1" style="color: var(--windows-title-color)">N/A</td>
+                    <td *ngIf="availability.percentage == -1" style="color: var(--windows-title-color)">NaN</td>
                     <td *ngIf="availability.percentage != -1" style="color: var(--main-text-color)">{{availability.successResponses}}</td>
                 </ng-template>
             </tr>
             <tr>
                 <td style="color: var(--main-text-color)">Availability</td>
                 <ng-template ngFor let-availability [ngForOf]="requestedServiceAvailabilityList" let-i="index">
-                    <td *ngIf="availability.percentage == -1" style="color: var(--windows-title-color)">N/A</td>
+                    <td *ngIf="availability.percentage == -1" style="color: var(--windows-title-color)">NaN</td>
                     <td *ngIf="availability.percentage != -1" [ngStyle]="{'background-color': getAvailabilityHexColorFromPerc(availability.percentage), 'color': '#ffffff'}">{{availability.percentage.toFixed(2)}}%</td>
                 </ng-template>
             </tr>

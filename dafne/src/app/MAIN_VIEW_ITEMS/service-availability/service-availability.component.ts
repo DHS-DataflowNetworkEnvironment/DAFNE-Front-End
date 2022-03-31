@@ -432,7 +432,7 @@ export class ServiceAvailabilityComponent implements OnInit {
                 p.fill(100);
                 p.textSize(textFontSize);
                 p.textSize(valueFontSize);
-                p.text("N/A", xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2 * dayYDim + k * dayYDim + 1 + dayYDim/5.5);
+                p.text("NaN", xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2 * dayYDim + k * dayYDim + 1 + dayYDim/5.5);
               }
             }
           }
