@@ -249,6 +249,8 @@ export class ServiceAvailabilityComponent implements OnInit {
       let sectionScaleSingle = 1.4;
       let maxValue = 100;
 
+      let lineDashSequence = [10, 10];
+
       let sf = 1.0;
       let tx = 0;
       let ty = 0;
@@ -377,7 +379,9 @@ export class ServiceAvailabilityComponent implements OnInit {
         /* Average Line */
         if (this.averageServiceAvailability >= 0) {
           p.stroke(averageLineColor);
+          p.drawingContext.setLineDash(lineDashSequence);
           p.line(xCenter - chartXDim2, yCenter + chartYDim2 - this.averageServiceAvailability * chartYDim / maxValue, xCenter + chartXDim2, yCenter + chartYDim2 - this.averageServiceAvailability * chartYDim / maxValue);
+          p.drawingContext.setLineDash([]);
           p.textSize(textFontSize);
           p.textAlign(p.RIGHT, p.CENTER);
         }
