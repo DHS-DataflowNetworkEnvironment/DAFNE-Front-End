@@ -242,7 +242,7 @@ export class ServiceAvailabilityComponent implements OnInit {
       let averageLineColor = p.color('#ffdf70');
 
       let valueFontSize = 20;
-      let dateFontSize = 12;
+      let dateFontSize = 10;
       let textFontSize = 10;
 
       let barGapScale = 30.0;
