@@ -73,7 +73,7 @@
                         <div class="mb-1 ml-auto">
                             <label for="add_service_url_sync" class="form-label">Service URL</label>
                             <input type="text" class="form-control" id="add_service_url_sync" [value]="currentSync.serviceUrl">
-                            <small id="serviceUrlSyncHelp" class="form-text">Length: 1 - 256 characters. Invalid characters: , ; and SPACE</small>
+                            <small id="serviceUrlSyncHelp" class="form-text">Length: 1 - 256 characters.<br>Invalid characters: , ; and SPACE</small>
                         </div>
                     </div>
                     <div class="input-group mb-1">
@@ -93,10 +93,10 @@
                         <div class="mb-1">
                             <label for="add_schedule" class="form-label">Schedule</label>
                             <input type="text" class="form-control" id="add_schedule" [value]="currentSync.schedule">
-                            <small id="scheduleHelp" class="form-text">Insert a valid CRON string. Valid characters: 0-9 * , - / ? and SPACE</small>
+                            <small id="scheduleHelp" class="form-text">Insert a valid CRON string.<br>Valid characters: 0-9 * , - / ? and SPACE</small>
                         </div>
-                        <div class="mb-1 ml-auto copy_product_div">
-                            <label for="add_copy_product" id="copy_product_label" class="form-label">Copy product</label>
+                        <div class="mb-1 ml-auto">
+                            <label for="add_copy_product" class="form-label">Copy product</label>
                             <input type="text" class="form-control" id="add_copy_product" [value]="currentSync.copyProduct" onkeydown="return false">
                             <i id="add_copy_product-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
                             <ul class="dropdown-menu" aria-labelledby="sync-dropdown">
@@ -147,7 +147,7 @@
                         <div class="mb-1 ml-auto">
                             <label for="add_last_creation_date" class="form-label">Last creation date</label>
                             <input type="text" class="form-control" id="add_last_creation_date" [value]="parseJsonDate(currentSync.lastCreationDate)">
-                            <small id="lastCreationDateHelp" class="form-text">Insert a valid data string: YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS.mmm</small>
+                            <small id="lastCreationDateHelp" class="form-text">Insert a valid data string: YYYY-MM-DD<br>or YYYY-MM-DDTHH:MM:SS.mmm</small>
                         </div>
                     </div>
                     <div class="input-group mb-1">
@@ -201,7 +201,7 @@
                         <div class="mb-1 ml-auto">
                             <label for="edit_service_url_sync" class="form-label">Service URL</label>
                             <input type="text" class="form-control" id="edit_service_url_sync" [value]="currentSync.serviceUrl">
-                            <small id="serviceUrlSyncHelp" class="form-text">Length: 1 - 256 characters. Invalid characters: , ; and SPACE</small>
+                            <small id="serviceUrlSyncHelp" class="form-text">Length: 1 - 256 characters.<br>Invalid characters: , ; and SPACE</small>
                         </div>
                     </div>
                     <div class="input-group mb-1">
@@ -221,7 +221,7 @@
                         <div class="mb-1">
                             <label for="edit_schedule" class="form-label">Schedule</label>
                             <input type="text" class="form-control" id="edit_schedule" [value]="currentSync.schedule">
-                            <small id="scheduleHelp" class="form-text">Insert a valid CRON string. Valid characters: 0-9 * , - / ? and SPACE</small>
+                            <small id="scheduleHelp" class="form-text">Insert a valid CRON string.<br>Valid characters: 0-9 * , - / ? and SPACE</small>
                         </div>
                         <div class="mb-1 ml-auto copy_product_div">
                             <label for="edit_copy_product" class="form-label">Copy product</label>
@@ -275,7 +275,7 @@
                         <div class="mb-1 ml-auto">
                             <label for="edit_last_creation_date" class="form-label">Last creation date</label>
                             <input type="text" class="form-control" id="edit_last_creation_date" [value]="parseJsonDate(currentSync.lastCreationDate)">
-                            <small id="lastCreationDateHelp" class="form-text">Insert a valid data string: YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS.mmm</small>
+                            <small id="lastCreationDateHelp" class="form-text">Insert a valid data string: YYYY-MM-DD<br>or YYYY-MM-DDTHH:MM:SS.mmm</small>
                         </div>
                     </div>
                     <div class="input-group mb-1">

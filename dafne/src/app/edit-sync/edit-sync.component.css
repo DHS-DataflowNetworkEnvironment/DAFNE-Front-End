@@ -110,6 +110,7 @@ small {
 }
 
 .form-control.valid {
+    border-color: green;
     border-width: 0;
 }
 

@@ -105,11 +105,12 @@ small {
 }
 
 .form-control.valid {
+    border-color: green;
     border-width: 0;
 }
 
 .form-control.invalid {
-    border: 1px solid red;
+    border-color: red;
     margin-bottom: 50px;
 }
 
@@ -123,7 +124,7 @@ small {
 .form-control.invalid + small {
     opacity: 1;
     height: auto;
-    margin-bottom: 20px;
+    margin-top: -40px;
     transition: opacity .4s ease-out;
 }
 #add_id, #edit_id {

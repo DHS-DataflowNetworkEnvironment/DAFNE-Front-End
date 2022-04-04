@@ -102,12 +102,17 @@ input, i {
 .modal-content label {
     margin-bottom: 0;
 }
+small {
+    position: absolute;
+}
 .form-control.valid {
     border-color: green;
+    border-width: 0;
 }
 
 .form-control.invalid {
     border-color: red;
+    margin-bottom: 50px;
 }
 
 .form-control + small {
@@ -120,8 +125,11 @@ input, i {
 .form-control.invalid + small {
     opacity: 1;
     height: auto;
-    margin-bottom: 20px;
+    margin-top: -40px;
     transition: opacity .4s ease-out;
+}
+#colorHelp {
+    margin-top: 50px;
 }
 #add_color-picker {
     -webkit-box-shadow:inset 0px 0px 0px 1px #000;
