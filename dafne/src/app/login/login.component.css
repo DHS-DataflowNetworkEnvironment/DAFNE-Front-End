@@ -1,30 +1,38 @@
-.card-container {
+.modal-dialog {
     justify-content: center;
     align-items: center;
-    height: calc(100vh - 3rem);
+    height: calc(100vh - 7rem)
 }
-.card {
-    width: 20rem;
-    height: 14rem;
+.modal-content {
     background-color: var(--title-bg-color);
     color: var(--main-text-color);
 }
-.card-header {
+.modal-header {
     border-bottom: 1px solid var(--table-border-color);
 }
-.username {
-    margin-left: auto;
+.modal-title {
+    color: var(--brighter-text-color);
 }
-.password {
-    margin-left: auto;
-}
-.buttons {
-    margin-left: auto;
-}
-input {
+.modal-content input {
     background-color: var(--modal-bg-color);
     border-color: var(--title-bg-color);
     color: var(--main-text-color);
+    width: 225px;
+    cursor: pointer !important;
+}
+.modal-content .fa-eye, .fa-eye-slash {
+    font-size: 1.0rem;
+    top: 1.7rem;
+    right: 0;
+    border: 0.5rem solid var(--modal-bg-color);
+    background-color: var(--modal-bg-color);
+    color: var(--main-text-color);
+    position: absolute;
+    z-index: 99;
+    cursor: pointer !important;
+}
+.modal-content label {
+    margin-bottom: 0;
 }
 
 /* Autofill settings for Firefow and Chrome */
