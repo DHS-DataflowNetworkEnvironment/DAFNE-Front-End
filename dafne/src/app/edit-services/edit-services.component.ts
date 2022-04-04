@@ -163,11 +163,19 @@ export class EditServicesComponent implements OnInit, OnDestroy {
   }
 
   public addNewService() {
+    this.service.service_type = '';
     this.service.username = '';
     this.service.password = '';
-    this.service.service_url = '';
-    this.service.service_type = '';
+    this.service.service_url = '';    
     this.service.centre = '';
+    let inputs = document.querySelectorAll('#addServiceForm input.form-control');
+    inputs.forEach((input) => {
+      if ((<HTMLInputElement>input).id == "add_service_type") (<HTMLInputElement>input).value = this.service.service_type;
+      if ((<HTMLInputElement>input).id == "add_service_username") (<HTMLInputElement>input).value = this.service.username;
+      if ((<HTMLInputElement>input).id == "add_service_password") (<HTMLInputElement>input).value = this.service.password;
+      if ((<HTMLInputElement>input).id == "add_service_url") (<HTMLInputElement>input).value = this.service.service_url;
+      if ((<HTMLInputElement>input).id == "add_centre") (<HTMLInputElement>input).value = this.service.centre;
+    });
     $("#addServiceModal").modal('toggle');
   }
 

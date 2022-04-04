@@ -215,21 +215,40 @@ export class EditSyncComponent implements OnInit, OnDestroy {
 
   public addNewSynchronizer() {
     this.currentSync = new Synchronizer();
-    this.currentSync.label = "";
     this.currentSync.serviceUrlBackend = "";
+    this.currentSync.label = "";
     this.currentSync.serviceUrl = "";
     this.currentSync.serviceLogin = "";
     this.currentSync.servicePassword = "";
-    this.currentSync.copyProduct = "true";
     this.currentSync.schedule = "";
+    this.currentSync.copyProduct = "true";
     this.currentSync.pageSize = null;
     this.currentSync.request = "stop";
+    this.currentSync.sourceCollection = "";
     this.currentSync.targetCollection = "";
     this.currentSync.remoteIncoming = "";
-    this.currentSync.sourceCollection = "";
     this.currentSync.lastCreationDate = null;
     this.currentSync.filterParam = "";
     this.currentSync.geoFilter = "";
+    let inputs = document.querySelectorAll('#addSyncForm input.form-control');
+    inputs.forEach((input) => {
+      console.log("id: " + (<HTMLInputElement>input).id);
+      if ((<HTMLInputElement>input).id == "add_service_url_backend") (<HTMLInputElement>input).value = this.currentSync.serviceUrlBackend;
+      if ((<HTMLInputElement>input).id == "add_label") (<HTMLInputElement>input).value = this.currentSync.label;
+      if ((<HTMLInputElement>input).id == "add_service_url_sync") (<HTMLInputElement>input).value = this.currentSync.serviceUrl;
+      if ((<HTMLInputElement>input).id == "add_service_login") (<HTMLInputElement>input).value = this.currentSync.serviceLogin;
+      if ((<HTMLInputElement>input).id == "add_service_password") (<HTMLInputElement>input).value = this.currentSync.servicePassword;
+      if ((<HTMLInputElement>input).id == "add_schedule") (<HTMLInputElement>input).value = this.currentSync.schedule;
+      if ((<HTMLInputElement>input).id == "add_copy_product") (<HTMLInputElement>input).value = this.currentSync.copyProduct;
+      if ((<HTMLInputElement>input).id == "add_page_size") (<HTMLInputElement>input).value = "";
+      if ((<HTMLInputElement>input).id == "add_request") (<HTMLInputElement>input).value = this.currentSync.request;
+      if ((<HTMLInputElement>input).id == "add_source_collection") (<HTMLInputElement>input).value = this.currentSync.sourceCollection;
+      if ((<HTMLInputElement>input).id == "add_target_collection") (<HTMLInputElement>input).value = this.currentSync.targetCollection;
+      if ((<HTMLInputElement>input).id == "add_remote_incoming") (<HTMLInputElement>input).value = this.currentSync.remoteIncoming;
+      if ((<HTMLInputElement>input).id == "add_last_creation_date") (<HTMLInputElement>input).value = this.currentSync.lastCreationDate;
+      if ((<HTMLInputElement>input).id == "add_filter_param") (<HTMLInputElement>input).value = this.currentSync.filterParam;
+      if ((<HTMLInputElement>input).id == "add_geo_filter") (<HTMLInputElement>input).value = this.currentSync.geoFilter;
+    });
     $("#addSynchronizerModal").modal('toggle');
   }
 
@@ -326,7 +345,6 @@ export class EditSyncComponent implements OnInit, OnDestroy {
         valid = false;
         this.alert.showErrorAlert("Form value error", "You entered an invalid value into '" + this.findLableForControl(input).innerHTML + "' field.");
       }
-      
     });
     if (valid) {
       let serviceUrl = (<HTMLInputElement>document.getElementById("add_service_url_backend")).value;
