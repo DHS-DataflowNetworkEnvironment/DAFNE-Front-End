@@ -232,7 +232,6 @@ export class EditSyncComponent implements OnInit, OnDestroy {
     this.currentSync.geoFilter = "";
     let inputs = document.querySelectorAll('#addSyncForm input.form-control');
     inputs.forEach((input) => {
-      console.log("id: " + (<HTMLInputElement>input).id);
       if ((<HTMLInputElement>input).id == "add_service_url_backend") (<HTMLInputElement>input).value = this.currentSync.serviceUrlBackend;
       if ((<HTMLInputElement>input).id == "add_label") (<HTMLInputElement>input).value = this.currentSync.label;
       if ((<HTMLInputElement>input).id == "add_service_url_sync") (<HTMLInputElement>input).value = this.currentSync.serviceUrl;
