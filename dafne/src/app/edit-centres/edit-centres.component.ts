@@ -132,10 +132,11 @@ export class EditCentresComponent implements OnInit, OnDestroy {
       this.validate(input, regexPatterns[input.id]);
       if (input.className == "form-control invalid") {
         valid = false;
-        this.alert.showErrorAlert("Form value error", "You entered an invalid value into '" + this.findLableForControl(input).innerHTML + "' field.");
+        return;
       }
     });
     if (valid) {
+      $('.modal').modal('hide');
       let body = {
         name: (<HTMLInputElement>document.getElementById("add_name")).value,
         latitude: (<HTMLInputElement>document.getElementById('add_latitude')).value,
@@ -150,7 +151,6 @@ export class EditCentresComponent implements OnInit, OnDestroy {
           this.refreshPage();
         }
       );
-    } else {
     }
   }
 
@@ -194,10 +194,11 @@ export class EditCentresComponent implements OnInit, OnDestroy {
       this.validate(input, regexPatterns[input.id]);
       if (input.className == "form-control invalid") {
         valid = false;
-        this.alert.showErrorAlert("Form value error", "You entered an invalid value into '" + this.findLableForControl(input).innerHTML + "' field.");
+        return;
       }
     });
     if (valid) {
+      $('.modal').modal('hide');
       let body = {
         name: (<HTMLInputElement>document.getElementById("edit_name")).value,
         latitude: (<HTMLInputElement>document.getElementById('edit_latitude')).value,
@@ -212,8 +213,6 @@ export class EditCentresComponent implements OnInit, OnDestroy {
           this.refreshPage();
         }
       )
-    } else {
-
     }
   }
 

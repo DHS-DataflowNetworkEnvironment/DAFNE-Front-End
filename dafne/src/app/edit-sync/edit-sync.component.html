@@ -9,7 +9,7 @@
             <table>
                 <tr>
                     <th>Label</th>
-                    <th>Service URL Backend</th>
+                    <th>Back-End URL</th>
                     <th>Service URL Synchronizer</th>
                     <th>Copy product</th>
                     <th>Schedule</th>
@@ -54,8 +54,9 @@
                             <input type="text" class="form-control" id="add_id" value="auto" onkeydown="return false" disabled>
                         </div>
                         <div class="mb-1 ml-auto">
-                            <label for="add_service_url_backend" class="form-label">Service URL Backend</label>
+                            <label for="add_service_url_backend" class="form-label">Back-End URL</label>
                             <input type="text" class="form-control" id="add_service_url_backend" [value]="currentSync.serviceUrlBackend" onkeydown="return false">
+                            <small id="addServiceUrlHelp" class="form-text">Please select a Back-End URL</small>
                             <i id="add_service_url_backend-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
                             <ul class="dropdown-menu" aria-labelledby="add_service_url_backend-dropdown">
                                 <li *ngFor="let serviceUrl of serviceUrlBackendList; let k = index">
@@ -164,7 +165,7 @@
                     </div>
                     <div class="row" >
                         <button type="button" class="btn btn-secondary ml-auto m-3" data-bs-dismiss="modal" aria-label="Close">Close</button>
-                        <button type="submit" class="btn btn-primary m-3" (click)="onAddSubmit()" data-bs-dismiss="modal">Submit</button>
+                        <button type="submit" class="btn btn-primary m-3" (click)="onAddSubmit()">Submit</button>
                     </div>
                 </form>
             </div>
@@ -188,8 +189,9 @@
                             <input type="text" class="form-control" id="edit_id" [value]="currentSync.id" onkeydown="return false" disabled>
                         </div>
                         <div class="mb-1 ml-auto">
-                            <label for="edit_service_url_backend" class="form-label">Service URL Backend</label>
+                            <label for="edit_service_url_backend" class="form-label">Back-End URL</label>
                             <input type="text" class="form-control" id="edit_service_url_backend" [value]="currentSync.serviceUrlBackend" onkeydown="return false" disabled>
+                            <!-- <small id="addServiceUrlHelp" class="form-text">Please select a Back-End URL</small> -->
                         </div>
                     </div>
                     <div class="input-group mb-1">
@@ -292,7 +294,7 @@
                     </div>
                     <div class="row" >
                         <button type="button" class="btn btn-secondary ml-auto m-3" data-bs-dismiss="modal" aria-label="Close">Close</button>
-                        <button type="submit" class="btn btn-primary m-3" (click)="onEditSubmit(currentSync.id)" data-bs-dismiss="modal">Submit</button>
+                        <button type="submit" class="btn btn-primary m-3" (click)="onEditSubmit(currentSync.id)">Submit</button>
                     </div>
                 </form>
             </div>

@@ -67,7 +67,7 @@ export class EditServicesComponent implements OnInit, OnDestroy {
 
     let inputs = document.querySelectorAll('input.form-control');
     inputs.forEach((input) => {
-      input.addEventListener('input', (e:any) => {        
+      input.addEventListener('input', (e:any) => {
         this.validate(e.target, regexPatterns[e.target.attributes.id.value]);
       });
     });
@@ -146,10 +146,16 @@ export class EditServicesComponent implements OnInit, OnDestroy {
 
   setNewFormServiceType(id: number) {
     this.service.service_type = this.serviceTypesList.filter(a => a.id == id)[0].service_type;
+    let element = document.getElementById('add_service_type');
+    (<HTMLInputElement>element).value = this.service.service_type;
+    element.dispatchEvent(new KeyboardEvent('input', { 'bubbles': true }));
   }
 
   setNewFormCentre(centreId: number) {
     this.service.centre = this.centreList.filter(a => a.id == centreId)[0].name;
+    let element = document.getElementById('add_centre');
+    (<HTMLInputElement>element).value = this.service.centre;
+    element.dispatchEvent(new KeyboardEvent('input', { 'bubbles': true }));
   }
 
   public findLableForControl(el) {
@@ -187,7 +193,7 @@ export class EditServicesComponent implements OnInit, OnDestroy {
       this.validate(input, regexPatterns[input.id]);
       if (input.className == "form-control invalid") {
         valid = false;
-        this.alert.showErrorAlert("Form value error", "You entered an invalid value into '" + this.findLableForControl(input).innerHTML + "' field.");
+        return;
       }
     });
     
@@ -219,8 +225,6 @@ export class EditServicesComponent implements OnInit, OnDestroy {
           this.refreshPage();
         }
       );
-    } else {
-
     }
   }
 
@@ -260,7 +264,7 @@ export class EditServicesComponent implements OnInit, OnDestroy {
       this.validate(input, regexPatterns[input.id]);
       if (input.className == "form-control invalid") {
         valid = false;
-        this.alert.showErrorAlert("Form value error", "You entered an invalid value into '" + this.findLableForControl(input).innerHTML + "' field.");
+        return;
       }
     });
     let tempCentreId = this.centreList.filter(a => a.name == (<HTMLInputElement>document.getElementById('edit_centre')).value)[0].id;    
@@ -283,6 +287,7 @@ export class EditServicesComponent implements OnInit, OnDestroy {
       }
     }
     if (valid) {
+      $('.modal').modal('hide');
       let body: any;
       if ((<HTMLInputElement>document.getElementById('edit_service_password')).value == '') {
         body = {
@@ -307,8 +312,6 @@ export class EditServicesComponent implements OnInit, OnDestroy {
           this.refreshPage();
         }
       );
-    } else {
-
     }
   }
 

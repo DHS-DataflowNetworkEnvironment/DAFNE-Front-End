@@ -170,49 +170,6 @@ export class EditSyncComponent implements OnInit, OnDestroy {
     );
   }
 
-
-  public editSynchronizer(id: number, service_url_backend: string) {
-    let tempSync: any;
-    for (var i = 0; i < this.serviceUrlBackendList.length; i++) {
-      if (this.serviceUrlBackendList[i] == service_url_backend) {
-        this.tempServiceUrlBackendNumber = i;
-        tempSync = this.syncList[i].filter(a => a.Id === id)[0];
-      }
-    }
-    
-    this.currentSync.id = tempSync.Id;
-    this.currentSync.label = tempSync.Label;
-    this.currentSync.serviceUrlBackend = service_url_backend; // serviceUrlBackend..
-    this.currentSync.serviceUrl = tempSync.ServiceUrl; // serviceUrlSync..
-    this.currentSync.serviceLogin = tempSync.ServiceLogin;
-    this.currentSync.servicePassword = '';
-    this.currentSync.copyProduct = tempSync.CopyProduct;
-    this.currentSync.schedule = tempSync.Schedule;
-    this.currentSync.pageSize = tempSync.PageSize;
-    this.currentSync.request = tempSync.Request;
-    this.currentSync.targetCollection = (tempSync.TargetCollectionName == undefined ? '' : tempSync.TargetCollectionName);
-    this.currentSync.remoteIncoming = tempSync.RemoteIncoming;
-    this.currentSync.sourceCollection = tempSync.SourceCollection;
-    this.currentSync.lastCreationDate = tempSync.LastCreationDate;
-    this.currentSync.filterParam = tempSync.FilterParam;
-    this.currentSync.geoFilter = tempSync.GeoFilter;
-    $("#editSyncModal").modal('toggle');
-  }
-
-
-  public setNewFormRequest(request) {
-    this.currentSync.request = request;
-  }
-
-  public setCopyProduct(copyProduct) {    
-    this.currentSync.copyProduct = copyProduct;
-  }
-
-  public editCopyProduct(copyProduct) {    
-    this.currentSync.copyProduct = copyProduct;
-  }
-
-
   public addNewSynchronizer() {
     this.currentSync = new Synchronizer();
     this.currentSync.serviceUrlBackend = "";
@@ -251,6 +208,67 @@ export class EditSyncComponent implements OnInit, OnDestroy {
     $("#addSynchronizerModal").modal('toggle');
   }
 
+  public onAddSubmit() {
+    let valid = true;
+    let inputs = document.querySelectorAll('#addSyncForm input.form-control');
+    inputs.forEach((input) => {
+      this.validate(input, regexPatterns[input.id]);
+      if (input.className == "form-control invalid") {
+        valid = false;
+        return;
+      }
+    });
+    if (valid) {
+      let serviceUrl = (<HTMLInputElement>document.getElementById("add_service_url_backend")).value;
+      let synch = {
+        "Label":  (<HTMLInputElement>document.getElementById("add_label")).value,
+        "ServiceUrl": (<HTMLInputElement>document.getElementById("add_service_url_sync")).value,
+        "ServiceLogin": (<HTMLInputElement>document.getElementById("add_service_login")).value,
+        "ServicePassword": (<HTMLInputElement>document.getElementById("add_service_password")).value,
+        "RemoteIncoming": (<HTMLInputElement>document.getElementById("add_remote_incoming")).value,
+        "Schedule": (<HTMLInputElement>document.getElementById("add_schedule")).value,
+        "PageSize": (<HTMLInputElement>document.getElementById("add_page_size")).value,
+        "CopyProduct": (<HTMLInputElement>document.getElementById("add_copy_product")).value,
+        "FilterParam": (<HTMLInputElement>document.getElementById("add_filter_param")).value,
+        "GeoFilter": (<HTMLInputElement>document.getElementById("add_geo_filter")).value,
+        "SourceCollection": (<HTMLInputElement>document.getElementById("add_source_collection")).value,
+        "LastCreationDate": (<HTMLInputElement>document.getElementById("add_last_creation_date")).value,
+        "Request": (<HTMLInputElement>document.getElementById("add_request")).value,
+        "TargetCollectionName": (<HTMLInputElement>document.getElementById("add_target_collection")).value
+      }
+
+      let body = {
+        serviceUrl: serviceUrl,
+        synch: synch
+      };
+
+    this.authenticationService.addSynchronizer(body).subscribe(
+      (res: string) => {
+        this.refreshPage();
+    });
+    }
+  }
+
+  public setNewFormServiceUrlBackend(idx: number) {
+    this.currentSync.serviceUrlBackend = this.serviceUrlBackendList[idx];
+  }
+
+  public setTargetCollection(id: number) {
+    this.currentSync.targetCollection = this.collectionsList[id];
+  }
+
+  public setNewFormRequest(request) {
+    this.currentSync.request = request;
+  }
+
+  public setCopyProduct(copyProduct) {    
+    this.currentSync.copyProduct = copyProduct;
+  }
+
+  public editCopyProduct(copyProduct) {    
+    this.currentSync.copyProduct = copyProduct;
+  }
+  
   public deleteSynchronizer(id: number, service_url_backend: string) {
     for (var i = 0; i < this.serviceUrlBackendList.length; i++) {
       if (this.serviceUrlBackendList[i] == service_url_backend) {
@@ -288,6 +306,34 @@ export class EditSyncComponent implements OnInit, OnDestroy {
     return undefined;
   }
 
+  public editSynchronizer(id: number, service_url_backend: string) {
+    let tempSync: any;
+    for (var i = 0; i < this.serviceUrlBackendList.length; i++) {
+      if (this.serviceUrlBackendList[i] == service_url_backend) {
+        this.tempServiceUrlBackendNumber = i;
+        tempSync = this.syncList[i].filter(a => a.Id === id)[0];
+      }
+    }
+    
+    this.currentSync.id = tempSync.Id;
+    this.currentSync.label = tempSync.Label;
+    this.currentSync.serviceUrlBackend = service_url_backend; // serviceUrlBackend..
+    this.currentSync.serviceUrl = tempSync.ServiceUrl; // serviceUrlSync..
+    this.currentSync.serviceLogin = tempSync.ServiceLogin;
+    this.currentSync.servicePassword = '';
+    this.currentSync.copyProduct = tempSync.CopyProduct;
+    this.currentSync.schedule = tempSync.Schedule;
+    this.currentSync.pageSize = tempSync.PageSize;
+    this.currentSync.request = tempSync.Request;
+    this.currentSync.targetCollection = (tempSync.TargetCollectionName == undefined ? '' : tempSync.TargetCollectionName);
+    this.currentSync.remoteIncoming = tempSync.RemoteIncoming;
+    this.currentSync.sourceCollection = tempSync.SourceCollection;
+    this.currentSync.lastCreationDate = tempSync.LastCreationDate;
+    this.currentSync.filterParam = tempSync.FilterParam;
+    this.currentSync.geoFilter = tempSync.GeoFilter;
+    $("#editSyncModal").modal('toggle');
+  }
+
   public onEditSubmit(id: number) {
     let valid = true;
     let inputs = document.querySelectorAll('#editSyncForm input.form-control');
@@ -295,7 +341,7 @@ export class EditSyncComponent implements OnInit, OnDestroy {
       this.validate(input, regexPatterns[input.id]);
       if (input.className == "form-control invalid") {
         valid = false;
-        this.alert.showErrorAlert("Form value error", "You entered an invalid value into '" + this.findLableForControl(input).innerHTML + "' field.");
+        return;
       }
     });
     if (valid) {
@@ -330,51 +376,7 @@ export class EditSyncComponent implements OnInit, OnDestroy {
   }
 
 
-  setNewFormServiceUrlBackend(idx: number) {
-    this.currentSync.serviceUrlBackend = this.serviceUrlBackendList[idx];
-  }
-
-  public onAddSubmit() {
-
-    let valid = true;
-    let inputs = document.querySelectorAll('#addSyncForm input.form-control');
-    inputs.forEach((input) => {
-      this.validate(input, regexPatterns[input.id]);
-      if (input.className == "form-control invalid") {
-        valid = false;
-        this.alert.showErrorAlert("Form value error", "You entered an invalid value into '" + this.findLableForControl(input).innerHTML + "' field.");
-      }
-    });
-    if (valid) {
-      let serviceUrl = (<HTMLInputElement>document.getElementById("add_service_url_backend")).value;
-      let synch = {
-        "Label":  (<HTMLInputElement>document.getElementById("add_label")).value,
-        "ServiceUrl": (<HTMLInputElement>document.getElementById("add_service_url_sync")).value,
-        "ServiceLogin": (<HTMLInputElement>document.getElementById("add_service_login")).value,
-        "ServicePassword": (<HTMLInputElement>document.getElementById("add_service_password")).value,
-        "RemoteIncoming": (<HTMLInputElement>document.getElementById("add_remote_incoming")).value,
-        "Schedule": (<HTMLInputElement>document.getElementById("add_schedule")).value,
-        "PageSize": (<HTMLInputElement>document.getElementById("add_page_size")).value,
-        "CopyProduct": (<HTMLInputElement>document.getElementById("add_copy_product")).value,
-        "FilterParam": (<HTMLInputElement>document.getElementById("add_filter_param")).value,
-        "GeoFilter": (<HTMLInputElement>document.getElementById("add_geo_filter")).value,
-        "SourceCollection": (<HTMLInputElement>document.getElementById("add_source_collection")).value,
-        "LastCreationDate": (<HTMLInputElement>document.getElementById("add_last_creation_date")).value,
-        "Request": (<HTMLInputElement>document.getElementById("add_request")).value,
-        "TargetCollectionName": (<HTMLInputElement>document.getElementById("add_target_collection")).value
-      }
-
-      let body = {
-        serviceUrl: serviceUrl,
-        synch: synch
-      };
-
-    this.authenticationService.addSynchronizer(body).subscribe(
-      (res: string) => {
-        this.refreshPage();
-    });
-    }
-  }
+  
   
   parseJsonDate = (jsonDate)  => {
     try {
@@ -420,10 +422,6 @@ export class EditSyncComponent implements OnInit, OnDestroy {
       (res: string) => {
         this.refreshPage();
       })
-  }
-
-  setTargetCollection(id: number) {
-    this.currentSync.targetCollection = this.collectionsList[id];
   }
 
   public toggleAddPasswordVisibility() {

@@ -131,6 +131,21 @@ small {
     color: #505053;
 }
 
+/* Autofill settings for Firefow and Chrome */
+input:autofill {
+    background: var(--modal-bg-color);
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    transition: all 0s 500s;
+    -webkit-box-shadow: 0 0 0 30px var(--modal-bg-color) inset !important;
+    box-shadow: 0 0 0 30px var(--modal-bg-color) inset !important;
+    -webkit-text-fill-color: var(--main-text-color) !important;
+}
+
 
 /* Dropdown menus */
 .dropdown-menu{
