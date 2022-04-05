@@ -252,6 +252,9 @@ export class EditSyncComponent implements OnInit, OnDestroy {
 
   public setNewFormServiceUrlBackend(idx: number) {
     this.currentSync.serviceUrlBackend = this.serviceUrlBackendList[idx];
+    let element = document.getElementById('add_service_url_backend');
+    (<HTMLInputElement>element).value = this.currentSync.serviceUrlBackend;
+    element.dispatchEvent(new KeyboardEvent('input', { 'bubbles': true }));
   }
 
   public setTargetCollection(id: number) {
