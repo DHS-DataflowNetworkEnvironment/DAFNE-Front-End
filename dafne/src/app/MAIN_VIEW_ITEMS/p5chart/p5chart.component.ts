@@ -806,7 +806,7 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
             if (barHeight == 0 || barHeight == undefined) {
               barHeight = 1;
             }
-            p.fill((((this.completenessDataList[i].values[k].value < 0 ? 0 : this.completenessDataList[i].values[k].value) * chartYDim / (maxSumValue+1)) <= barTextLimit && k == 0) ? lineColor : (barHeight > barTextLimit ? '#000000' : lineColor));
+            p.fill((((this.completenessDataList[i].values[k].value < 0 ? 0 : this.completenessDataList[i].values[k].value) * chartYDim / (maxSumValue+1)) <= barTextLimit && k == 0) ? lineColor : '#000000');
             p.noStroke();
             p.textSize(valueFontSize);
             p.textAlign(p.CENTER, p.TOP);
@@ -947,7 +947,7 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
               if (this.completenessDataList[i].values[j].value > 0) barHeight += this.completenessDataList[i].values[j].value;
             }
             barHeight = barHeight * chartYDim / (sumDayValue[i]);
-            p.fill(((this.completenessDataList[i].values[k].value * chartYDim / (sumDayValue[i]+1)) <= barTextLimit && k == 0) ? lineColor : (barHeight > barTextLimit ? '#000000' : lineColor));
+            p.fill(((this.completenessDataList[i].values[k].value * chartYDim / (sumDayValue[i]+1)) <= barTextLimit && k == 0) ? lineColor : '#000000');
             p.noStroke();
             p.textSize(valueFontSize);
             p.textAlign(p.CENTER, p.TOP);
