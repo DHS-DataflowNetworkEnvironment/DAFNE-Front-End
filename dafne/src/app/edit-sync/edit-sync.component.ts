@@ -219,6 +219,7 @@ export class EditSyncComponent implements OnInit, OnDestroy {
       }
     });
     if (valid) {
+      $('.modal').modal('hide');
       let serviceUrl = (<HTMLInputElement>document.getElementById("add_service_url_backend")).value;
       let synch = {
         "Label":  (<HTMLInputElement>document.getElementById("add_label")).value,
@@ -345,6 +346,7 @@ export class EditSyncComponent implements OnInit, OnDestroy {
       }
     });
     if (valid) {
+      $('.modal').modal('hide');
       let serviceUrl = (<HTMLInputElement>document.getElementById("edit_service_url_backend")).value;
       let synch = {
         "Label":  (<HTMLInputElement>document.getElementById("edit_label")).value,

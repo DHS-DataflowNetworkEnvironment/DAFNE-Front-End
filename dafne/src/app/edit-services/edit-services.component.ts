@@ -198,6 +198,7 @@ export class EditServicesComponent implements OnInit, OnDestroy {
     });
     
     if (valid) {
+      $('.modal').modal('hide');
       let tempCentreId = this.centreList.filter(a => a.name == (<HTMLInputElement>document.getElementById('add_centre')).value)[0].id;
       let tempServiceTypeId = this.serviceTypesList.filter(a => a.service_type == (<HTMLInputElement>document.getElementById('add_service_type')).value)[0].id;
       if (tempServiceTypeId != this.serviceTypesList.filter(a => a.service_type == 'DHuS Back-End')[0].id) {
