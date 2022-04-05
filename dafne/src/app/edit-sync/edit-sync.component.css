@@ -146,7 +146,7 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover, 
 input:-webkit-autofill:focus, 
 input:-webkit-autofill:active {
-    transition: all 0s 500s;
+    transition: background-color 500s ease-in-out 0s;
     -webkit-box-shadow: 0 0 0 30px var(--modal-bg-color) inset !important;
     box-shadow: 0 0 0 30px var(--modal-bg-color) inset !important;
     -webkit-text-fill-color: var(--main-text-color) !important;
