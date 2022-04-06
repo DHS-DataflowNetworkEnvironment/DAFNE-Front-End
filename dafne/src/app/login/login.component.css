@@ -6,6 +6,7 @@
 .modal-content {
     background-color: var(--title-bg-color);
     color: var(--main-text-color);
+    width: 25rem;
 }
 .modal-header {
     border-bottom: 1px solid var(--table-border-color);
@@ -13,26 +14,29 @@
 .modal-title {
     color: var(--brighter-text-color);
 }
+.formInput {
+    display: flex;
+    justify-content: flex-end;
+    align-items: baseline;
+    margin: 0.5rem 1rem;
+}
 .modal-content input {
     background-color: var(--modal-bg-color);
     border-color: var(--title-bg-color);
     color: var(--main-text-color);
-    width: 225px;
+    width: 250px;
     cursor: pointer !important;
 }
 .modal-content .fa-eye, .fa-eye-slash {
     font-size: 1.0rem;
-    top: 1.7rem;
-    right: 0;
+    top: 4.6rem;
+    right: 2.2rem;
     border: 0.5rem solid var(--modal-bg-color);
     background-color: var(--modal-bg-color);
     color: var(--main-text-color);
     position: absolute;
     z-index: 99;
     cursor: pointer !important;
-}
-.modal-content label {
-    margin-bottom: 0;
 }
 
 /* Autofill settings for Firefow and Chrome */
