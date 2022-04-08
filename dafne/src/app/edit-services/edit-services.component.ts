@@ -71,6 +71,16 @@ export class EditServicesComponent implements OnInit, OnDestroy {
         this.validate(e.target, regexPatterns[e.target.attributes.id.value]);
       });
     });
+    var inputEditPassword = document.querySelector('#edit_service_password');
+    inputEditPassword.addEventListener('input', (e:any) => {
+      document.getElementById('toggleEditPassword').style.setProperty('display', 'inline');
+    })
+    $('.modal').on('hidden.bs.modal', function () {
+      var passwordAddEl = document.getElementById('add_service_password');
+      passwordAddEl.setAttribute('type', 'password');
+      var passwordEditEl = document.getElementById('edit_service_password');
+      passwordEditEl.setAttribute('type', 'password');
+    })
   }
 
   ngOnDestroy(): void {
@@ -247,7 +257,7 @@ export class EditServicesComponent implements OnInit, OnDestroy {
   public deleteServiceCanceled() {
     this.tempServiceIdToDelete = -1;
   }
-
+  
   public editService(id: number) {
     this.service.id = this.serviceList.filter(a => a.id === id)[0].id;
     this.service.username = this.serviceList.filter(a => a.id === id)[0].username;
@@ -255,6 +265,13 @@ export class EditServicesComponent implements OnInit, OnDestroy {
     this.service.service_url = this.serviceList.filter(a => a.id === id)[0].service_url;
     this.service.service_type = this.serviceList.filter(a => a.id === id)[0].service_type;
     this.service.centre = this.serviceList.filter(a => a.id === id)[0].centre;
+
+    var passwordEl = document.getElementById('edit_service_password');
+    (<HTMLInputElement>passwordEl).value = null;
+    var eyeEl = document.getElementById('toggleEditPassword');
+    eyeEl.setAttribute('class', 'far fa-eye');
+    eyeEl.style.setProperty('display', 'none');
+
     $("#editServiceModal").modal('toggle');
   }
 

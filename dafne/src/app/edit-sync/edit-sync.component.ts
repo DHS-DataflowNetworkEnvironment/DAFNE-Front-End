@@ -11,8 +11,8 @@ const regexPatterns = {
   add_label: "^.{1,60}$",
   add_service_url_backend: "^[^\ \,\;]{1,256}$",
   add_service_url_sync: "^[^\ \,\;]{1,256}$",
-  add_service_login: "^.{1,60}$",
-  add_service_password: "^.{1,60}$",
+  add_sync_service_login: "^.{1,60}$",
+  add_sync_service_password: "^.{1,60}$",
   add_schedule:  "^(@(annually|yearly|monthly|weekly|daily|hourly|reboot))|(@every ([\\d]+(ns|us|µs|ms|s|m|h))+)|(((([1-5]?[0-9])|[\*])[\/|\,|\-])?(([1-5]?[0-9])|[\*]) (((2[0-3]|1[0-9]|[0-9])|[\*])([\/|\,|\-]))?((2[0-3]|1[0-9]|[0-9])|[\*]) (((3[01]|[12][0-9]|[1-9])|[\*])[\/|\,|\-])?((3[01]|[12][0-9]|[1-9])|[\*]) (((1[0-2]|[1-9])|[\*])[\/|\,|\-])?((1[0-2]|[1-9])|[\*]) ((([0-6])|[\*])[\/|\,|\-])?(([0-6])|[\*]) [\?])$",
   add_copy_product: "^.{1,60}$",
   add_page_size: "^((1[0-9][0-9])|([1-9][0-9])|([1-9]))$", /* number: 1 to 199 */
@@ -26,8 +26,8 @@ const regexPatterns = {
   edit_label: "^.{1,60}$",
   edit_service_url_backend: "^[^\ \,\;]{1,256}$",
   edit_service_url_sync: "^[^\ \,\;]{1,256}$",
-  edit_service_login: "^.{1,60}$",
-  edit_service_password: "^.{0,60}$",
+  edit_sync_service_login: "^.{1,60}$",
+  edit_sync_service_password: "^.{0,60}$",
   edit_schedule:  "^(@(annually|yearly|monthly|weekly|daily|hourly|reboot))|(@every ([\\d]+(ns|us|µs|ms|s|m|h))+)|(((([1-5]?[0-9])|[\*])[\/|\,|\-])?(([1-5]?[0-9])|[\*]) (((2[0-3]|1[0-9]|[0-9])|[\*])([\/|\,|\-]))?((2[0-3]|1[0-9]|[0-9])|[\*]) (((3[01]|[12][0-9]|[1-9])|[\*])[\/|\,|\-])?((3[01]|[12][0-9]|[1-9])|[\*]) (((1[0-2]|[1-9])|[\*])[\/|\,|\-])?((1[0-2]|[1-9])|[\*]) ((([0-6])|[\*])[\/|\,|\-])?(([0-6])|[\*]) [\?])$",
   edit_copy_product: "^.{1,60}$",
   edit_page_size: "^((1[0-9][0-9])|([1-9][0-9])|([1-9]))$", /* number: 1 to 199 */
@@ -109,6 +109,16 @@ export class EditSyncComponent implements OnInit, OnDestroy {
         this.validate(e.target, regexPatterns[e.target.attributes.id.value]);
       });
     });
+    var inputEditPassword = document.querySelector('#edit_sync_service_password');
+    inputEditPassword.addEventListener('input', (e:any) => {
+      document.getElementById('toggleEditSyncPassword').style.setProperty('display', 'inline');
+    })
+    $('.modal').on('hidden.bs.modal', function () {
+      var passwordAddEl = document.getElementById('add_sync_service_password');
+      passwordAddEl.setAttribute('type', 'password');
+      var passwordEditEl = document.getElementById('edit_sync_service_password');
+      passwordEditEl.setAttribute('type', 'password');
+    })
   }
 
   ngOnDestroy(): void {
@@ -192,8 +202,8 @@ export class EditSyncComponent implements OnInit, OnDestroy {
       if ((<HTMLInputElement>input).id == "add_service_url_backend") (<HTMLInputElement>input).value = this.currentSync.serviceUrlBackend;
       if ((<HTMLInputElement>input).id == "add_label") (<HTMLInputElement>input).value = this.currentSync.label;
       if ((<HTMLInputElement>input).id == "add_service_url_sync") (<HTMLInputElement>input).value = this.currentSync.serviceUrl;
-      if ((<HTMLInputElement>input).id == "add_service_login") (<HTMLInputElement>input).value = this.currentSync.serviceLogin;
-      if ((<HTMLInputElement>input).id == "add_service_password") (<HTMLInputElement>input).value = this.currentSync.servicePassword;
+      if ((<HTMLInputElement>input).id == "add_sync_service_login") (<HTMLInputElement>input).value = this.currentSync.serviceLogin;
+      if ((<HTMLInputElement>input).id == "add_sync_service_password") (<HTMLInputElement>input).value = this.currentSync.servicePassword;
       if ((<HTMLInputElement>input).id == "add_schedule") (<HTMLInputElement>input).value = this.currentSync.schedule;
       if ((<HTMLInputElement>input).id == "add_copy_product") (<HTMLInputElement>input).value = this.currentSync.copyProduct;
       if ((<HTMLInputElement>input).id == "add_page_size") (<HTMLInputElement>input).value = "";
@@ -224,8 +234,8 @@ export class EditSyncComponent implements OnInit, OnDestroy {
       let synch = {
         "Label":  (<HTMLInputElement>document.getElementById("add_label")).value,
         "ServiceUrl": (<HTMLInputElement>document.getElementById("add_service_url_sync")).value,
-        "ServiceLogin": (<HTMLInputElement>document.getElementById("add_service_login")).value,
-        "ServicePassword": (<HTMLInputElement>document.getElementById("add_service_password")).value,
+        "ServiceLogin": (<HTMLInputElement>document.getElementById("add_sync_service_login")).value,
+        "ServicePassword": (<HTMLInputElement>document.getElementById("add_sync_service_password")).value,
         "RemoteIncoming": (<HTMLInputElement>document.getElementById("add_remote_incoming")).value,
         "Schedule": (<HTMLInputElement>document.getElementById("add_schedule")).value,
         "PageSize": (<HTMLInputElement>document.getElementById("add_page_size")).value,
@@ -335,6 +345,13 @@ export class EditSyncComponent implements OnInit, OnDestroy {
     this.currentSync.lastCreationDate = tempSync.LastCreationDate;
     this.currentSync.filterParam = tempSync.FilterParam;
     this.currentSync.geoFilter = tempSync.GeoFilter;
+
+    var passwordEl = document.getElementById('edit_sync_service_password');
+    (<HTMLInputElement>passwordEl).value = null;
+    var eyeEl = document.getElementById('toggleEditSyncPassword');
+    eyeEl.setAttribute('class', 'far fa-eye');
+    eyeEl.style.setProperty('display', 'none');
+
     $("#editSyncModal").modal('toggle');
   }
 
@@ -354,8 +371,8 @@ export class EditSyncComponent implements OnInit, OnDestroy {
       let synch = {
         "Label":  (<HTMLInputElement>document.getElementById("edit_label")).value,
         "ServiceUrl": (<HTMLInputElement>document.getElementById("edit_service_url_sync")).value,
-        "ServiceLogin": (<HTMLInputElement>document.getElementById("edit_service_login")).value,
-        "ServicePassword": (<HTMLInputElement>document.getElementById("edit_service_password")).value,
+        "ServiceLogin": (<HTMLInputElement>document.getElementById("edit_sync_service_login")).value,
+        "ServicePassword": (<HTMLInputElement>document.getElementById("edit_sync_service_password")).value,
         "RemoteIncoming": (<HTMLInputElement>document.getElementById("edit_remote_incoming")).value,
         "Schedule": (<HTMLInputElement>document.getElementById("edit_schedule")).value,
         "PageSize": (<HTMLInputElement>document.getElementById("edit_page_size")).value,
@@ -430,8 +447,8 @@ export class EditSyncComponent implements OnInit, OnDestroy {
   }
 
   public toggleAddPasswordVisibility() {
-    const togglePassword = document.querySelector('#toggleAddPassword');
-    const passwordInput = document.querySelector('#add_service_password');
+    const togglePassword = document.querySelector('#toggleAddSyncPassword');
+    const passwordInput = document.querySelector('#add_sync_service_password');
     const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
     passwordInput.setAttribute('type', type);
     // toggle the eye slash icon
@@ -440,8 +457,8 @@ export class EditSyncComponent implements OnInit, OnDestroy {
   }
 
   public toggleEditPasswordVisibility() {
-    const togglePassword = document.querySelector('#toggleEditPassword');
-    const passwordInput = document.querySelector('#edit_service_password');
+    const togglePassword = document.querySelector('#toggleEditSyncPassword');
+    const passwordInput = document.querySelector('#edit_sync_service_password');
     const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
     passwordInput.setAttribute('type', type);
     // toggle the eye slash icon

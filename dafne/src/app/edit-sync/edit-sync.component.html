@@ -79,15 +79,15 @@
                     </div>
                     <div class="input-group mb-1">
                         <div class="mb-1">
-                            <label for="add_service_login" class="form-label">Service Login</label>
-                            <input type="text" class="form-control" id="add_service_login" [value]="currentSync.serviceLogin">
+                            <label for="add_sync_service_login" class="form-label">Service Login</label>
+                            <input type="text" class="form-control" id="add_sync_service_login" [value]="currentSync.serviceLogin">
                             <small id="serviceLoginHelp" class="form-text">Length: 1 - 60 characters</small>
                         </div>
                         <div class="mb-1 ml-auto">
-                            <label for="add_service_password" class="form-label">Service Password</label>
-                            <input type="password" class="form-control" id="add_service_password" autocomplete="current-password" [value]="currentSync.servicePassword">
+                            <label for="add_sync_service_password" class="form-label">Service Password</label>
+                            <input type="password" class="form-control" id="add_sync_service_password" autocomplete="current-password" [value]="currentSync.servicePassword">
                             <small id="servicePasswordHelp" class="form-text">Length: 1 - 60 characters</small>
-                            <i class="fas fa-eye" id="toggleAddPassword" (click)="toggleAddPasswordVisibility()"></i>
+                            <i class="fas fa-eye" id="toggleAddSyncPassword" (click)="toggleAddPasswordVisibility()"></i>
                         </div>
                     </div>
                     <div class="input-group mb-1">
@@ -191,7 +191,6 @@
                         <div class="mb-1 ml-auto">
                             <label for="edit_service_url_backend" class="form-label">Back-End URL</label>
                             <input type="text" class="form-control" id="edit_service_url_backend" [value]="currentSync.serviceUrlBackend" onkeydown="return false" disabled>
-                            <!-- <small id="addServiceUrlHelp" class="form-text">Please select a Back-End URL</small> -->
                         </div>
                     </div>
                     <div class="input-group mb-1">
@@ -208,15 +207,15 @@
                     </div>
                     <div class="input-group mb-1">
                         <div class="mb-1">
-                            <label for="edit_service_login" class="form-label">Service Login</label>
-                            <input type="text" class="form-control" id="edit_service_login" [value]="currentSync.serviceLogin">
+                            <label for="edit_sync_service_login" class="form-label">Service Login</label>
+                            <input type="text" class="form-control" id="edit_sync_service_login" [value]="currentSync.serviceLogin">
                             <small id="serviceLoginHelp" class="form-text">Length: 1 - 60 characters</small>
                         </div>
                         <div class="mb-1 ml-auto">
-                            <label for="edit_service_password" class="form-label">Service Password</label>
-                            <input type="password" class="form-control" id="edit_service_password" placeholder="unchanged" autocomplete="current-password" [value]="currentSync.servicePassword">
+                            <label for="edit_sync_service_password" class="form-label">Service Password</label>
+                            <input type="password" class="form-control" id="edit_sync_service_password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;">
                             <small id="servicePasswordHelp" class="form-text">Length: 1 - 60 characters</small>
-                            <i class="fas fa-eye" id="toggleEditPassword" (click)="toggleEditPasswordVisibility()"></i>
+                            <i class="fas fa-eye" style="display: none;" id="toggleEditSyncPassword" (click)="toggleEditPasswordVisibility()"></i>
                         </div>
                     </div>
                     <div class="input-group mb-1">

@@ -131,9 +131,9 @@
                         </div>
                         <div class="mb-1 ml-auto">
                             <label for="edit_service_password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="edit_service_password" autocomplete="current-password" placeholder="unchanged" [value]="service.password">
+                            <input type="password" class="form-control" id="edit_service_password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" >
                             <small id="passwordHelp" class="form-text">Length: 1 - 60 characters</small>
-                            <i class="fas fa-eye" id="toggleEditPassword" (click)="toggleEditPasswordVisibility()"></i>
+                            <i class="fas fa-eye" style="display: none;" id="toggleEditPassword" (click)="toggleEditPasswordVisibility()"></i>
                         </div>
                     </div>
                     <div class="input-group mb-1">
