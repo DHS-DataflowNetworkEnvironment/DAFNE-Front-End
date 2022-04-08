@@ -109,6 +109,10 @@ export class EditSyncComponent implements OnInit, OnDestroy {
         this.validate(e.target, regexPatterns[e.target.attributes.id.value]);
       });
     });
+    var inputAddPassword = document.querySelector('#add_sync_service_password');
+    inputAddPassword.addEventListener('input', (e:any) => {
+      document.getElementById('toggleAddSyncPassword').style.setProperty('display', 'inline');
+    })
     var inputEditPassword = document.querySelector('#edit_sync_service_password');
     inputEditPassword.addEventListener('input', (e:any) => {
       document.getElementById('toggleEditSyncPassword').style.setProperty('display', 'inline');
@@ -215,6 +219,9 @@ export class EditSyncComponent implements OnInit, OnDestroy {
       if ((<HTMLInputElement>input).id == "add_filter_param") (<HTMLInputElement>input).value = this.currentSync.filterParam;
       if ((<HTMLInputElement>input).id == "add_geo_filter") (<HTMLInputElement>input).value = this.currentSync.geoFilter;
     });
+    var eyeEl = document.getElementById('toggleAddSyncPassword');
+    eyeEl.setAttribute('class', 'far fa-eye');
+    eyeEl.style.setProperty('display', 'none');
     $("#addSynchronizerModal").modal('toggle');
   }
 

@@ -71,6 +71,10 @@ export class EditServicesComponent implements OnInit, OnDestroy {
         this.validate(e.target, regexPatterns[e.target.attributes.id.value]);
       });
     });
+    var inputAddPassword = document.querySelector('#add_service_password');
+    inputAddPassword.addEventListener('input', (e:any) => {
+      document.getElementById('toggleAddPassword').style.setProperty('display', 'inline');
+    })
     var inputEditPassword = document.querySelector('#edit_service_password');
     inputEditPassword.addEventListener('input', (e:any) => {
       document.getElementById('toggleEditPassword').style.setProperty('display', 'inline');
@@ -192,6 +196,9 @@ export class EditServicesComponent implements OnInit, OnDestroy {
       if ((<HTMLInputElement>input).id == "add_service_url") (<HTMLInputElement>input).value = this.service.service_url;
       if ((<HTMLInputElement>input).id == "add_centre") (<HTMLInputElement>input).value = this.service.centre;
     });
+    var eyeEl = document.getElementById('toggleAddPassword');
+    eyeEl.setAttribute('class', 'far fa-eye');
+    eyeEl.style.setProperty('display', 'none');
     $("#addServiceModal").modal('toggle');
   }
 
