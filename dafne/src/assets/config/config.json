@@ -5,6 +5,13 @@
         "textSize": 12,
         "iconSize": 30
     },
+    "latencyColors": [
+        {"threshold": 259200, "color": "#ee0000"},
+        {"threshold": 129600, "color": "#6d4400"},
+        {"threshold": 43200, "color": "#373d00"},
+        {"threshold": 14400, "color": "#185e00"},
+        {"threshold": 0, "color": "#00781d"}
+    ],
     "availabilityColors": [
         {"threshold": 0.0, "color": "#ee0000"},
         {"threshold": 75.0, "color": "#6d4400"},
