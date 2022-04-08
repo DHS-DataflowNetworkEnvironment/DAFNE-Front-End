@@ -104,12 +104,14 @@ small {
     position: absolute;
 }
 
+/* .form-control.valid { */
 .form-control.valid {
+    border-color: green;
     border-width: 0;
 }
 
 .form-control.invalid {
-    border: 1px solid red;
+    border-color: red;
     margin-bottom: 50px;
 }
 
@@ -123,11 +125,26 @@ small {
 .form-control.invalid + small {
     opacity: 1;
     height: auto;
-    margin-bottom: 20px;
+    margin-top: -40px;
     transition: opacity .4s ease-out;
 }
 #add_id, #edit_id {
     color: #505053;
+}
+
+/* Autofill settings for Firefow and Chrome */
+input:autofill {
+    background: var(--modal-bg-color);
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    transition: background-color 500s ease-in-out 0s;
+    -webkit-box-shadow: 0 0 0 30px var(--modal-bg-color) inset !important;
+    box-shadow: 0 0 0 30px var(--modal-bg-color) inset !important;
+    -webkit-text-fill-color: var(--main-text-color) !important;
 }
 
 

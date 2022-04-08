@@ -102,12 +102,17 @@ input, i {
 .modal-content label {
     margin-bottom: 0;
 }
+small {
+    position: absolute;
+}
 .form-control.valid {
     border-color: green;
+    border-width: 0;
 }
 
 .form-control.invalid {
     border-color: red;
+    margin-bottom: 50px;
 }
 
 .form-control + small {
@@ -120,8 +125,11 @@ input, i {
 .form-control.invalid + small {
     opacity: 1;
     height: auto;
-    margin-bottom: 20px;
+    margin-top: -40px;
     transition: opacity .4s ease-out;
+}
+#colorHelp {
+    margin-top: 50px;
 }
 #add_color-picker {
     -webkit-box-shadow:inset 0px 0px 0px 1px #000;
@@ -159,6 +167,20 @@ input, i {
   -moz-appearance: textfield;
 }
 
+/* Autofill settings for Firefow and Chrome */
+input:autofill {
+    background: var(--modal-bg-color);
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    transition: background-color 500s ease-in-out 0s;
+    -webkit-box-shadow: 0 0 0 30px var(--modal-bg-color) inset !important;
+    box-shadow: 0 0 0 30px var(--modal-bg-color) inset !important;
+    -webkit-text-fill-color: var(--main-text-color) !important;
+}
 
 ::ng-deep .color-picker .button-area {
     margin-top: -20px;

@@ -109,10 +109,19 @@ export class EditCentresComponent implements OnInit, OnDestroy {
 
   public addNewCentre() {
     this.tempCentre.name = '';
-    this.tempCentre.description = '';
     this.tempCentre.latitude = '0.0';
     this.tempCentre.longitude = '0.0';
     this.tempCentre.color = this.getRandomColor();
+    this.tempCentre.local = false;
+    this.tempCentre.description = '';
+    let inputs = document.querySelectorAll('#addCentreForm input.form-control');
+    inputs.forEach((input) => {
+      if ((<HTMLInputElement>input).id == "add_name") (<HTMLInputElement>input).value = this.tempCentre.name;
+      if ((<HTMLInputElement>input).id == "add_latitude") (<HTMLInputElement>input).value = this.tempCentre.latitude;
+      if ((<HTMLInputElement>input).id == "add_longitude") (<HTMLInputElement>input).value = this.tempCentre.longitude;
+      if ((<HTMLInputElement>input).id == "add_local") (<HTMLInputElement>input).checked = this.tempCentre.local;
+      if ((<HTMLInputElement>input).id == "add_description") (<HTMLInputElement>input).value = this.tempCentre.description;
+    });
     $("#addCentreModal").modal('toggle');
   }
 
@@ -123,10 +132,11 @@ export class EditCentresComponent implements OnInit, OnDestroy {
       this.validate(input, regexPatterns[input.id]);
       if (input.className == "form-control invalid") {
         valid = false;
-        this.alert.showErrorAlert("Form value error", "You entered an invalid value into '" + this.findLableForControl(input).innerHTML + "' field.");
+        return;
       }
     });
     if (valid) {
+      $('.modal').modal('hide');
       let body = {
         name: (<HTMLInputElement>document.getElementById("add_name")).value,
         latitude: (<HTMLInputElement>document.getElementById('add_latitude')).value,
@@ -141,7 +151,6 @@ export class EditCentresComponent implements OnInit, OnDestroy {
           this.refreshPage();
         }
       );
-    } else {
     }
   }
 
@@ -185,10 +194,11 @@ export class EditCentresComponent implements OnInit, OnDestroy {
       this.validate(input, regexPatterns[input.id]);
       if (input.className == "form-control invalid") {
         valid = false;
-        this.alert.showErrorAlert("Form value error", "You entered an invalid value into '" + this.findLableForControl(input).innerHTML + "' field.");
+        return;
       }
     });
     if (valid) {
+      $('.modal').modal('hide');
       let body = {
         name: (<HTMLInputElement>document.getElementById("edit_name")).value,
         latitude: (<HTMLInputElement>document.getElementById('edit_latitude')).value,
@@ -203,8 +213,6 @@ export class EditCentresComponent implements OnInit, OnDestroy {
           this.refreshPage();
         }
       )
-    } else {
-
     }
   }
 

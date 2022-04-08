@@ -54,12 +54,12 @@
                         <div class="mb-1">
                             <label for="add_latitude" class="form-label">Latitude</label>
                             <input type="number" class="form-control" id="add_latitude" [value]="tempCentre.latitude">
-                            <small id="latitudeHelp" class="form-text">Input a number in the range: [-90.0, 90.0]</small>
+                            <small id="latitudeHelp" class="form-text">Input a number in the range:<br>[-90.0, 90.0]</small>
                         </div>
                         <div class="mb-1 ml-auto">
                             <label for="add_longitude" class="form-label">Longitude</label>
                             <input type="number" class="form-control" id="add_longitude" [value]="tempCentre.longitude">
-                            <small id="longitudeHelp" class="form-text">Input a number in the range: [-180.0, 180.0]</small>
+                            <small id="longitudeHelp" class="form-text">Input a number in the range:<br>[-180.0, 180.0]</small>
                         </div>
                     </div>
                     <div class="input-group mb-1">
@@ -70,12 +70,12 @@
                                         [(colorPicker)]="tempCentre.color" cpWidth='400px' cpHeight="300px"
                                         [cpOKButton]="true" [cpOKButtonClass]="'btn btn-primary'"
                                         [cpCancelButton]="true" [cpCancelButtonClass]="'btn btn-secondary'"
-                                        cpOutputFormat="hex" [style.background]="tempCentre.color" />
+                                        cpOutputFormat="hex" [style.background]="tempCentre.color">
                                 <input type="text" class="form-control" id="add_color" [value]="tempCentre.color">
                                 <small id="colorHelp" class="form-text">Hex color in the form #rrggbb</small>
                             </div>
                         </div>
-                        <div class="mb-1 mr-1 ml-auto">
+                        <div class="mb-1 ml-auto">
                             <label for="add_local" class="form-label">Local</label>
                             <input type="checkbox" class="form-control" id="add_local" name="local-checkbox" [checked]="false">
                         </div>
@@ -87,7 +87,7 @@
                     </div>
                     <div class="row" >
                         <button type="button" class="btn btn-secondary ml-auto m-3" data-bs-dismiss="modal" aria-label="Close">Close</button>
-                        <button type="submit" class="btn btn-primary m-3" (click)="onAddSubmit()" data-bs-dismiss="modal">Submit</button>
+                        <button type="submit" class="btn btn-primary m-3" (click)="onAddSubmit()">Submit</button>
                     </div>
                 </form>
             </div>
@@ -113,12 +113,12 @@
                         <div class="mb-1">
                             <label for="edit_latitude" class="form-label">Latitude</label>
                             <input type="text" class="form-control" id="edit_latitude" [value]="tempCentre.latitude">
-                            <small id="latitudeHelp" class="form-text">Input a number in the range: [-90.0, 90.0]</small>
+                            <small id="latitudeHelp" class="form-text">Input a number in the range:<br>[-90.0, 90.0]</small>
                         </div>
                         <div class="mb-1 ml-auto">
                             <label for="edit_longitude" class="form-label">Longitude</label>
                             <input type="text" class="form-control" id="edit_longitude" [value]="tempCentre.longitude">
-                            <small id="latitudeHelp" class="form-text">Input a number in the range: [-180.0, 180.0]</small>
+                            <small id="latitudeHelp" class="form-text">Input a number in the range:<br>[-180.0, 180.0]</small>
                         </div>
                     </div>
                     <div class="input-group mb-1">
@@ -146,7 +146,7 @@
                     </div>
                     <div class="row" >
                         <button type="button" class="btn btn-secondary ml-auto m-3" data-bs-dismiss="modal" aria-label="Close">Close</button>
-                        <button type="submit" class="btn btn-primary m-3" (click)="onEditSubmit(tempCentre.id)" data-bs-dismiss="modal">Submit</button>
+                        <button type="submit" class="btn btn-primary m-3" (click)="onEditSubmit(tempCentre.id)">Submit</button>
                     </div>
                 </form>
             </div>

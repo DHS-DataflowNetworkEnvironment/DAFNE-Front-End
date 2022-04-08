@@ -1,20 +1,23 @@
- <div class="card-container row">
-    <div class="card">
-        <h4 class="card-header">DAFNE Login</h4>
-        <form [formGroup]="loginForm" (ngSubmit)="submit()" autocomplete="on">
-            <div class="card-body d-flex flex-column">
-                <div class="username">
-                    <label class="p-2" for="username">Username: </label>
-                    <input id="username" type="text" formControlName="username">
+<div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">DAFNE Login</h5>
+        </div>
+        <div class="modal-body">
+            <form [formGroup]="loginForm" autocomplete="on">
+                <div class="formInput">
+                    <label for="login_username" class="form-label mr-3">Username</label>
+                    <input type="text" class="form-control" id="login_username" formControlName="username">
                 </div>
-                <div class="password">
-                    <label class="p-2" for="password">Password: </label>
-                    <input id="password" type="password" formControlName="password">
+                <div class="formInput">
+                    <label for="login_password" class="form-label mr-3">Password</label>
+                    <input type="password" class="form-control" id="login_password" formControlName="password">
+                    <i class="fas fa-eye" id="toggleLoginPassword" (click)="toggleLoginPasswordVisibility()"></i>
                 </div>
-                <div class="buttons ml-auto">
-                    <button class="btn btn-primary mr-3" type="submit">Login</button>
-                </div>                
-            </div>
-        </form>
+                <div class="formInput">
+                    <button type="submit" class="btn btn-primary" (click)="onLoginSubmit()" data-bs-dismiss="modal">Submit</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>

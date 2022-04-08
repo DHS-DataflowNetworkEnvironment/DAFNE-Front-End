@@ -392,7 +392,7 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.p5Chart = new p5(p => {
       let blankXDim = 140;
-      let blankYDim = 140;
+      let blankYDim = 160;
       let xCenter = canvasWidth / 2;
       let yCenter = canvasHeight / 2;
       let pieExtDiameter = (canvasWidth > canvasHeight) ? canvasHeight - blankYDim : canvasWidth - blankXDim;
@@ -418,7 +418,7 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
       let zeroDiameter = 80;
       let zeroRadius = zeroDiameter / 2;
 
-      let dateFontSize = 12;
+      let dateFontSize = 10;
       let valueFontSize = 10;
 
       let barGapScale = 30.0;
@@ -463,8 +463,10 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
         }
 
         if (p.mouseIsPressed) {
-          tx -= p.pmouseX - p.mouseX;
-          ty -= p.pmouseY - p.mouseY;
+          if (p.mouseButton === p.CENTER) {
+            tx -= p.pmouseX - p.mouseX;
+            ty -= p.pmouseY - p.mouseY;
+          }
         }
         
         if (this.doResetZoom) {
@@ -659,10 +661,32 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
           p.fill(lineColor);
           p.noStroke();
           p.textSize(dateFontSize);
-          p.text(this.completenessDataList[i].date, sectionXCenter, yCenter + chartYDim2 + 15);
+          /* Rotate Dates */
+          let tempText
+          tempText = this.completenessDataList[i].date;          
+          let tempRadium = (sectionXFilledDim - (2 * barGap) - dateFontSize);
+          let angle = 0;
+          if (tempRadium > p.textWidth(tempText)) tempRadium = p.textWidth(tempText);
+          if (tempRadium > 0) angle = p.acos(tempRadium / p.textWidth(tempText));
+          else angle = p.PI/2;
+          let sinOfAngleTemp = p.sin(angle);
+          if (sinOfAngleTemp < 0.001) {
+            sinOfAngleTemp = 0.001;
+          }
+          let sinOfAngle = sinOfAngleTemp * (p.textWidth(tempText) / 2);
+          p.push();
+          p.translate(sectionXCenter, yCenter + chartYDim2 + sinOfAngle + dateFontSize);
+          if (angle > p.PI / 2) angle = p.PI / 2;
+          if (angle < 0) angle = 0;
+          p.rotate(-angle);
+          p.text(tempText, 0, 0);
+          p.pop();
+
+          /* xAxis lines */
           p.noFill();
           p.stroke(lineColor);
           p.line(xCenter - chartXDim2 + (i + 1) * chartXDim / this.daysNumber, yCenter + chartYDim2 + 5, xCenter - chartXDim2 + (i + 1) * chartXDim / this.daysNumber, yCenter + chartYDim2);
+          
           /* Bars */
           p.rectMode(p.CORNER);
           for (var k = 0; k < this.centreNumber; k++) {
@@ -725,12 +749,34 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
           let sectionXCenter = xCenter - chartXDim2 + chartXDim / (2 * this.daysNumber) + i * chartXDim / this.daysNumber;
           let sectionXFilledDim = (chartXDim / this.daysNumber) / sectionScaleStacked;
           let sectionXFilledDim2 = sectionXFilledDim / 2;
+          let barGap = sectionXFilledDim / barGapScale;
           /* xAxis Text */
           p.textAlign(p.CENTER, p.CENTER);
           p.fill(lineColor);
           p.noStroke();
           p.textSize(dateFontSize);
-          p.text(this.completenessDataList[i].date, sectionXCenter, yCenter + chartYDim2 + 15);
+          /* Rotate Dates */
+          let tempText
+          tempText = this.completenessDataList[i].date;          
+          let tempRadium = (sectionXFilledDim - (2 * barGap) - dateFontSize);
+          let angle = 0;
+          if (tempRadium > p.textWidth(tempText)) tempRadium = p.textWidth(tempText);
+          if (tempRadium > 0) angle = p.acos(tempRadium / p.textWidth(tempText));
+          else angle = p.PI/2;
+          let sinOfAngleTemp = p.sin(angle);
+          if (sinOfAngleTemp < 0.001) {
+            sinOfAngleTemp = 0.001;
+          }
+          let sinOfAngle = sinOfAngleTemp * (p.textWidth(tempText) / 2);
+          p.push();
+          p.translate(sectionXCenter, yCenter + chartYDim2 + sinOfAngle + dateFontSize);
+          if (angle > p.PI / 2) angle = p.PI / 2;
+          if (angle < 0) angle = 0;
+          p.rotate(-angle);
+          p.text(tempText, 0, 0);
+          p.pop();
+
+          /* xAxis lines */
           p.noFill();
           p.stroke(lineColor);
           p.line(xCenter - chartXDim2 + (i + 1) * chartXDim / this.daysNumber, yCenter + chartYDim2 + 5, xCenter - chartXDim2 + (i + 1) * chartXDim / this.daysNumber, yCenter + chartYDim2);
@@ -760,7 +806,7 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
             if (barHeight == 0 || barHeight == undefined) {
               barHeight = 1;
             }
-            p.fill((((this.completenessDataList[i].values[k].value < 0 ? 0 : this.completenessDataList[i].values[k].value) * chartYDim / (maxSumValue+1)) <= barTextLimit && k == 0) ? lineColor : (barHeight > barTextLimit ? '#000000' : lineColor));
+            p.fill((((this.completenessDataList[i].values[k].value < 0 ? 0 : this.completenessDataList[i].values[k].value) * chartYDim / (maxSumValue+1)) <= barTextLimit && k == 0) ? lineColor : '#000000');
             p.noStroke();
             p.textSize(valueFontSize);
             p.textAlign(p.CENTER, p.TOP);
@@ -811,7 +857,12 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
           }
           tempSum = 0;
         }
-
+        let sectionMinXDim = chartXDim / this.daysNumber;
+        for (var i = 0; i < this.daysNumber; i++) {
+          if (((sumDayValue[i]) * chartXDim / sumPeriodValue) < sectionMinXDim) {
+            sectionMinXDim = ((sumDayValue[i]) * chartXDim / sumPeriodValue);
+          }
+        }
         let sectionXDim = new Array<number>(this.daysNumber);
         let sectionXCenter = new Array<number>(this.daysNumber);
         let tempXDimsPrec: number = 0;
@@ -828,14 +879,36 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
           tempXDimsPrec += sectionXDim[i];
           sectionXFilledDim[i] = sectionXDim[i] / sectionScaleStacked;
           sectionXFilledDim2[i] = sectionXFilledDim[i] / 2;
+          let barGap = sectionMinXDim / barGapScale;
+
           /* xAxis Text */
           p.textAlign(p.CENTER, p.CENTER);
           p.fill(lineColor);
           p.noStroke();
           p.textSize(dateFontSize);
           if (sumDayValue[i] > 0) {
-            p.text(this.completenessDataList[i].date, sectionXCenter[i], yCenter + chartYDim2 + 15);
-            p.text("( " + sumDayValue[i] + " )", sectionXCenter[i], yCenter + chartYDim2 + 30);
+            /* Rotate Dates */
+            let tempText
+            tempText = this.completenessDataList[i].date;          
+            let tempRadium = (sectionMinXDim - (2 * barGap) - dateFontSize);
+            let angle = 0;
+            if (tempRadium > p.textWidth(tempText)) tempRadium = p.textWidth(tempText);
+            if (tempRadium > 0) angle = p.acos(tempRadium / p.textWidth(tempText));
+            else angle = p.PI/2;
+            let sinOfAngleTemp = p.sin(angle);
+            if (sinOfAngleTemp < 0.001) {
+              sinOfAngleTemp = 0.001;
+            }
+            let sinOfAngle = sinOfAngleTemp * (p.textWidth(tempText) / 2);
+            p.push();
+            p.translate(sectionXCenter[i], yCenter + chartYDim2 + sinOfAngle + dateFontSize*1.5);
+            if (angle > p.PI / 2) angle = p.PI / 2;
+            if (angle < 0) angle = 0;
+            p.rotate(-angle);
+            p.text(tempText + "\n( " + sumDayValue[i] + " )", 0, 0);
+            p.pop();
+
+            /* xAxis lines */
             p.noFill();
             p.stroke(lineColor);
             p.strokeWeight(1);
@@ -874,13 +947,12 @@ export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
               if (this.completenessDataList[i].values[j].value > 0) barHeight += this.completenessDataList[i].values[j].value;
             }
             barHeight = barHeight * chartYDim / (sumDayValue[i]);
-            p.fill((((this.completenessDataList[i].values[k].value < 0 ? 0 : this.completenessDataList[i].values[k].value) * chartYDim / (sumDayValue[i]+1)) <= barTextLimit && k == 0) ? lineColor : (barHeight > barTextLimit ? '#000000' : lineColor));
+            p.fill(((this.completenessDataList[i].values[k].value * chartYDim / (sumDayValue[i]+1)) <= barTextLimit && k == 0) ? lineColor : '#000000');
             p.noStroke();
             p.textSize(valueFontSize);
             p.textAlign(p.CENTER, p.TOP);
             p.text((this.completenessDataList[i].values[k].value < 0 ? "NaN" : ((this.completenessDataList[i].values[k].value * chartYDim / (sumDayValue[i]+1)) > barTextLimit) ? this.completenessDataList[i].values[k].value : this.completenessDataList[i].values[k].value + p.char(0x21b4)),
-                    sectionXCenter[i], // + ((((this.completenessDataList[i].values[k].value < 0 ? 0 : this.completenessDataList[i].values[k].value) * chartYDim / (sumDayValue[i]+1)) > barTextLimit) ? 0 : 0),     /* Should move right if overlapping? */
-                    yCenter + chartYDim2 - barHeight + ((((this.completenessDataList[i].values[k].value < 0 ? 0 : this.completenessDataList[i].values[k].value) * chartYDim / (sumDayValue[i]+1)) > barTextLimit) ? dateFontSize / 4 : -dateFontSize)
+                    sectionXCenter[i], yCenter + chartYDim2 - barHeight + ((((this.completenessDataList[i].values[k].value < 0 ? 0 : this.completenessDataList[i].values[k].value) * chartYDim / (sumDayValue[i]+1)) > barTextLimit) ? dateFontSize / 4 : -dateFontSize)
                   );
           }
         }

@@ -30,7 +30,17 @@ export class LoginComponent implements OnInit {
 
   get f() { return this.loginForm.controls; }
 
-  submit() {
+  public toggleLoginPasswordVisibility() {
+    const togglePassword = document.querySelector('#toggleLoginPassword');
+    const passwordInput = document.querySelector('#login_password');
+    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordInput.setAttribute('type', type);
+    // toggle the eye slash icon
+    const eye = passwordInput.getAttribute('type') === 'password' ? 'far fa-eye' : 'far fa-eye-slash';
+    togglePassword.setAttribute('class', eye);
+  }
+
+  onLoginSubmit() {
 		this.submitted = true;
 
 		this.authenticationService.login(this.loginForm.value.username, this.loginForm.value.password)

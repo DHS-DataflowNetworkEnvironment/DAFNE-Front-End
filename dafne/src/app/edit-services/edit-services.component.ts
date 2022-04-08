@@ -67,10 +67,24 @@ export class EditServicesComponent implements OnInit, OnDestroy {
 
     let inputs = document.querySelectorAll('input.form-control');
     inputs.forEach((input) => {
-      input.addEventListener('input', (e:any) => {        
+      input.addEventListener('input', (e:any) => {
         this.validate(e.target, regexPatterns[e.target.attributes.id.value]);
       });
     });
+    var inputAddPassword = document.querySelector('#add_service_password');
+    inputAddPassword.addEventListener('input', (e:any) => {
+      document.getElementById('toggleAddPassword').style.setProperty('display', 'inline');
+    })
+    var inputEditPassword = document.querySelector('#edit_service_password');
+    inputEditPassword.addEventListener('input', (e:any) => {
+      document.getElementById('toggleEditPassword').style.setProperty('display', 'inline');
+    })
+    $('.modal').on('hidden.bs.modal', function () {
+      var passwordAddEl = document.getElementById('add_service_password');
+      passwordAddEl.setAttribute('type', 'password');
+      var passwordEditEl = document.getElementById('edit_service_password');
+      passwordEditEl.setAttribute('type', 'password');
+    })
   }
 
   ngOnDestroy(): void {
@@ -146,10 +160,16 @@ export class EditServicesComponent implements OnInit, OnDestroy {
 
   setNewFormServiceType(id: number) {
     this.service.service_type = this.serviceTypesList.filter(a => a.id == id)[0].service_type;
+    let element = document.getElementById('add_service_type');
+    (<HTMLInputElement>element).value = this.service.service_type;
+    element.dispatchEvent(new KeyboardEvent('input', { 'bubbles': true }));
   }
 
   setNewFormCentre(centreId: number) {
     this.service.centre = this.centreList.filter(a => a.id == centreId)[0].name;
+    let element = document.getElementById('add_centre');
+    (<HTMLInputElement>element).value = this.service.centre;
+    element.dispatchEvent(new KeyboardEvent('input', { 'bubbles': true }));
   }
 
   public findLableForControl(el) {
@@ -163,11 +183,22 @@ export class EditServicesComponent implements OnInit, OnDestroy {
   }
 
   public addNewService() {
+    this.service.service_type = '';
     this.service.username = '';
     this.service.password = '';
-    this.service.service_url = '';
-    this.service.service_type = '';
+    this.service.service_url = '';    
     this.service.centre = '';
+    let inputs = document.querySelectorAll('#addServiceForm input.form-control');
+    inputs.forEach((input) => {
+      if ((<HTMLInputElement>input).id == "add_service_type") (<HTMLInputElement>input).value = this.service.service_type;
+      if ((<HTMLInputElement>input).id == "add_service_username") (<HTMLInputElement>input).value = this.service.username;
+      if ((<HTMLInputElement>input).id == "add_service_password") (<HTMLInputElement>input).value = this.service.password;
+      if ((<HTMLInputElement>input).id == "add_service_url") (<HTMLInputElement>input).value = this.service.service_url;
+      if ((<HTMLInputElement>input).id == "add_centre") (<HTMLInputElement>input).value = this.service.centre;
+    });
+    var eyeEl = document.getElementById('toggleAddPassword');
+    eyeEl.setAttribute('class', 'far fa-eye');
+    eyeEl.style.setProperty('display', 'none');
     $("#addServiceModal").modal('toggle');
   }
 
@@ -179,11 +210,12 @@ export class EditServicesComponent implements OnInit, OnDestroy {
       this.validate(input, regexPatterns[input.id]);
       if (input.className == "form-control invalid") {
         valid = false;
-        this.alert.showErrorAlert("Form value error", "You entered an invalid value into '" + this.findLableForControl(input).innerHTML + "' field.");
+        return;
       }
     });
     
     if (valid) {
+      $('.modal').modal('hide');
       let tempCentreId = this.centreList.filter(a => a.name == (<HTMLInputElement>document.getElementById('add_centre')).value)[0].id;
       let tempServiceTypeId = this.serviceTypesList.filter(a => a.service_type == (<HTMLInputElement>document.getElementById('add_service_type')).value)[0].id;
       if (tempServiceTypeId != this.serviceTypesList.filter(a => a.service_type == 'DHuS Back-End')[0].id) {
@@ -211,8 +243,6 @@ export class EditServicesComponent implements OnInit, OnDestroy {
           this.refreshPage();
         }
       );
-    } else {
-
     }
   }
 
@@ -234,7 +264,7 @@ export class EditServicesComponent implements OnInit, OnDestroy {
   public deleteServiceCanceled() {
     this.tempServiceIdToDelete = -1;
   }
-
+  
   public editService(id: number) {
     this.service.id = this.serviceList.filter(a => a.id === id)[0].id;
     this.service.username = this.serviceList.filter(a => a.id === id)[0].username;
@@ -242,6 +272,13 @@ export class EditServicesComponent implements OnInit, OnDestroy {
     this.service.service_url = this.serviceList.filter(a => a.id === id)[0].service_url;
     this.service.service_type = this.serviceList.filter(a => a.id === id)[0].service_type;
     this.service.centre = this.serviceList.filter(a => a.id === id)[0].centre;
+
+    var passwordEl = document.getElementById('edit_service_password');
+    (<HTMLInputElement>passwordEl).value = null;
+    var eyeEl = document.getElementById('toggleEditPassword');
+    eyeEl.setAttribute('class', 'far fa-eye');
+    eyeEl.style.setProperty('display', 'none');
+
     $("#editServiceModal").modal('toggle');
   }
 
@@ -252,7 +289,7 @@ export class EditServicesComponent implements OnInit, OnDestroy {
       this.validate(input, regexPatterns[input.id]);
       if (input.className == "form-control invalid") {
         valid = false;
-        this.alert.showErrorAlert("Form value error", "You entered an invalid value into '" + this.findLableForControl(input).innerHTML + "' field.");
+        return;
       }
     });
     let tempCentreId = this.centreList.filter(a => a.name == (<HTMLInputElement>document.getElementById('edit_centre')).value)[0].id;    
@@ -275,6 +312,7 @@ export class EditServicesComponent implements OnInit, OnDestroy {
       }
     }
     if (valid) {
+      $('.modal').modal('hide');
       let body: any;
       if ((<HTMLInputElement>document.getElementById('edit_service_password')).value == '') {
         body = {
@@ -299,8 +337,6 @@ export class EditServicesComponent implements OnInit, OnDestroy {
           this.refreshPage();
         }
       );
-    } else {
-
     }
   }
 

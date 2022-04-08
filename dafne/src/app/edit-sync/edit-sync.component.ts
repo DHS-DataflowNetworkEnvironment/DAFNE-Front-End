@@ -11,8 +11,8 @@ const regexPatterns = {
   add_label: "^.{1,60}$",
   add_service_url_backend: "^[^\ \,\;]{1,256}$",
   add_service_url_sync: "^[^\ \,\;]{1,256}$",
-  add_service_login: "^.{1,60}$",
-  add_service_password: "^.{1,60}$",
+  add_sync_service_login: "^.{1,60}$",
+  add_sync_service_password: "^.{1,60}$",
   add_schedule:  "^(@(annually|yearly|monthly|weekly|daily|hourly|reboot))|(@every ([\\d]+(ns|us|µs|ms|s|m|h))+)|(((([1-5]?[0-9])|[\*])[\/|\,|\-])?(([1-5]?[0-9])|[\*]) (((2[0-3]|1[0-9]|[0-9])|[\*])([\/|\,|\-]))?((2[0-3]|1[0-9]|[0-9])|[\*]) (((3[01]|[12][0-9]|[1-9])|[\*])[\/|\,|\-])?((3[01]|[12][0-9]|[1-9])|[\*]) (((1[0-2]|[1-9])|[\*])[\/|\,|\-])?((1[0-2]|[1-9])|[\*]) ((([0-6])|[\*])[\/|\,|\-])?(([0-6])|[\*]) [\?])$",
   add_copy_product: "^.{1,60}$",
   add_page_size: "^((1[0-9][0-9])|([1-9][0-9])|([1-9]))$", /* number: 1 to 199 */
@@ -26,8 +26,8 @@ const regexPatterns = {
   edit_label: "^.{1,60}$",
   edit_service_url_backend: "^[^\ \,\;]{1,256}$",
   edit_service_url_sync: "^[^\ \,\;]{1,256}$",
-  edit_service_login: "^.{1,60}$",
-  edit_service_password: "^.{0,60}$",
+  edit_sync_service_login: "^.{1,60}$",
+  edit_sync_service_password: "^.{0,60}$",
   edit_schedule:  "^(@(annually|yearly|monthly|weekly|daily|hourly|reboot))|(@every ([\\d]+(ns|us|µs|ms|s|m|h))+)|(((([1-5]?[0-9])|[\*])[\/|\,|\-])?(([1-5]?[0-9])|[\*]) (((2[0-3]|1[0-9]|[0-9])|[\*])([\/|\,|\-]))?((2[0-3]|1[0-9]|[0-9])|[\*]) (((3[01]|[12][0-9]|[1-9])|[\*])[\/|\,|\-])?((3[01]|[12][0-9]|[1-9])|[\*]) (((1[0-2]|[1-9])|[\*])[\/|\,|\-])?((1[0-2]|[1-9])|[\*]) ((([0-6])|[\*])[\/|\,|\-])?(([0-6])|[\*]) [\?])$",
   edit_copy_product: "^.{1,60}$",
   edit_page_size: "^((1[0-9][0-9])|([1-9][0-9])|([1-9]))$", /* number: 1 to 199 */
@@ -109,6 +109,20 @@ export class EditSyncComponent implements OnInit, OnDestroy {
         this.validate(e.target, regexPatterns[e.target.attributes.id.value]);
       });
     });
+    var inputAddPassword = document.querySelector('#add_sync_service_password');
+    inputAddPassword.addEventListener('input', (e:any) => {
+      document.getElementById('toggleAddSyncPassword').style.setProperty('display', 'inline');
+    })
+    var inputEditPassword = document.querySelector('#edit_sync_service_password');
+    inputEditPassword.addEventListener('input', (e:any) => {
+      document.getElementById('toggleEditSyncPassword').style.setProperty('display', 'inline');
+    })
+    $('.modal').on('hidden.bs.modal', function () {
+      var passwordAddEl = document.getElementById('add_sync_service_password');
+      passwordAddEl.setAttribute('type', 'password');
+      var passwordEditEl = document.getElementById('edit_sync_service_password');
+      passwordEditEl.setAttribute('type', 'password');
+    })
   }
 
   ngOnDestroy(): void {
@@ -170,35 +184,99 @@ export class EditSyncComponent implements OnInit, OnDestroy {
     );
   }
 
-
-  public editSynchronizer(id: number, service_url_backend: string) {
-    let tempSync: any;
-    for (var i = 0; i < this.serviceUrlBackendList.length; i++) {
-      if (this.serviceUrlBackendList[i] == service_url_backend) {
-        this.tempServiceUrlBackendNumber = i;
-        tempSync = this.syncList[i].filter(a => a.Id === id)[0];
-      }
-    }
-    
-    this.currentSync.id = tempSync.Id;
-    this.currentSync.label = tempSync.Label;
-    this.currentSync.serviceUrlBackend = service_url_backend; // serviceUrlBackend..
-    this.currentSync.serviceUrl = tempSync.ServiceUrl; // serviceUrlSync..
-    this.currentSync.serviceLogin = tempSync.ServiceLogin;
-    this.currentSync.servicePassword = '';
-    this.currentSync.copyProduct = tempSync.CopyProduct;
-    this.currentSync.schedule = tempSync.Schedule;
-    this.currentSync.pageSize = tempSync.PageSize;
-    this.currentSync.request = tempSync.Request;
-    this.currentSync.targetCollection = (tempSync.TargetCollectionName == undefined ? '' : tempSync.TargetCollectionName);
-    this.currentSync.remoteIncoming = tempSync.RemoteIncoming;
-    this.currentSync.sourceCollection = tempSync.SourceCollection;
-    this.currentSync.lastCreationDate = tempSync.LastCreationDate;
-    this.currentSync.filterParam = tempSync.FilterParam;
-    this.currentSync.geoFilter = tempSync.GeoFilter;
-    $("#editSyncModal").modal('toggle');
+  public addNewSynchronizer() {
+    this.currentSync = new Synchronizer();
+    this.currentSync.serviceUrlBackend = "";
+    this.currentSync.label = "";
+    this.currentSync.serviceUrl = "";
+    this.currentSync.serviceLogin = "";
+    this.currentSync.servicePassword = "";
+    this.currentSync.schedule = "";
+    this.currentSync.copyProduct = "true";
+    this.currentSync.pageSize = null;
+    this.currentSync.request = "stop";
+    this.currentSync.sourceCollection = "";
+    this.currentSync.targetCollection = "";
+    this.currentSync.remoteIncoming = "";
+    this.currentSync.lastCreationDate = null;
+    this.currentSync.filterParam = "";
+    this.currentSync.geoFilter = "";
+    let inputs = document.querySelectorAll('#addSyncForm input.form-control');
+    inputs.forEach((input) => {
+      if ((<HTMLInputElement>input).id == "add_service_url_backend") (<HTMLInputElement>input).value = this.currentSync.serviceUrlBackend;
+      if ((<HTMLInputElement>input).id == "add_label") (<HTMLInputElement>input).value = this.currentSync.label;
+      if ((<HTMLInputElement>input).id == "add_service_url_sync") (<HTMLInputElement>input).value = this.currentSync.serviceUrl;
+      if ((<HTMLInputElement>input).id == "add_sync_service_login") (<HTMLInputElement>input).value = this.currentSync.serviceLogin;
+      if ((<HTMLInputElement>input).id == "add_sync_service_password") (<HTMLInputElement>input).value = this.currentSync.servicePassword;
+      if ((<HTMLInputElement>input).id == "add_schedule") (<HTMLInputElement>input).value = this.currentSync.schedule;
+      if ((<HTMLInputElement>input).id == "add_copy_product") (<HTMLInputElement>input).value = this.currentSync.copyProduct;
+      if ((<HTMLInputElement>input).id == "add_page_size") (<HTMLInputElement>input).value = "";
+      if ((<HTMLInputElement>input).id == "add_request") (<HTMLInputElement>input).value = this.currentSync.request;
+      if ((<HTMLInputElement>input).id == "add_source_collection") (<HTMLInputElement>input).value = this.currentSync.sourceCollection;
+      if ((<HTMLInputElement>input).id == "add_target_collection") (<HTMLInputElement>input).value = this.currentSync.targetCollection;
+      if ((<HTMLInputElement>input).id == "add_remote_incoming") (<HTMLInputElement>input).value = this.currentSync.remoteIncoming;
+      if ((<HTMLInputElement>input).id == "add_last_creation_date") (<HTMLInputElement>input).value = this.currentSync.lastCreationDate;
+      if ((<HTMLInputElement>input).id == "add_filter_param") (<HTMLInputElement>input).value = this.currentSync.filterParam;
+      if ((<HTMLInputElement>input).id == "add_geo_filter") (<HTMLInputElement>input).value = this.currentSync.geoFilter;
+    });
+    var eyeEl = document.getElementById('toggleAddSyncPassword');
+    eyeEl.setAttribute('class', 'far fa-eye');
+    eyeEl.style.setProperty('display', 'none');
+    $("#addSynchronizerModal").modal('toggle');
   }
 
+  public onAddSubmit() {
+    let valid = true;
+    let inputs = document.querySelectorAll('#addSyncForm input.form-control');
+    inputs.forEach((input) => {
+      this.validate(input, regexPatterns[input.id]);
+      if (input.className == "form-control invalid") {
+        valid = false;
+        return;
+      }
+    });
+    if (valid) {
+      $('.modal').modal('hide');
+      let serviceUrl = (<HTMLInputElement>document.getElementById("add_service_url_backend")).value;
+      let synch = {
+        "Label":  (<HTMLInputElement>document.getElementById("add_label")).value,
+        "ServiceUrl": (<HTMLInputElement>document.getElementById("add_service_url_sync")).value,
+        "ServiceLogin": (<HTMLInputElement>document.getElementById("add_sync_service_login")).value,
+        "ServicePassword": (<HTMLInputElement>document.getElementById("add_sync_service_password")).value,
+        "RemoteIncoming": (<HTMLInputElement>document.getElementById("add_remote_incoming")).value,
+        "Schedule": (<HTMLInputElement>document.getElementById("add_schedule")).value,
+        "PageSize": (<HTMLInputElement>document.getElementById("add_page_size")).value,
+        "CopyProduct": (<HTMLInputElement>document.getElementById("add_copy_product")).value,
+        "FilterParam": (<HTMLInputElement>document.getElementById("add_filter_param")).value,
+        "GeoFilter": (<HTMLInputElement>document.getElementById("add_geo_filter")).value,
+        "SourceCollection": (<HTMLInputElement>document.getElementById("add_source_collection")).value,
+        "LastCreationDate": (<HTMLInputElement>document.getElementById("add_last_creation_date")).value,
+        "Request": (<HTMLInputElement>document.getElementById("add_request")).value,
+        "TargetCollectionName": (<HTMLInputElement>document.getElementById("add_target_collection")).value
+      }
+
+      let body = {
+        serviceUrl: serviceUrl,
+        synch: synch
+      };
+
+    this.authenticationService.addSynchronizer(body).subscribe(
+      (res: string) => {
+        this.refreshPage();
+    });
+    }
+  }
+
+  public setNewFormServiceUrlBackend(idx: number) {
+    this.currentSync.serviceUrlBackend = this.serviceUrlBackendList[idx];
+    let element = document.getElementById('add_service_url_backend');
+    (<HTMLInputElement>element).value = this.currentSync.serviceUrlBackend;
+    element.dispatchEvent(new KeyboardEvent('input', { 'bubbles': true }));
+  }
+
+  public setTargetCollection(id: number) {
+    this.currentSync.targetCollection = this.collectionsList[id];
+  }
 
   public setNewFormRequest(request) {
     this.currentSync.request = request;
@@ -211,28 +289,7 @@ export class EditSyncComponent implements OnInit, OnDestroy {
   public editCopyProduct(copyProduct) {    
     this.currentSync.copyProduct = copyProduct;
   }
-
-
-  public addNewSynchronizer() {
-    this.currentSync = new Synchronizer();
-    this.currentSync.label = "";
-    this.currentSync.serviceUrlBackend = "";
-    this.currentSync.serviceUrl = "";
-    this.currentSync.serviceLogin = "";
-    this.currentSync.servicePassword = "";
-    this.currentSync.copyProduct = "true";
-    this.currentSync.schedule = "";
-    this.currentSync.pageSize = null;
-    this.currentSync.request = "stop";
-    this.currentSync.targetCollection = "";
-    this.currentSync.remoteIncoming = "";
-    this.currentSync.sourceCollection = "";
-    this.currentSync.lastCreationDate = null;
-    this.currentSync.filterParam = "";
-    this.currentSync.geoFilter = "";
-    $("#addSynchronizerModal").modal('toggle');
-  }
-
+  
   public deleteSynchronizer(id: number, service_url_backend: string) {
     for (var i = 0; i < this.serviceUrlBackendList.length; i++) {
       if (this.serviceUrlBackendList[i] == service_url_backend) {
@@ -270,6 +327,41 @@ export class EditSyncComponent implements OnInit, OnDestroy {
     return undefined;
   }
 
+  public editSynchronizer(id: number, service_url_backend: string) {
+    let tempSync: any;
+    for (var i = 0; i < this.serviceUrlBackendList.length; i++) {
+      if (this.serviceUrlBackendList[i] == service_url_backend) {
+        this.tempServiceUrlBackendNumber = i;
+        tempSync = this.syncList[i].filter(a => a.Id === id)[0];
+      }
+    }
+    
+    this.currentSync.id = tempSync.Id;
+    this.currentSync.label = tempSync.Label;
+    this.currentSync.serviceUrlBackend = service_url_backend; // serviceUrlBackend..
+    this.currentSync.serviceUrl = tempSync.ServiceUrl; // serviceUrlSync..
+    this.currentSync.serviceLogin = tempSync.ServiceLogin;
+    this.currentSync.servicePassword = '';
+    this.currentSync.copyProduct = tempSync.CopyProduct;
+    this.currentSync.schedule = tempSync.Schedule;
+    this.currentSync.pageSize = tempSync.PageSize;
+    this.currentSync.request = tempSync.Request;
+    this.currentSync.targetCollection = (tempSync.TargetCollectionName == undefined ? '' : tempSync.TargetCollectionName);
+    this.currentSync.remoteIncoming = tempSync.RemoteIncoming;
+    this.currentSync.sourceCollection = tempSync.SourceCollection;
+    this.currentSync.lastCreationDate = tempSync.LastCreationDate;
+    this.currentSync.filterParam = tempSync.FilterParam;
+    this.currentSync.geoFilter = tempSync.GeoFilter;
+
+    var passwordEl = document.getElementById('edit_sync_service_password');
+    (<HTMLInputElement>passwordEl).value = null;
+    var eyeEl = document.getElementById('toggleEditSyncPassword');
+    eyeEl.setAttribute('class', 'far fa-eye');
+    eyeEl.style.setProperty('display', 'none');
+
+    $("#editSyncModal").modal('toggle');
+  }
+
   public onEditSubmit(id: number) {
     let valid = true;
     let inputs = document.querySelectorAll('#editSyncForm input.form-control');
@@ -277,16 +369,17 @@ export class EditSyncComponent implements OnInit, OnDestroy {
       this.validate(input, regexPatterns[input.id]);
       if (input.className == "form-control invalid") {
         valid = false;
-        this.alert.showErrorAlert("Form value error", "You entered an invalid value into '" + this.findLableForControl(input).innerHTML + "' field.");
+        return;
       }
     });
     if (valid) {
+      $('.modal').modal('hide');
       let serviceUrl = (<HTMLInputElement>document.getElementById("edit_service_url_backend")).value;
       let synch = {
         "Label":  (<HTMLInputElement>document.getElementById("edit_label")).value,
         "ServiceUrl": (<HTMLInputElement>document.getElementById("edit_service_url_sync")).value,
-        "ServiceLogin": (<HTMLInputElement>document.getElementById("edit_service_login")).value,
-        "ServicePassword": (<HTMLInputElement>document.getElementById("edit_service_password")).value,
+        "ServiceLogin": (<HTMLInputElement>document.getElementById("edit_sync_service_login")).value,
+        "ServicePassword": (<HTMLInputElement>document.getElementById("edit_sync_service_password")).value,
         "RemoteIncoming": (<HTMLInputElement>document.getElementById("edit_remote_incoming")).value,
         "Schedule": (<HTMLInputElement>document.getElementById("edit_schedule")).value,
         "PageSize": (<HTMLInputElement>document.getElementById("edit_page_size")).value,
@@ -312,52 +405,7 @@ export class EditSyncComponent implements OnInit, OnDestroy {
   }
 
 
-  setNewFormServiceUrlBackend(idx: number) {
-    this.currentSync.serviceUrlBackend = this.serviceUrlBackendList[idx];
-  }
-
-  public onAddSubmit() {
-
-    let valid = true;
-    let inputs = document.querySelectorAll('#addSyncForm input.form-control');
-    inputs.forEach((input) => {
-      this.validate(input, regexPatterns[input.id]);
-      if (input.className == "form-control invalid") {
-        valid = false;
-        this.alert.showErrorAlert("Form value error", "You entered an invalid value into '" + this.findLableForControl(input).innerHTML + "' field.");
-      }
-      
-    });
-    if (valid) {
-      let serviceUrl = (<HTMLInputElement>document.getElementById("add_service_url_backend")).value;
-      let synch = {
-        "Label":  (<HTMLInputElement>document.getElementById("add_label")).value,
-        "ServiceUrl": (<HTMLInputElement>document.getElementById("add_service_url_sync")).value,
-        "ServiceLogin": (<HTMLInputElement>document.getElementById("add_service_login")).value,
-        "ServicePassword": (<HTMLInputElement>document.getElementById("add_service_password")).value,
-        "RemoteIncoming": (<HTMLInputElement>document.getElementById("add_remote_incoming")).value,
-        "Schedule": (<HTMLInputElement>document.getElementById("add_schedule")).value,
-        "PageSize": (<HTMLInputElement>document.getElementById("add_page_size")).value,
-        "CopyProduct": (<HTMLInputElement>document.getElementById("add_copy_product")).value,
-        "FilterParam": (<HTMLInputElement>document.getElementById("add_filter_param")).value,
-        "GeoFilter": (<HTMLInputElement>document.getElementById("add_geo_filter")).value,
-        "SourceCollection": (<HTMLInputElement>document.getElementById("add_source_collection")).value,
-        "LastCreationDate": (<HTMLInputElement>document.getElementById("add_last_creation_date")).value,
-        "Request": (<HTMLInputElement>document.getElementById("add_request")).value,
-        "TargetCollectionName": (<HTMLInputElement>document.getElementById("add_target_collection")).value
-      }
-
-      let body = {
-        serviceUrl: serviceUrl,
-        synch: synch
-      };
-
-    this.authenticationService.addSynchronizer(body).subscribe(
-      (res: string) => {
-        this.refreshPage();
-    });
-    }
-  }
+  
   
   parseJsonDate = (jsonDate)  => {
     try {
@@ -405,13 +453,9 @@ export class EditSyncComponent implements OnInit, OnDestroy {
       })
   }
 
-  setTargetCollection(id: number) {
-    this.currentSync.targetCollection = this.collectionsList[id];
-  }
-
   public toggleAddPasswordVisibility() {
-    const togglePassword = document.querySelector('#toggleAddPassword');
-    const passwordInput = document.querySelector('#add_service_password');
+    const togglePassword = document.querySelector('#toggleAddSyncPassword');
+    const passwordInput = document.querySelector('#add_sync_service_password');
     const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
     passwordInput.setAttribute('type', type);
     // toggle the eye slash icon
@@ -420,8 +464,8 @@ export class EditSyncComponent implements OnInit, OnDestroy {
   }
 
   public toggleEditPasswordVisibility() {
-    const togglePassword = document.querySelector('#toggleEditPassword');
-    const passwordInput = document.querySelector('#edit_service_password');
+    const togglePassword = document.querySelector('#toggleEditSyncPassword');
+    const passwordInput = document.querySelector('#edit_sync_service_password');
     const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
     passwordInput.setAttribute('type', type);
     // toggle the eye slash icon

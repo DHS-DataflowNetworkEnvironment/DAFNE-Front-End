@@ -242,12 +242,14 @@ export class ServiceAvailabilityComponent implements OnInit {
       let averageLineColor = p.color('#ffdf70');
 
       let valueFontSize = 20;
-      let dateFontSize = 12;
+      let dateFontSize = 10;
       let textFontSize = 10;
 
       let barGapScale = 30.0;
       let sectionScaleSingle = 1.4;
       let maxValue = 100;
+
+      let lineDashSequence = [10, 10];
 
       let sf = 1.0;
       let tx = 0;
@@ -275,10 +277,12 @@ export class ServiceAvailabilityComponent implements OnInit {
         }
 
         if (p.mouseIsPressed) {
-          tx -= p.pmouseX - p.mouseX;
-          ty -= p.pmouseY - p.mouseY;
+          if (p.mouseButton === p.CENTER) {
+            tx -= p.pmouseX - p.mouseX;
+            ty -= p.pmouseY - p.mouseY;
+          }
         }
-        
+
         if (this.doResetZoom) {
           this.doResetZoom = false;
           resetZoom();
@@ -375,7 +379,9 @@ export class ServiceAvailabilityComponent implements OnInit {
         /* Average Line */
         if (this.averageServiceAvailability >= 0) {
           p.stroke(averageLineColor);
+          p.drawingContext.setLineDash(lineDashSequence);
           p.line(xCenter - chartXDim2, yCenter + chartYDim2 - this.averageServiceAvailability * chartYDim / maxValue, xCenter + chartXDim2, yCenter + chartYDim2 - this.averageServiceAvailability * chartYDim / maxValue);
+          p.drawingContext.setLineDash([]);
           p.textSize(textFontSize);
           p.textAlign(p.RIGHT, p.CENTER);
         }
@@ -430,7 +436,7 @@ export class ServiceAvailabilityComponent implements OnInit {
                 p.fill(100);
                 p.textSize(textFontSize);
                 p.textSize(valueFontSize);
-                p.text("N/A", xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2 * dayYDim + k * dayYDim + 1 + dayYDim/5.5);
+                p.text("NaN", xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2 * dayYDim + k * dayYDim + 1 + dayYDim/5.5);
               }
             }
           }

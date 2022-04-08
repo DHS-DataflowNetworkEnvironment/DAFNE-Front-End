@@ -28,26 +28,7 @@
         </div>
     </div>
 </div>
-<app-footer class="footer row"></app-footer>
-
-<!-- Delete Alert! -->
-<div class="modal fade" id="deleteServiceModal" tabindex="-1" aria-labelledby="deleteServiceModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><i class="fas fa-exclamation-triangle mr-4"></i>Delete Service: {{tempServiceUrlToDelete}}</h5>
-            </div>
-            <div class="modal-body">
-                <label>Are you sure?</label>
-                <div class="row">
-                    <button type="button" class="btn btn-secondary ml-auto" (click)="deleteServiceCanceled()" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary ml-4 mr-4" (click)="deleteServiceConfirmed()" data-bs-dismiss="modal">Yes</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-  
+<app-footer class="footer row"></app-footer>  
 
 <!-- Add Modal -->
 <div class="modal fade" id="addServiceModal" tabindex="-1" aria-labelledby="addServiceModalLabel" aria-hidden="true">
@@ -66,6 +47,7 @@
                         <div class="mb-1 ml-auto">
                             <label for="add_service_type" class="form-label">Service type</label>
                             <input type="text" class="form-control" id="add_service_type" [value]="service.service_type" onkeydown="return false">
+                            <small id="serviceTypeHelp" class="form-text">Please select a service type</small>
                             <i id="service-type-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
                             <ul class="dropdown-menu" aria-labelledby="service-type-dropdown">
                                 <li *ngFor="let serviceType of serviceTypesList; let k = index">
@@ -91,11 +73,12 @@
                         <div class="mb-1">
                             <label for="add_service_url" class="form-label">Service URL</label>
                             <input type="text" class="form-control" id="add_service_url" [value]="service.service_url">
-                            <small id="serviceUrlHelp" class="form-text">Length: 1 - 256 characters. Invalid characters: , ; and SPACE</small>
+                            <small id="serviceUrlHelp" class="form-text">Length: 1 - 256 characters.<br>Invalid characters: , ; and SPACE</small>
                         </div>
                         <div class="mb-1 ml-auto">
                             <label for="add_centre" class="form-label">Centre</label>
                             <input type="text" class="form-control" id="add_centre" [value]="service.centre" onkeydown="return false">
+                            <small id="centreHelp" class="form-text">Please select a centre</small>
                             <i id="centre-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
                             <ul class="dropdown-menu" aria-labelledby="centre-dropdown">
                                 <li *ngFor="let centre of centreList">
@@ -106,7 +89,7 @@
                     </div>
                     <div class="row" >
                         <button type="button" class="btn btn-secondary ml-auto m-3" data-bs-dismiss="modal" aria-label="Close">Close</button>
-                        <button type="submit" class="btn btn-primary m-3" (click)="onAddSubmit()" data-bs-dismiss="modal">Submit</button>
+                        <button type="submit" class="btn btn-primary m-3" (click)="onAddSubmit()">Submit</button>
                     </div>
                 </form>
             </div>
@@ -131,6 +114,7 @@
                         <div class="mb-1 ml-auto">
                             <label for="edit_service_type" class="form-label">Service type</label>
                             <input type="text" class="form-control" id="edit_service_type" [value]="service.service_type" onkeydown="return false">
+                            <small id="serviceTypeHelp" class="form-text">Please select a service type</small>
                             <i id="service-type-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
                             <ul class="dropdown-menu" aria-labelledby="service-type-dropdown">
                                 <li *ngFor="let serviceType of serviceTypesList; let k = index">
@@ -147,20 +131,21 @@
                         </div>
                         <div class="mb-1 ml-auto">
                             <label for="edit_service_password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="edit_service_password" autocomplete="current-password" placeholder="unchanged" [value]="service.password">
-                            <small id="usernameHelp" class="form-text">Length: 1 - 60 characters</small>
-                            <i class="fas fa-eye" id="toggleEditPassword" (click)="toggleEditPasswordVisibility()"></i>
+                            <input type="password" class="form-control" id="edit_service_password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" >
+                            <small id="passwordHelp" class="form-text">Length: 1 - 60 characters</small>
+                            <i class="fas fa-eye" style="display: none;" id="toggleEditPassword" (click)="toggleEditPasswordVisibility()"></i>
                         </div>
                     </div>
                     <div class="input-group mb-1">
                         <div class="mb-1">
                             <label for="edit_service_url" class="form-label">Service URL</label>
                             <input type="text" class="form-control" id="edit_service_url" [value]="service.service_url">
-                            <small id="serviceUrlHelp" class="form-text">Length: 1 - 256 characters. Invalid characters: , ; and SPACE</small>
+                            <small id="serviceUrlHelp" class="form-text">Length: 1 - 256 characters.<br>Invalid characters: , ; and SPACE</small>
                         </div>
                         <div class="mb-1 ml-auto">
                             <label for="edit_centre" class="form-label">Centre</label>
                             <input type="text" class="form-control" id="edit_centre" [value]="service.centre" onkeydown="return false">
+                            <small id="centreHelp" class="form-text">Please select a centre</small>
                             <i id="centre-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
                             <ul class="dropdown-menu" aria-labelledby="centre-dropdown">
                                 <li *ngFor="let centre of centreList">
@@ -171,9 +156,27 @@
                     </div>
                     <div class="row" >
                         <button type="button" class="btn btn-secondary ml-auto m-3" data-bs-dismiss="modal" aria-label="Close">Close</button>
-                        <button type="submit" class="btn btn-primary m-3" (click)="onEditSubmit(service.id)" data-bs-dismiss="modal">Submit</button>
+                        <button type="submit" class="btn btn-primary m-3" (click)="onEditSubmit(service.id)">Submit</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Alert! -->
+<div class="modal fade" id="deleteServiceModal" tabindex="-1" aria-labelledby="deleteServiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle mr-4"></i>Delete Service: {{tempServiceUrlToDelete}}</h5>
+            </div>
+            <div class="modal-body">
+                <label>Are you sure?</label>
+                <div class="row">
+                    <button type="button" class="btn btn-secondary ml-auto" (click)="deleteServiceCanceled()" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary ml-4 mr-4" (click)="deleteServiceConfirmed()" data-bs-dismiss="modal">Yes</button>
+                </div>
             </div>
         </div>
     </div>
