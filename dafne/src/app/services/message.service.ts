@@ -1,6 +1,5 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Subscription } from 'rxjs/internal/Subscription';
 
 @Injectable({
   providedIn: 'root'

@@ -9,6 +9,7 @@
             <li id="synchronizers-link"><a class="dropdown-item" routerLink="edit-synchronizers" [skipLocationChange]="true" >Synchronizers</a></li>
             <li id="completeness-link"><a class="dropdown-item" [routerLink]="['/gui', { outlets: { centralBodyRouter: ['p5chart-component']}}]" [skipLocationChange]="true">Completeness</a></li>
             <li id="services-availability-link"><a class="dropdown-item" [routerLink]="['/gui', { outlets: { centralBodyRouter: ['service-availability']}}]" [skipLocationChange]="true" >Service Availability</a></li>
+            <li id="publication-latency-link"><a class="dropdown-item" [routerLink]="['/gui', { outlets: { centralBodyRouter: ['publication-latency-component']}}]" [skipLocationChange]="true">Publication Latency</a></li>
             <li><a class="dropdown-item" (click)="logout()">Logout</a></li>
       </ul>
 </div>

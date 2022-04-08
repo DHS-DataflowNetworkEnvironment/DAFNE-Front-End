@@ -4,6 +4,7 @@ import { MainViewComponent } from './main-view/main-view.component';
 import { NetworkViewComponent } from './MAIN_VIEW_ITEMS/network-view/network-view.component';
 import { LoginComponent } from './login/login.component';
 import { P5chartComponent } from './MAIN_VIEW_ITEMS/p5chart/p5chart.component';
+import { PublicationLatencyComponent } from './MAIN_VIEW_ITEMS/publication-latency/publication-latency.component';
 import { AuthGuard } from './util/auth.guard';
 import { EditCentresComponent } from './edit-centres/edit-centres.component';
 import { EditServicesComponent } from './edit-services/edit-services.component';
@@ -18,6 +19,7 @@ const routes: Routes = [
       /* Auxiliary routes */
       { path: 'network-component/:mapType', outlet: 'centralBodyRouter', component: NetworkViewComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always'},
       { path: 'p5chart-component', outlet: 'centralBodyRouter', component: P5chartComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always'},
+      { path: 'publication-latency-component', outlet: 'centralBodyRouter', component: PublicationLatencyComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always'},
       { path: 'service-availability', outlet: 'centralBodyRouter', component: ServiceAvailabilityComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always'},
       { path: '', outlet: 'centralBodyRouter', component: NetworkViewComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always'}
     ]
