@@ -173,7 +173,7 @@ export class EditSyncComponent implements OnInit, OnDestroy {
             this.syncList[i][k].ServiceUrlBackend = res[i].serviceUrl;
           }
           this.collectionsList.push([]);
-          if (res[i].collection != undefined) {
+          if (res[i].collections != undefined) {
             res[i].collections.forEach((item, index) => {
               this.collectionsList[i].push(item.Name);
             });
