@@ -1,4 +1,5 @@
 import { Component, OnInit, ElementRef } from '@angular/core';
+import { AuthenticationService } from '../../services/authentication.service';
 import { AlertComponent } from '../../alert/alert.component';
 import { IDatePickerConfig } from 'ng2-date-picker';
 import { Latency, DayLatency } from '../../models/latency';
@@ -15,25 +16,25 @@ export class PublicationLatencyComponent implements OnInit {
 
   public p5Chart;
 
-  public tempDaysNumber: number = 0;
-  public daysNumber: number = 30; /// THIS VALUE HAS TO BE TAKEN FROM A GET!!!!!!!!!!!
-  public hoursNumber: number = 24; // EVALUATE HOW TO HANDLE DIFFERENT NUMBER OF READINGS PER DAY.
+  public localCentre = {
+    id: -1,
+    name: "",
+    color: "#ffffff"
+  };
+
+  public latencyDaysNumber: number = 0;
+  public requestedDaysNumber: number = 0;
+  public latencyDetailNumber: number = 0;
   public millisPerDay = 86400000;
-  public maxDays = 29;
+  public maxDays = 30;
   public millisPerMaxPeriod = this.millisPerDay * this.maxDays;
 
   public today = new Date();
-  public dd = String(this.today.getDate()).padStart(2, '0');
-  public mm = String(this.today.getMonth() + 1).padStart(2, '0');
-  public yyyy = this.today.getFullYear();
-  public todayDate: string = this.yyyy + '-' + this.mm + '-' + this.dd;
+  public todayDate: string = this.today.toISOString().slice(0, 10);
 
-  public initialStartDayMillis = Date.parse(this.todayDate) - (this.maxDays * this.millisPerDay);
+  public initialStartDayMillis = Date.parse(this.todayDate) - this.millisPerMaxPeriod;
   public startDateTemp = new Date(this.initialStartDayMillis);
-  public ddStart = String(this.startDateTemp.getDate()).padStart(2, '0');
-  public mmStart = String(this.startDateTemp.getMonth() + 1).padStart(2, '0');
-  public yyyyStart = this.startDateTemp.getFullYear();
-  public startDate: string = this.yyyyStart + '-' + this.mmStart + '-' + this.ddStart;
+  public startDate: string = this.startDateTemp.toISOString().slice(0, 10);
 
   public stopDate = this.todayDate;
   public startDatePickerConfig: IDatePickerConfig = {
@@ -55,90 +56,24 @@ export class PublicationLatencyComponent implements OnInit {
   public chartType: string = this.selectorText[0];
   public doResetZoom: boolean = false;
 
-  public fakePublicationLatencyJson = {
-    centreId: 0,
-    values: [
-      {date: "2022-01-20", latency: 2000, source: "FE"},
-      {date: "2022-01-21", latency: 20, source: "FE"},
-      {date: "2022-01-22", latency: 6500, source: "FE"},
-      {date: "2022-01-23", latency: 740, source: "FE"},
-      {date: "2022-01-24", latency: 9800, source: "FE"},
-      {date: "2022-01-25", latency: 9600, source: "BE"},
-      {date: "2022-01-26", latency: 98000, source: "FE"},
-      {date: "2022-01-27", latency: 300000, source: "FE"},
-      {date: "2022-01-28", latency: 298000, source: "FE"},
-      {date: "2022-01-29", latency: 28000, source: "FE"},
-      {date: "2022-01-30", latency: 177000, source: "FE"},
-      {date: "2022-01-31", latency: 0, source: "FE"},
-      {date: "2022-02-01", latency: 97, source: "FE"},
-      {date: "2022-02-02", latency: 122, source: "BE"},
-      {date: "2022-02-03", latency: 0, source: "FE"},
-      {date: "2022-02-04", latency: 0, source: "FE"},
-      {date: "2022-02-05", latency: 15800, source: "FE"},
-      {date: "2022-02-06", latency: 35700, source: "FE"},
-      {date: "2022-02-07", latency: 0, source: "FE"},
-      {date: "2022-02-08", latency: 9700, source: "FE"},
-      {date: "2022-02-09", latency: 4400, source: "FE"},
-      {date: "2022-02-10", latency: 0, source: "FE"},
-      {date: "2022-02-11", latency: 0, source: "FE"},
-      {date: "2022-02-12", latency: 59200, source: "BE"},
-      {date: "2022-02-13", latency: 38800, source: "BE"},
-      {date: "2022-02-14", latency: 240, source: "FE"},
-      {date: "2022-02-15", latency: 990, source: "FE"},
-      {date: "2022-02-16", latency: 940, source: "FE"},
-      {date: "2022-02-17", latency: 0, source: "FE"},
-      {date: "2022-02-18", latency: 20, source: "FE"}
-    ]
-  };
+  public publicationLatencyList: Array<Latency> = [];
+  public publicationDetailLatencyList: Array<DayLatency> = [];
+  public requestedPublicationLatencyList: Array<Latency> = [];
 
-  public fakePublicationDayLatencyJson = {
-    centreId: 0,
-    date: "2022-01-27",
-    values: [
-      {time: "00", latency: 2000},
-      {time: "01", latency: 0},
-      {time: "02", latency: 650},
-      {time: "03", latency: 740},
-      {time: "04", latency: 980},
-      {time: "05", latency: 900},
-      {time: "06", latency: 980},
-      {time: "07", latency: 1000},
-      {time: "08", latency: 32000},
-      {time: "09", latency: 54000},
-      {time: "10", latency: 770},
-      {time: "11", latency: 0},
-      {time: "12", latency: 970},
-      {time: "13", latency: 1220},
-      {time: "14", latency: 0},
-      {time: "15", latency: 0},
-      {time: "16", latency: 15800},
-      {time: "17", latency: 5700},
-      {time: "18", latency: 2000},
-      {time: "19", latency: 9700},
-      {time: "20", latency: 7400},
-      {time: "21", latency: 400},
-      {time: "22", latency: 680},
-      {time: "23", latency: 120}
-    ]
-  };
-
-  public publicationLatencyList: Array<Latency> = this.fakePublicationLatencyJson.values;
-  public publicationDayLatencyList: Array<DayLatency> = this.fakePublicationDayLatencyJson.values;
-  //public publicationLatencyList: Array<Latency> = Array.apply(null, Array(30)).map(function () {});
-  //public publicationLatencyList: Array<Latency>  = Array.apply(null, Array(30)).map(function () {});
-  public dayOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   public mouseIsOnList: Array<boolean> = Array.apply(false, Array(30)).map(function () {});
-  public showDayLatency: boolean = false;
-  public showDayDate: string = "";
+  public showDetailLatency: boolean = false;
+  public latencyDetailDate: string = "";
 
   public latencyColors;
+  public tempSelectedFilterSyncLabel;
+  public selectedFilterSyncLabel;
 
-  public syncFakeList = [
-    "Sync_1", "Sync_2", "Sync_3"
-  ];
-  public selectedFilterSync;
+  public syncServiceUrl: string;
+  public syncList;
+  public tempSelectedSyncId: number;
 
   constructor(
+    public authenticationService: AuthenticationService,
     private csvService: CsvDataService,
     private el: ElementRef,
     private alert: AlertComponent,
@@ -147,17 +82,42 @@ export class PublicationLatencyComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.init_P5();
+    this.authenticationService.getAllCentres().subscribe(
+      (res: object) => {
+        /* Get Local Centre */
+        if (Object.values(res).filter((x) => x.local == true)[0]) {
+          this.localCentre = Object.values(res).filter((x) => x.local == true)[0];
+          /* Get Synchronizers to fill the filter */
+          this.authenticationService.getSynchronizersV2().subscribe(
+            (res: object) => {
+              this.syncServiceUrl = res[0].serviceUrl;
+              
+              /* Sync List filtered for Cron == true */
+              this.syncList = res[0].synchronizers.filter((x) => x.Cron.Active == true);
+              this.tempSelectedFilterSyncLabel = this.syncList[0].Label;
+              this.init_P5();
+            }
+          );
+        } else {
+          this.localCentre = {
+            id: -1,
+            name: "No Local",
+            color: "#ffffff"
+          };
+          this.alert.showErrorAlert("No local Centre is set", "Please setup one Centre as local");
+        }
+      }
+    );
   }
 
   onFilterSyncChange(sync) {
-    this.selectedFilterSync = sync.target.value;
+    this.tempSelectedFilterSyncLabel = sync.target.value;
   }
 
   onStartDateChanged(date) {
     let tempMillisDate = (Date.parse(date) + this.millisPerMaxPeriod);
     if (Date.parse(this.stopDate) > tempMillisDate) {
-      this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 15 days");
+      this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 31 days");
       let tempDate = new Date(tempMillisDate);
       let dd = String(tempDate.getDate()).padStart(2, '0');
       let mm = String(tempDate.getMonth() + 1).padStart(2, '0');
@@ -173,7 +133,7 @@ export class PublicationLatencyComponent implements OnInit {
   onStopDateChanged(date) {
     let tempMillisDate = (Date.parse(date) - this.millisPerMaxPeriod);
     if (Date.parse(this.startDate) < tempMillisDate) {
-      this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 15 days");
+      this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 31 days");
       let tempDate = new Date(tempMillisDate);
       let dd = String(tempDate.getDate()).padStart(2, '0');
       let mm = String(tempDate.getMonth() + 1).padStart(2, '0');
@@ -190,62 +150,123 @@ export class PublicationLatencyComponent implements OnInit {
     let tempStopDate = new Date(this.stopDate);
     let tempStartDate = new Date(this.startDate);
     let tempTimeDifference = tempStopDate.getTime() - tempStartDate.getTime();
-    //console.log("Time difference: " + tempTimeDifference);
-    
-    this.tempDaysNumber = tempTimeDifference / (1000 * 3600 * 24) + 1;
-    //this.sectionRadians = (2 * Math.PI) / this.daysNumber;
-    //console.log("Days difference: " + tempDaysNumber);
-  
-    for (var i = 0; i < this.tempDaysNumber; i++) {
-      //console.log("Date " + i + " - " + new Date(tempStartDate.getTime() + i*(1000*3600*24)));
-      let tempFilteredDate = new Date(tempStartDate.getTime() + i*(1000*3600*24));
-      let tempdd = String(tempFilteredDate.getDate()).padStart(2, '0');
-      let tempmm = String(tempFilteredDate.getMonth() + 1).padStart(2, '0');
-      let tempyyyy = tempFilteredDate.getFullYear();
-      let tempFilteredDateString: string = tempyyyy + '-' + tempmm + '-' + tempdd;
-      //console.log("TempFilteredDate: " + tempFilteredDateString);
 
-/*       let body: object = {
-        "mission":this.bodyMission,
-        "productType":this.productType,
-        "startDate":tempFilteredDateString,
-        "stopDate":tempFilteredDateString
-      }; */
-      //console.log("FILTER Body: " + JSON.stringify(body, null, 2));
-/*       this.completenessDailyGetDone[i] = false;   
-      this.getDailyCompleteness(body, i); */
+    this.tempSelectedSyncId = this.syncList.filter((x) => x.Label == this.tempSelectedFilterSyncLabel)[0].Id;
+    let body: object = {
+      "startDate": this.startDate.concat("T00:00:00"),
+      "stopDate": this.stopDate.concat("T23:59:59"),
+      "synchId": this.tempSelectedSyncId,
+      "synchLabel": this.tempSelectedFilterSyncLabel,
+      "backendUrl": this.syncServiceUrl
     }
+    
+    this.authenticationService.getPublicationLatency(this.localCentre.id, body).subscribe(
+      (res) => {
+        this.latencyDaysNumber = 0;
+        if (res.centreId == this.localCentre.id) {
+          this.selectedFilterSyncLabel = this.tempSelectedFilterSyncLabel;
+          this.latencyDaysNumber = res.values.length;
+          this.requestedDaysNumber = tempTimeDifference / (1000 * 3600 * 24) + 1;
+          this.requestedPublicationLatencyList = [];
+          this.publicationLatencyList = res.values;
 
-    /* CHECK!!!!  ---->  Fill the Array on filter submit */
-    this.publicationLatencyList = this.fakePublicationLatencyJson.values;
-    this.publicationDayLatencyList = this.fakePublicationDayLatencyJson.values;
-    this.p5Chart.windowResized();
+          for (var i = 0; i < this.requestedDaysNumber; i++) {
+            this.requestedPublicationLatencyList[i] = {
+              day: new Date(Date.parse(this.startDate) + (i * this.millisPerDay)).toISOString().slice(0,10),
+              centre_id: -1,
+              synch_id: -1,
+              synch_label: "",
+              average_fe: null,
+              average_be: null,
+              average_latency: null,
+              number_of_measurements: 0,
+              source: ""
+            }
+          }
+
+          for (var i = 0; i < this.requestedDaysNumber; i++) {
+            for (var k = 0; k < this.latencyDaysNumber; k++) {
+              if (this.publicationLatencyList[k].day == this.requestedPublicationLatencyList[i].day) {
+                if (this.publicationLatencyList[k].average_fe == null) {
+                  if (this.publicationLatencyList[k].average_be == null) {
+                    this.publicationLatencyList[k].source = "null";
+                    this.publicationLatencyList[k].average_latency = -1;
+                  } else {
+                    this.publicationLatencyList[k].source = "BE";
+                  }                  
+                } else if (this.publicationLatencyList[k].average_fe > this.publicationLatencyList[k].average_latency) {
+                  this.publicationLatencyList[k].source = "FE+BE";
+                } else {
+                  this.publicationLatencyList[k].source = "FE";
+                }
+                this.requestedPublicationLatencyList[i] = this.publicationLatencyList[k];
+              }
+            }
+          }
+          this.showDetailLatency = false;
+          this.p5Chart.setClickTimeoutId(undefined);
+          this.p5Chart.windowResized();
+        }
+      }
+    );
+  }
+
+  onDetailLatencyReq(date: string) {
+    /* Retrieve Detailed Day Latency */
+    this.tempSelectedSyncId = this.syncList.filter((x) => x.Label == this.tempSelectedFilterSyncLabel)[0].Id;
+    let body: object = {
+      "date": date,
+      "synchId": this.tempSelectedSyncId,
+      "synchLabel": this.tempSelectedFilterSyncLabel,
+      "backendUrl": this.syncServiceUrl
+    }
+    console.log("Pub Lat - Request Body: " + JSON.stringify(body, null, 2));
+    
+    this.authenticationService.getPublicationLatencyDetail(this.localCentre.id, body).subscribe(
+      (res) => {
+        this.latencyDetailNumber = 0;
+        this.selectedFilterSyncLabel = this.tempSelectedFilterSyncLabel;
+
+        if (res.centreId == this.localCentre.id) {
+          this.latencyDetailNumber = res.values.length;
+          console.log("Pub Lat Detail - Response: " + JSON.stringify(res, null, 2));
+          this.publicationDetailLatencyList = res.values;
+
+          for (var i = 0; i < this.latencyDetailNumber; i++) {
+            if (this.publicationDetailLatencyList[i].latency_fe != null) {
+              this.publicationDetailLatencyList[i].source = 'FE';
+            } else if (this.publicationDetailLatencyList[i].latency_fe == null 
+              && this.publicationDetailLatencyList[i].latency_be != null) {
+                this.publicationDetailLatencyList[i].source = 'BE';
+            } else {
+              this.publicationDetailLatencyList[i].source = 'null';
+            }
+          }
+          console.log("Pub Lat - Values: " + JSON.stringify(this.publicationDetailLatencyList, null, 2));
+          this.showDetailLatency = true;
+        }
+      }
+    );
   }
 
   onBackToPeriodClicked() {
-    if (this.showDayLatency) {
-      this.showDayLatency = false;
+    if (this.showDetailLatency) {
+      this.showDetailLatency = false;
+      this.p5Chart.setClickTimeoutId(undefined);
     }
   }
 
   toggleTable() {
-    //if (getComputedStyle(document.getElementById("data-table-container")).visibility == 'collapse') {
     if (document.getElementById("data-table-container").style.display == "none") {
       /* Show */
       document.getElementById("main-column-container").style.height = "calc(100vh - 9rem - 12rem)";
       document.getElementById("p5PublicationLatencyCanvas-column-div").style.height = "calc(100vh - 25.5rem)";
-      /* document.getElementById("p5PublicationLatencyCanvas").style.height = "100%"; */
       document.getElementById("data-table-container").style.display = "block";
-      
-      //this.p5Chart.windowResized();
     } else {
       /* Hide */
       document.getElementById("main-column-container").style.height = "calc(100vh - 9rem)";
       document.getElementById("p5PublicationLatencyCanvas-column-div").style.height = "calc(100vh - 13.5rem)"; 
-      /* document.getElementById("p5PublicationLatencyCanvas").style.height = "100%";  */
       document.getElementById("data-table-container").style.display = "none";
-      
-      //this.p5Chart.windowResized();
     }
   }
 
@@ -255,29 +276,64 @@ export class PublicationLatencyComponent implements OnInit {
   }
 
   saveAsCSV() {
-    /* if (this.completenessDataList.length > 0) {
-      var csvContent: string = '';
-      var table = document.getElementById('data-table');
-      for (var r = 0; r < table.childElementCount; r++) {
-        for (var c = 0; c < table.children[r].childElementCount; c++) {
-          csvContent += table.children[r].children[c].innerHTML;
-          if (!(c == (table.children[r].childElementCount - 1) && r == (table.childElementCount - 1))) csvContent += ',';
+    if (this.showDetailLatency) {
+      /* Export Detail Latency */
+      if (this.publicationDetailLatencyList.length > 0) {
+        var csvContent: string = '';
+        var table = <HTMLTableElement>document.getElementById('data-table');
+        for (var h = 0; h < table.tHead.childElementCount; h++) {
+          csvContent += table.tHead.children[h].textContent;
+          if (h != table.tHead.childElementCount - 1) csvContent += ',';
         }
-        r < (table.childElementCount - 1) ? csvContent += '\n' : null;
+        csvContent += '\n';
+        for (var r = 0; r < table.rows.length; r++) {
+          for (var c = 0; c < table.rows[r].cells.length; c++) {
+            csvContent += table.rows[r].cells[c].innerText;
+            if (!(c == (table.rows[r].childElementCount - 1) && r == (table.childElementCount - 1))) csvContent += ',';
+          }
+          r < (table.childElementCount - 1) ? csvContent += '\n' : null;
+        }
+        this.csvService.exportToCsv(
+          'DAFNE-Publication_Detail_Latency('
+          + this.localCentre.name
+          + ')_Sync('
+          + this.selectedFilterSyncLabel 
+          + ')_Date('
+          + this.latencyDetailDate
+          + ').csv', csvContent
+        );
       }
-      let tempCompleteCsvMissionName = this.missionFiltered.acronym + this.platformNumber;
-      this.csvService.exportToCsv(
-        'DAFNE-Mission('
-        + tempCompleteCsvMissionName
-        + ')_Product('
-        + this.productType 
-        + ')_From('
-        + table.children[0].children[1].innerHTML
-        + ')_To('
-        + table.children[0].children[table.children[0].childElementCount - 1].innerHTML
-        + ').csv', csvContent
-      );
-    } */
+    } else {
+      /* Export Daily Latency */
+      if (this.publicationLatencyList.length > 0) {
+        var csvContent: string = '';
+        var table = <HTMLTableElement>document.getElementById('data-table');
+        for (var h = 0; h < table.tHead.childElementCount; h++) {
+          csvContent += table.tHead.children[h].textContent;
+          if (h != table.tHead.childElementCount - 1) csvContent += ',';
+        }
+        csvContent += '\n';
+        for (var r = 0; r < table.rows.length; r++) {
+          for (var c = 0; c < table.rows[r].cells.length; c++) {
+            csvContent += table.rows[r].cells[c].innerText;
+            if (!(c == (table.rows[r].childElementCount - 1) && r == (table.childElementCount - 1))) csvContent += ',';
+          }
+          r < (table.childElementCount - 1) ? csvContent += '\n' : null;
+        }          
+
+        this.csvService.exportToCsv(
+          'DAFNE-Publication_Latency('
+          + this.localCentre.name
+          + ')_Sync('
+          + this.selectedFilterSyncLabel 
+          + ')_From('
+          + this.startDate
+          + ')_To('
+          + this.stopDate
+          + ').csv', csvContent
+        );
+      }
+    }
   }
 
   init_P5() {
@@ -306,20 +362,16 @@ export class PublicationLatencyComponent implements OnInit {
       let labelBackgroundColor = p.color('#12222fcc')
       let lineColor = p.color('#aaaaaa');
       let valuesColor = p.color(200);
-      let dateFontSize = 12;
+      let dateFontSize = 10;
       let valueFontSize = 10;
 
       let barGapScale = 30.0;
       let sectionScaleSingle = 1.4;
-      let maxValue = 592;
+      let maxValue = 100;
 
       let sf = 1.0;
       let tx = 0;
       let ty = 0;
-
-      let expNum = 1.056975;
-      let publicationLatencyListScaled: Array<number> = [];
-      let publicationDayLatencyListScaled: Array<number> = [];
 
       let clickTimerId;
 
@@ -330,8 +382,7 @@ export class PublicationLatencyComponent implements OnInit {
         p.frameRate(10);
         p.textFont('NotesESA-Reg');
         canvasSpace.mouseWheel(e => wheelZoom(e));
-        //canvasSpace.doubleClicked(resetZoom);
-        //canvasSpace.mouseClicked(e => toggleDayView(e));
+        
       };
 
       p.draw = () => {
@@ -339,43 +390,38 @@ export class PublicationLatencyComponent implements OnInit {
         p.windowResized();
         p.translate(tx, ty);
 
-        for (var i = 0; i < this.daysNumber; i++) {
-          publicationLatencyListScaled[i] = expNum ** this.publicationLatencyList[i].latency;
-        }
-        for (var i = 0; i < this.hoursNumber; i++) {
-          publicationDayLatencyListScaled[i] = expNum ** this.publicationDayLatencyList[i].latency;
-        }
-
-        this.mouseIsOnList = Array.apply(false, Array(30)).map(function () {}); // Change total days number.
-        if (this.chartType == this.selectorText[0]) {
-          if (this.showDayLatency) {
-            p.fillDayBarChart();
-          } else {
-            p.fillBarChart();
+        this.mouseIsOnList = Array.apply(false, Array(31)).map(function () {});
+          if (this.chartType == this.selectorText[0]) {
+            if (this.showDetailLatency) {
+              p.fillDayBarChart();
+            } else {
+              p.fillBarChart();
+            }
+          } else if (this.chartType == this.selectorText[1]) {
+            if (this.showDetailLatency) {
+              p.fillDayLineChart();
+            } else {
+              p.fillLineChart();
+            }
           }
-        } else if (this.chartType == this.selectorText[1]) {
-          if (this.showDayLatency) {
-            p.fillDayLineChart();
-          } else {
-            p.fillLineChart();
-          }
-        }
-
-        if (p.mouseIsPressed) {
-          tx -= p.pmouseX - p.mouseX;
-          ty -= p.pmouseY - p.mouseY;
-        }
         
-        if (this.doResetZoom) {
-          this.doResetZoom = false;
-          resetZoom();
-        }
+          if (p.mouseIsPressed) {
+            if (p.mouseButton === p.CENTER) {
+              tx -= p.pmouseX - p.mouseX;
+              ty -= p.pmouseY - p.mouseY;
+            }
+          }
+          
+          if (this.doResetZoom) {
+            this.doResetZoom = false;
+            resetZoom();
+          }
       }
 
       p.doubleClicked = () => {
         if (clickTimerId) {
           clearTimeout(clickTimerId);
-          clickTimerId = 0;
+          clickTimerId = undefined;
         }
         resetZoom();
       }
@@ -383,22 +429,23 @@ export class PublicationLatencyComponent implements OnInit {
       p.mouseClicked = () => {
         if (p.mouseX > xCenter - chartXDim2 + tx && p.mouseX < xCenter + chartXDim2 + tx
           && p.mouseY > yCenter - chartYDim2 + ty && p.mouseY < yCenter + chartYDim2 + ty) {
-            if (!clickTimerId) {
-              clickTimerId = setTimeout(() => {
-              //console.log("Mouse clicked.");
-    
-              if (this.showDayLatency == false) {
-                for (var i = 0; i < this.daysNumber; i++) {
+          if (!clickTimerId) {
+            clickTimerId = setTimeout(() => {    
+              if (this.showDetailLatency == false) {
+                for (var i = 0; i < this.requestedDaysNumber; i++) {
                   if (this.mouseIsOnList[i] == true) {
-                    //console.log("Day Clicked: " + i);
-                    this.showDayDate = this.publicationLatencyList[i].date;
-                    this.showDayLatency = true;
+                    this.latencyDetailDate = this.requestedPublicationLatencyList[i].day;
+                    this.onDetailLatencyReq(this.latencyDetailDate);
                   }
                 }
-              }   
+              }
             }, 500)
           }      
         }  
+      }
+
+      p.setClickTimeoutId = (id) => {
+        clickTimerId = id;    
       }
 
       function applyScale(s) {
@@ -437,21 +484,27 @@ export class PublicationLatencyComponent implements OnInit {
       };
 
       p.fillBarChart = () => {
-        maxValue = 300000;
-        let sectionXFilledDim = (chartXDim / this.daysNumber) / sectionScaleSingle;
+        maxValue = 0;
+        for (var i = 0; i < this.latencyDaysNumber; i++) {
+          if (this.publicationLatencyList[i].average_latency > maxValue) {
+            maxValue = this.publicationLatencyList[i].average_latency;
+          }
+        }
+        let sectionXFilledDim = (chartXDim / this.requestedDaysNumber) / sectionScaleSingle;
         let sectionXFilledDim2 = sectionXFilledDim / 2;
         let barGap = sectionXFilledDim / barGapScale;
 
-        /* CHECK IF THRESHOLD LINES ARE OUTSIDE CHART!!! */
         /* Threshold Lines */
         for (var i = 0; i < this.latencyColors.length; i++) {
           p.noFill();
           p.stroke(this.rgbConvertToArray(this.latencyColors[i].color));
-          p.line(xCenter - chartXDim2, yCenter + chartYDim2 - this.latencyColors[i].threshold * chartYDim / maxValue, xCenter + chartXDim2, yCenter + chartYDim2 - this.latencyColors[i].threshold * chartYDim / maxValue);
+          if (this.latencyColors[i].threshold * chartYDim / maxValue <= chartYDim) {
+            p.line(xCenter - chartXDim2, yCenter + chartYDim2 - this.latencyColors[i].threshold * chartYDim / maxValue, xCenter + chartXDim2, yCenter + chartYDim2 - this.latencyColors[i].threshold * chartYDim / maxValue);
+          }
         }
 
-        for (var i = 0; i < this.daysNumber; i++) {
-          let sectionXCenter = xCenter - chartXDim2 + chartXDim / (2 * this.daysNumber) + i * chartXDim / this.daysNumber;
+        for (var i = 0; i < this.requestedDaysNumber; i++) {
+          let sectionXCenter = xCenter - chartXDim2 + chartXDim / (2 * this.requestedDaysNumber) + i * chartXDim / this.requestedDaysNumber;
 
           /* xAxis Text */
           p.textAlign(p.CENTER, p.CENTER);
@@ -459,7 +512,7 @@ export class PublicationLatencyComponent implements OnInit {
           p.noStroke();
           p.textSize(dateFontSize);
           /* Rotate Dates */
-          let tempText = this.publicationLatencyList[i].date;
+          let tempText = this.requestedPublicationLatencyList[i].day;
           let tempRadium = (sectionXFilledDim - (2 * barGap) - dateFontSize);
           let angle = 0;
           if (tempRadium > p.textWidth(tempText)) tempRadium = p.textWidth(tempText);
@@ -472,12 +525,16 @@ export class PublicationLatencyComponent implements OnInit {
           let sinOfAngle = sinOfAngleTemp * (p.textWidth(tempText));
           let sinOfAngle2 = sinOfAngleTemp * (p.textWidth(tempText) / 2);
           p.push();
-          p.translate(sectionXCenter, yCenter + chartYDim2 + sinOfAngle2 + dateFontSize);
+          p.translate(sectionXCenter, yCenter + chartYDim2 + sinOfAngle2 + dateFontSize*2);
           if (angle > p.PI / 2) angle = p.PI / 2;
           if (angle < 0) angle = 0;
           p.rotate(-angle);
-          if (this.publicationLatencyList[i].source == "BE") {
-            tempText = tempText + "\n(BE)";
+          if (this.requestedPublicationLatencyList[i].source == "BE") {
+            tempText = tempText + "\n( BE )";
+          } else if (this.requestedPublicationLatencyList[i].source == "FE+BE") {
+            tempText = tempText + "\n( FE+BE )";
+          } else {
+            tempText = tempText + "\n";
           }
           p.text(tempText, 0, 0);
           p.pop();
@@ -485,41 +542,32 @@ export class PublicationLatencyComponent implements OnInit {
           
           p.noFill();
           p.stroke(lineColor);
-          p.line(xCenter - chartXDim2 + (i + 1) * chartXDim / this.daysNumber, yCenter + chartYDim2 + 5, xCenter - chartXDim2 + (i + 1) * chartXDim / this.daysNumber, yCenter + chartYDim2);
+          p.line(xCenter - chartXDim2 + (i + 1) * chartXDim / this.requestedDaysNumber, yCenter + chartYDim2 + 5, xCenter - chartXDim2 + (i + 1) * chartXDim / this.requestedDaysNumber, yCenter + chartYDim2);
           /* Bars */
           p.rectMode(p.CORNER);
-          //p.fill(publicationLatencyListScaled[i], 255 - publicationLatencyListScaled[i], 0);
-          if (this.publicationLatencyList[i].latency > this.latencyColors[0].threshold) {
+          if (this.requestedPublicationLatencyList[i].average_latency > this.latencyColors[0].threshold) {
             p.fill(this.rgbConvertToArray(this.latencyColors[0].color));
-          } else if (this.publicationLatencyList[i].latency > this.latencyColors[1].threshold && this.publicationLatencyList[i].latency <= this.latencyColors[0].threshold) {
+          } else if (this.requestedPublicationLatencyList[i].average_latency > this.latencyColors[1].threshold && this.requestedPublicationLatencyList[i].average_latency <= this.latencyColors[0].threshold) {
             p.fill(this.rgbConvertToArray(this.latencyColors[1].color));
-          } else if (this.publicationLatencyList[i].latency > this.latencyColors[2].threshold && this.publicationLatencyList[i].latency <= this.latencyColors[1].threshold) {
+          } else if (this.requestedPublicationLatencyList[i].average_latency > this.latencyColors[2].threshold && this.requestedPublicationLatencyList[i].average_latency <= this.latencyColors[1].threshold) {
             p.fill(this.rgbConvertToArray(this.latencyColors[2].color));
-          } else if (this.publicationLatencyList[i].latency > this.latencyColors[3].threshold && this.publicationLatencyList[i].latency <= this.latencyColors[2].threshold) {
+          } else if (this.requestedPublicationLatencyList[i].average_latency > this.latencyColors[3].threshold && this.requestedPublicationLatencyList[i].average_latency <= this.latencyColors[2].threshold) {
             p.fill(this.rgbConvertToArray(this.latencyColors[3].color));
-          } else if (this.publicationLatencyList[i].latency >= this.latencyColors[4].threshold && this.publicationLatencyList[i].latency <= this.latencyColors[3].threshold) {
+          } else if (this.requestedPublicationLatencyList[i].average_latency >= this.latencyColors[4].threshold && this.requestedPublicationLatencyList[i].average_latency <= this.latencyColors[3].threshold) {
             p.fill(this.rgbConvertToArray(this.latencyColors[4].color));
           }
           
           p.noStroke();
-          p.rect(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2, sectionXFilledDim, -((this.publicationLatencyList[i].latency < 0 ? 0 : this.publicationLatencyList[i].latency) * chartYDim / maxValue));
+          p.rect(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2, sectionXFilledDim, -((this.requestedPublicationLatencyList[i].average_latency < 0 ? 0 : this.requestedPublicationLatencyList[i].average_latency * chartYDim / maxValue)));
           
-          if (p.mouseX > sectionXCenter - (chartXDim / this.daysNumber)/2 + tx && p.mouseX < sectionXCenter + (chartXDim / this.daysNumber)/2 + tx
+          if (p.mouseX > sectionXCenter - (chartXDim / this.requestedDaysNumber)/2 + tx && p.mouseX < sectionXCenter + (chartXDim / this.requestedDaysNumber)/2 + tx
               && p.mouseY > yCenter - chartYDim2 + ty && p.mouseY < yCenter + chartYDim2 + sinOfAngle + 2*dateFontSize + ty) {
             p.stroke(230);
             p.fill(255, 30);
             p.rect(sectionXCenter - sectionXFilledDim2, yCenter - chartYDim2, sectionXFilledDim, chartYDim + sinOfAngle + 2*dateFontSize);
-            this.mouseIsOnList = Array.apply(false, Array(30)).map(function () {}); // Change total days number.
+            this.mouseIsOnList = Array.apply(false, Array(30)).map(function () {});
             this.mouseIsOnList[i] = true;
           }
-
-          /* if (this.publicationLatencyList[i].source == "BE") {
-            p.stroke(255, 223, 112); // #ffdf70
-            p.noFill();
-            //p.rect(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2 - this.publicationLatencyList[i].latency * chartYDim / maxValue, sectionXFilledDim, - dateFontSize, 10);
-            p.textAlign(p.CENTER, p.CENTER);
-            p.text("BE", sectionXCenter, yCenter + chartYDim2 - this.publicationLatencyList[i].latency * chartYDim / maxValue - dateFontSize);
-          } */
         } 
         /* Scheme */
         p.rectMode(p.CENTER);
@@ -539,20 +587,23 @@ export class PublicationLatencyComponent implements OnInit {
         for (var i = 0; i < nLines; i++) {
           p.fill(lineColor);
           p.noStroke();
-          /* p.text(p.int(maxValue / (nLines / (i + 1))) + "s", xCenter - chartXDim2 - 15, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines + 1); */
-          p.text(this.secondsToHHMMSS(p.int(maxValue / (nLines / (i + 1)))), xCenter - chartXDim2 - 15, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines + 1);
+          p.text(this.millisToHHMMSS(maxValue / (nLines / (i + 1))), xCenter - chartXDim2 - 15, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines + 1);
           p.stroke(lineColor);
           p.line(xCenter - chartXDim2 - 5, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines, xCenter - chartXDim2, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines)
         }
       }
 
       p.fillLineChart = () => {
-        maxValue = 300000;
+        maxValue = 0;
+        for (var i = 0; i < this.latencyDaysNumber; i++) {
+          if (this.publicationLatencyList[i].average_latency > maxValue) {
+            maxValue = this.publicationLatencyList[i].average_latency;
+          }
+        }
+
         let xpoint: Array<number> = [];
         let ypoint: Array<number> = [];
-        
-        //let sectionXFilledDim = chartXDim / this.daysNumber;
-        let sectionXFilledDim = (chartXDim / this.daysNumber) / sectionScaleSingle;
+        let sectionXFilledDim = (chartXDim / this.requestedDaysNumber) / sectionScaleSingle;
         let sectionXFilledDim2 = sectionXFilledDim / 2;
         let barGap = sectionXFilledDim / barGapScale;
 
@@ -560,7 +611,9 @@ export class PublicationLatencyComponent implements OnInit {
         for (var i = 0; i < this.latencyColors.length; i++) {
           p.noFill();
           p.stroke(this.rgbConvertToArray(this.latencyColors[i].color));
-          p.line(xCenter - chartXDim2, yCenter + chartYDim2 - this.latencyColors[i].threshold * chartYDim / maxValue, xCenter + chartXDim2, yCenter + chartYDim2 - this.latencyColors[i].threshold * chartYDim / maxValue);
+          if (this.latencyColors[i].threshold * chartYDim / maxValue <= chartYDim) {
+            p.line(xCenter - chartXDim2, yCenter + chartYDim2 - this.latencyColors[i].threshold * chartYDim / maxValue, xCenter + chartXDim2, yCenter + chartYDim2 - this.latencyColors[i].threshold * chartYDim / maxValue);
+          }
         }
 
         p.curveTightness(1.0);
@@ -569,10 +622,10 @@ export class PublicationLatencyComponent implements OnInit {
         p.curveVertex(xCenter - chartXDim2 + sectionXFilledDim2, yCenter + chartYDim2);
         p.rectMode(p.CORNER);
 
-        for (var i = 0; i < this.daysNumber; i++) {
-          let sectionXCenter = xCenter - chartXDim2 + chartXDim / (2 * this.daysNumber) + i * chartXDim / this.daysNumber;
-          xpoint[i] = sectionXCenter; // - sectionXFilledDim2;
-          ypoint[i] = yCenter + chartYDim2 -((this.publicationLatencyList[i].latency < 0 ? 0 : this.publicationLatencyList[i].latency) * chartYDim / maxValue);
+        for (var i = 0; i < this.requestedDaysNumber; i++) {
+          let sectionXCenter = xCenter - chartXDim2 + chartXDim / (2 * this.requestedDaysNumber) + i * chartXDim / this.requestedDaysNumber;
+          xpoint[i] = sectionXCenter;
+          ypoint[i] = yCenter + chartYDim2 -((this.requestedPublicationLatencyList[i].average_latency < 0 ? 0 : this.requestedPublicationLatencyList[i].average_latency) * chartYDim / maxValue);
           
           /* Draw Curve */
           p.stroke(255,255,0);
@@ -580,7 +633,7 @@ export class PublicationLatencyComponent implements OnInit {
           p.curveVertex(xpoint[i], ypoint[i]);          
 
           /* Rotate Dates */
-          let tempText = this.publicationLatencyList[i].date;
+          let tempText = this.requestedPublicationLatencyList[i].day;
           let tempRadium = (sectionXFilledDim - (2 * barGap) - dateFontSize);
           let angle = 0;
           if (tempRadium > p.textWidth(tempText)) tempRadium = p.textWidth(tempText);
@@ -593,7 +646,7 @@ export class PublicationLatencyComponent implements OnInit {
           let sinOfAngle = sinOfAngleTemp * (p.textWidth(tempText));
           let sinOfAngle2 = sinOfAngleTemp * (p.textWidth(tempText) / 2);
           p.push();
-          p.translate(sectionXCenter, yCenter + chartYDim2 + sinOfAngle2 + dateFontSize);
+          p.translate(sectionXCenter, yCenter + chartYDim2 + sinOfAngle2 + dateFontSize*2);
           if (angle > p.PI / 2) angle = p.PI / 2;
           if (angle < 0) angle = 0;
           p.rotate(-angle);
@@ -601,40 +654,35 @@ export class PublicationLatencyComponent implements OnInit {
           p.fill(lineColor);
           p.noStroke();
           p.textSize(dateFontSize);
-          if (this.publicationLatencyList[i].source == "BE") {
-            tempText = tempText + "\n(BE)";
+          if (this.requestedPublicationLatencyList[i].source == "BE") {
+            tempText = tempText + "\n( BE )";
+          } else if (this.requestedPublicationLatencyList[i].source == "FE+BE") {
+            tempText = tempText + "\n( FE+BE )";
+          } else {
+            tempText = tempText + "\n";
           }
           p.text(tempText, 0, 0);
           p.pop();
 
-          if (p.mouseX > sectionXCenter - (chartXDim / this.daysNumber)/2 + tx && p.mouseX < sectionXCenter + (chartXDim / this.daysNumber)/2 + tx
+          if (p.mouseX > sectionXCenter - (chartXDim / this.requestedDaysNumber)/2 + tx && p.mouseX < sectionXCenter + (chartXDim / this.requestedDaysNumber)/2 + tx
               && p.mouseY > yCenter - chartYDim2 + ty && p.mouseY < yCenter + chartYDim2 + sinOfAngle + 2*dateFontSize + ty) {
             p.stroke(230);
             p.fill(255, 30);
             p.rect(sectionXCenter - sectionXFilledDim2, yCenter - chartYDim2, sectionXFilledDim, chartYDim + sinOfAngle + 2*dateFontSize);
-            this.mouseIsOnList = Array.apply(false, Array(30)).map(function () {}); // Change total days number.
+            this.mouseIsOnList = Array.apply(false, Array(30)).map(function () {});
             this.mouseIsOnList[i] = true;
           }
-          
-          /* if (this.publicationLatencyList[i].source == "BE") {
-            p.stroke(255, 223, 112); // #ffdf70
-            p.noFill();
-            //p.rect(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2 - this.publicationLatencyList[i].latency * chartYDim / maxValue, sectionXFilledDim, - dateFontSize, 10);
-            p.textAlign(p.CENTER, p.CENTER);
-            p.text("BE", sectionXCenter, yCenter + chartYDim2 - this.publicationLatencyList[i].latency * chartYDim / maxValue - dateFontSize);
-          } */
 
           /* xAxis Lines */
           p.fill(255, 255, 255, 20);
           p.stroke(lineColor);
-          p.line(xCenter - chartXDim2 + (i + 1) * chartXDim / this.daysNumber, yCenter + chartYDim2 + 5, xCenter - chartXDim2 + (i + 1) * chartXDim / this.daysNumber, yCenter + chartYDim2);
+          p.line(xCenter - chartXDim2 + (i + 1) * chartXDim / this.requestedDaysNumber, yCenter + chartYDim2 + 5, xCenter - chartXDim2 + (i + 1) * chartXDim / this.requestedDaysNumber, yCenter + chartYDim2);
         }
         p.curveVertex(xCenter + chartXDim2 - sectionXFilledDim2, yCenter + chartYDim2);
         p.curveVertex(xCenter + chartXDim2 - sectionXFilledDim2, yCenter + chartYDim2); 
         p.endShape();
 
         /* Scheme */
-        //p.rectMode(p.CENTER);
         p.textAlign(p.RIGHT, p.CENTER);
         p.noFill();
         p.stroke(lineColor);
@@ -651,9 +699,7 @@ export class PublicationLatencyComponent implements OnInit {
         for (var i = 0; i < nLines; i++) {
           p.fill(lineColor);
           p.noStroke();
-          //p.text(p.int(maxValue / (nLines / (i + 1))) + "s", xCenter - chartXDim2 - 15, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines + 1);
           p.text(this.secondsToHHMMSS(p.int(maxValue / (nLines / (i + 1)))), xCenter - chartXDim2 - 15, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines + 1);
-          //p.stroke((i+1) * (255 / nLines), 255 - (i+1) * (255 / nLines), 0);
           p.stroke(lineColor);
           p.line(xCenter - chartXDim2 - 5, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines, xCenter - chartXDim2, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines)
         }
@@ -661,9 +707,14 @@ export class PublicationLatencyComponent implements OnInit {
 
 
       p.fillDayBarChart = () => {
-        maxValue = 54000;
+        maxValue = 0;
+        for (var i = 0; i < this.latencyDetailNumber; i++) {
+          if (this.publicationDetailLatencyList[i].latency_be > maxValue) {
+            maxValue = this.publicationDetailLatencyList[i].latency_be;
+          }
+        }
 
-        let sectionXFilledDim = (chartXDim / this.hoursNumber) / sectionScaleSingle;
+        let sectionXFilledDim = (chartXDim / this.latencyDetailNumber) / sectionScaleSingle;
         let sectionXFilledDim2 = sectionXFilledDim / 2;
         let barGap = sectionXFilledDim / barGapScale;
 
@@ -671,11 +722,13 @@ export class PublicationLatencyComponent implements OnInit {
         for (var i = 0; i < this.latencyColors.length; i++) {
           p.noFill();
           p.stroke(this.rgbConvertToArray(this.latencyColors[i].color));
-          p.line(xCenter - chartXDim2, yCenter + chartYDim2 - this.latencyColors[i].threshold * chartYDim / maxValue, xCenter + chartXDim2, yCenter + chartYDim2 - this.latencyColors[i].threshold * chartYDim / maxValue);
+          if (this.latencyColors[i].threshold * chartYDim / maxValue <= chartYDim) {
+            p.line(xCenter - chartXDim2, yCenter + chartYDim2 - this.latencyColors[i].threshold * chartYDim / maxValue, xCenter + chartXDim2, yCenter + chartYDim2 - this.latencyColors[i].threshold * chartYDim / maxValue);
+          }
         }
 
-        for (var i = 0; i < this.hoursNumber; i++) {
-          let sectionXCenter = xCenter - chartXDim2 + chartXDim / (2 * this.hoursNumber) + i * chartXDim / this.hoursNumber;
+        for (var i = 0; i < this.latencyDetailNumber; i++) {
+          let sectionXCenter = xCenter - chartXDim2 + chartXDim / (2 * this.latencyDetailNumber) + i * chartXDim / this.latencyDetailNumber;
 
           /* xAxis Text */
           p.textAlign(p.CENTER, p.CENTER);
@@ -683,7 +736,7 @@ export class PublicationLatencyComponent implements OnInit {
           p.noStroke();
           p.textSize(dateFontSize);
           /* Rotate Dates */
-          let tempText = this.publicationDayLatencyList[i].time;
+          let tempText = this.publicationDetailLatencyList[i].timezone.slice(11, 16);
           let tempRadium = (sectionXFilledDim - (2 * barGap) - dateFontSize);
           let angle = 0;
           if (tempRadium > p.textWidth(tempText)) tempRadium = p.textWidth(tempText);
@@ -696,32 +749,36 @@ export class PublicationLatencyComponent implements OnInit {
           let sinOfAngle = sinOfAngleTemp * (p.textWidth(tempText));
           let sinOfAngle2 = sinOfAngleTemp * (p.textWidth(tempText) / 2);
           p.push();
-          p.translate(sectionXCenter, yCenter + chartYDim2 + sinOfAngle2 + dateFontSize);
+          p.translate(sectionXCenter, yCenter + chartYDim2 + sinOfAngle2 + dateFontSize*2);
           if (angle > p.PI / 2) angle = p.PI / 2;
           if (angle < 0) angle = 0;
           p.rotate(-angle);
+          if (this.publicationDetailLatencyList[i].source == "BE") {
+            tempText = tempText + "\n( BE )";
+          } else {
+            tempText = tempText + "\n";
+          }
           p.text(tempText, 0, 0);
           p.pop();
 
           p.noFill();
           p.stroke(lineColor);
-          p.line(xCenter - chartXDim2 + (i + 1) * chartXDim / this.hoursNumber, yCenter + chartYDim2 + 5, xCenter - chartXDim2 + (i + 1) * chartXDim / this.hoursNumber, yCenter + chartYDim2);
+          p.line(xCenter - chartXDim2 + (i + 1) * chartXDim / this.latencyDetailNumber, yCenter + chartYDim2 + 5, xCenter - chartXDim2 + (i + 1) * chartXDim / this.latencyDetailNumber, yCenter + chartYDim2);
           /* Bars */
           p.rectMode(p.CORNER);
-          //p.fill(publicationDayLatencyListScaled[i], 255 - publicationDayLatencyListScaled[i], 0);
-          if (this.publicationDayLatencyList[i].latency > this.latencyColors[0].threshold) {
+          if (this.publicationDetailLatencyList[i].latency_be > this.latencyColors[0].threshold) {
             p.fill(this.rgbConvertToArray(this.latencyColors[0].color));
-          } else if (this.publicationDayLatencyList[i].latency > this.latencyColors[1].threshold && this.publicationDayLatencyList[i].latency <= this.latencyColors[0].threshold) {
+          } else if (this.publicationDetailLatencyList[i].latency_be > this.latencyColors[1].threshold && this.publicationDetailLatencyList[i].latency_be <= this.latencyColors[0].threshold) {
             p.fill(this.rgbConvertToArray(this.latencyColors[1].color));
-          } else if (this.publicationDayLatencyList[i].latency > this.latencyColors[2].threshold && this.publicationDayLatencyList[i].latency <= this.latencyColors[1].threshold) {
+          } else if (this.publicationDetailLatencyList[i].latency_be > this.latencyColors[2].threshold && this.publicationDetailLatencyList[i].latency_be <= this.latencyColors[1].threshold) {
             p.fill(this.rgbConvertToArray(this.latencyColors[2].color));
-          } else if (this.publicationDayLatencyList[i].latency > this.latencyColors[3].threshold && this.publicationDayLatencyList[i].latency <= this.latencyColors[2].threshold) {
+          } else if (this.publicationDetailLatencyList[i].latency_be > this.latencyColors[3].threshold && this.publicationDetailLatencyList[i].latency_be <= this.latencyColors[2].threshold) {
             p.fill(this.rgbConvertToArray(this.latencyColors[3].color));
-          } else if (this.publicationDayLatencyList[i].latency >= this.latencyColors[4].threshold && this.publicationDayLatencyList[i].latency <= this.latencyColors[3].threshold) {
+          } else if (this.publicationDetailLatencyList[i].latency_be >= this.latencyColors[4].threshold && this.publicationDetailLatencyList[i].latency_be <= this.latencyColors[3].threshold) {
             p.fill(this.rgbConvertToArray(this.latencyColors[4].color));
           }
           p.noStroke();
-          p.rect(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2, sectionXFilledDim, -((this.publicationDayLatencyList[i].latency < 0 ? 0 : this.publicationDayLatencyList[i].latency) * chartYDim / maxValue));
+          p.rect(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2, sectionXFilledDim, -((this.publicationDetailLatencyList[i].latency_be < 0 ? 0 : this.publicationDetailLatencyList[i].latency_be) * chartYDim / maxValue));
         } 
         /* Scheme */
         p.rectMode(p.CENTER);
@@ -741,19 +798,24 @@ export class PublicationLatencyComponent implements OnInit {
         for (var i = 0; i < nLines; i++) {
           p.fill(lineColor);
           p.noStroke();
-          //p.text(p.int(maxValue / (nLines / (i + 1))) + "s", xCenter - chartXDim2 - 15, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines + 1);
-          p.text(this.secondsToHHMMSS(p.int(maxValue / (nLines / (i + 1)))), xCenter - chartXDim2 - 15, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines + 1);
+          p.text(this.millisToHHMMSS(maxValue / (nLines / (i + 1))), xCenter - chartXDim2 - 15, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines + 1);
           p.stroke(lineColor);
           p.line(xCenter - chartXDim2 - 5, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines, xCenter - chartXDim2, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines)
         }
       }
 
       p.fillDayLineChart = () => {
-        maxValue = 54000;
+        maxValue = 0;
+        for (var i = 0; i < this.latencyDetailNumber; i++) {
+          if (this.publicationDetailLatencyList[i].latency_be > maxValue) {
+            maxValue = this.publicationDetailLatencyList[i].latency_be;
+          }
+        }
+
         let xpoint: Array<number> = [];
         let ypoint: Array<number> = [];
         
-        let sectionXFilledDim = chartXDim / this.hoursNumber;
+        let sectionXFilledDim = chartXDim / this.latencyDetailNumber;
         let sectionXFilledDim2 = sectionXFilledDim / 2;
         let barGap = sectionXFilledDim / barGapScale;
 
@@ -761,23 +823,23 @@ export class PublicationLatencyComponent implements OnInit {
         for (var i = 0; i < this.latencyColors.length; i++) {
           p.noFill();
           p.stroke(this.rgbConvertToArray(this.latencyColors[i].color));
-          p.line(xCenter - chartXDim2, yCenter + chartYDim2 - this.latencyColors[i].threshold * chartYDim / maxValue, xCenter + chartXDim2, yCenter + chartYDim2 - this.latencyColors[i].threshold * chartYDim / maxValue);
+          if (this.latencyColors[i].threshold * chartYDim / maxValue <= chartYDim) {
+            p.line(xCenter - chartXDim2, yCenter + chartYDim2 - this.latencyColors[i].threshold * chartYDim / maxValue, xCenter + chartXDim2, yCenter + chartYDim2 - this.latencyColors[i].threshold * chartYDim / maxValue);
+          }
         }
 
         p.curveTightness(1.0);
         p.beginShape();
         p.stroke(255,255,0);
         p.fill(255, 255, 255, 20);
-        //p.curveVertex(xCenter - chartXDim2, yCenter + chartYDim2);
-        //p.curveVertex(xCenter - chartXDim2, yCenter + chartYDim2);  
         p.curveVertex(xCenter - chartXDim2 + sectionXFilledDim2, yCenter + chartYDim2);
         p.curveVertex(xCenter - chartXDim2 + sectionXFilledDim2, yCenter + chartYDim2);
         p.rectMode(p.CORNER);
 
-        for (var i = 0; i < this.hoursNumber; i++) {
-          let sectionXCenter = xCenter - chartXDim2 + chartXDim / (2 * this.hoursNumber) + i * chartXDim / this.hoursNumber;
-          xpoint[i] = sectionXCenter; // - sectionXFilledDim2;
-          ypoint[i] = yCenter + chartYDim2 -((this.publicationDayLatencyList[i].latency < 0 ? 0 : this.publicationDayLatencyList[i].latency) * chartYDim / maxValue);
+        for (var i = 0; i < this.latencyDetailNumber; i++) {
+          let sectionXCenter = xCenter - chartXDim2 + chartXDim / (2 * this.latencyDetailNumber) + i * chartXDim / this.latencyDetailNumber;
+          xpoint[i] = sectionXCenter;
+          ypoint[i] = yCenter + chartYDim2 -((this.publicationDetailLatencyList[i].latency_be < 0 ? 0 : this.publicationDetailLatencyList[i].latency_be) * chartYDim / maxValue);
           
           /* Draw Curve */
           p.stroke(255,255,0);
@@ -785,7 +847,7 @@ export class PublicationLatencyComponent implements OnInit {
           p.curveVertex(xpoint[i], ypoint[i]);          
 
           /* Rotate Dates */
-          let tempText = this.publicationDayLatencyList[i].time;
+          let tempText = this.publicationDetailLatencyList[i].timezone.slice(11, 16);
           let tempRadium = (sectionXFilledDim - (2 * barGap) - dateFontSize);
           let angle = 0;
           if (tempRadium > p.textWidth(tempText)) tempRadium = p.textWidth(tempText);
@@ -798,7 +860,7 @@ export class PublicationLatencyComponent implements OnInit {
           let sinOfAngle = sinOfAngleTemp * (p.textWidth(tempText));
           let sinOfAngle2 = sinOfAngleTemp * (p.textWidth(tempText) / 2);
           p.push();
-          p.translate(sectionXCenter, yCenter + chartYDim2 + sinOfAngle2 + dateFontSize);
+          p.translate(sectionXCenter, yCenter + chartYDim2 + sinOfAngle2 + dateFontSize*2);
           if (angle > p.PI / 2) angle = p.PI / 2;
           if (angle < 0) angle = 0;
           p.rotate(-angle);
@@ -806,21 +868,23 @@ export class PublicationLatencyComponent implements OnInit {
           p.fill(lineColor);
           p.noStroke();
           p.textSize(dateFontSize);
+          if (this.publicationDetailLatencyList[i].source == "BE") {
+            tempText = tempText + "\n( BE )";
+          } else {
+            tempText = tempText + "\n";
+          }
           p.text(tempText, 0, 0);
           p.pop();
 
           /* xAxis Lines */
           p.stroke(lineColor);
-          p.line(xCenter - chartXDim2 + (i + 1) * chartXDim / this.hoursNumber, yCenter + chartYDim2 + 5, xCenter - chartXDim2 + (i + 1) * chartXDim / this.hoursNumber, yCenter + chartYDim2);
+          p.line(xCenter - chartXDim2 + (i + 1) * chartXDim / this.latencyDetailNumber, yCenter + chartYDim2 + 5, xCenter - chartXDim2 + (i + 1) * chartXDim / this.latencyDetailNumber, yCenter + chartYDim2);
         }
-        //p.curveVertex(xCenter + chartXDim2 - chartXDim / this.hoursNumber, yCenter + chartYDim2);
-        //p.curveVertex(xCenter + chartXDim2 - chartXDim / this.hoursNumber, yCenter + chartYDim2); 
         p.curveVertex(xCenter + chartXDim2 - sectionXFilledDim2, yCenter + chartYDim2);
         p.curveVertex(xCenter + chartXDim2 - sectionXFilledDim2, yCenter + chartYDim2); 
         p.endShape();
 
         /* Scheme */
-        //p.rectMode(p.CENTER);
         p.textAlign(p.RIGHT, p.CENTER);
         p.noFill();
         p.stroke(lineColor);
@@ -837,9 +901,7 @@ export class PublicationLatencyComponent implements OnInit {
         for (var i = 0; i < nLines; i++) {
           p.fill(lineColor);
           p.noStroke();
-          //p.text(p.int(maxValue / (nLines / (i + 1))) + "s", xCenter - chartXDim2 - 15, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines + 1);
-          p.text(this.secondsToHHMMSS(p.int(maxValue / (nLines / (i + 1)))), xCenter - chartXDim2 - 15, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines + 1);
-          //p.stroke((i+1) * (255 / nLines), 255 - (i+1) * (255 / nLines), 0);
+          p.text(this.millisToHHMMSS(maxValue / (nLines / (i + 1))), xCenter - chartXDim2 - 15, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines + 1);
           p.stroke(lineColor);
           p.line(xCenter - chartXDim2 - 5, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines, xCenter - chartXDim2, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines)
         }
@@ -898,11 +960,20 @@ export class PublicationLatencyComponent implements OnInit {
   }
 
   secondsToHHMMSS(secondsTot) {
-    //var timeStr = new Date(1000*secondsTot).toISOString(); //.slice(11, 19);
-    var sec_num = parseInt(secondsTot, 10); // don't forget the second param
+    var sec_num = parseInt(secondsTot, 10);
     var hours   = Math.floor(sec_num / 3600);
     var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
     var seconds = sec_num - (hours * 3600) - (minutes * 60);
+    var timeStr = hours.toString(10).padStart(2, '0') + "h:" + minutes.toString(10).padStart(2, '0') + "m:" + seconds.toString(10).padStart(2, '0') + "s";
+    return timeStr;
+  }
+
+  millisToHHMMSS(millisTot) {
+    var millis_num = parseInt(millisTot, 10);
+    var sec_num = millis_num/1000;
+    var hours   = Math.floor(sec_num / 3600);
+    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+    var seconds = Math.floor(sec_num) - (hours * 3600) - (minutes * 60);
     var timeStr = hours.toString(10).padStart(2, '0') + "h:" + minutes.toString(10).padStart(2, '0') + "m:" + seconds.toString(10).padStart(2, '0') + "s";
     return timeStr;
   }

@@ -36,7 +36,11 @@
             <ng-template ngFor let-color [ngForOf]="availabilityColors" let-i="index">
                 <div *ngIf="i>0" class="color-threshold" [ngStyle]="{'background-color': availabilityColors[availabilityColors.length-1-i].color}">&gt;<span *ngIf="i==availabilityColors.length - 1">=</span> {{availabilityColors[availabilityColors.length-1-i].threshold}}% &lt;= {{availabilityColors[availabilityColors.length-i].threshold}}%</div>
             </ng-template>
-            <div class="average-legend">Average:<span *ngIf="averageServiceAvailability >= 0"> {{averageServiceAvailability.toFixed(2)}}%</span></div>
+            <br> 
+            <div class="average-legend" [ngStyle]="{'background-color': averageColor}">Average:
+                <span *ngIf="averageServiceAvailability >= 0"> {{averageServiceAvailability.toFixed(2)}}%</span>
+                <span *ngIf="averageServiceAvailability < 0"> ---</span>
+            </div>
         </section>
     </div>
 </div>
@@ -73,7 +77,7 @@
                 <td style="color: var(--main-text-color)">Availability</td>
                 <ng-template ngFor let-availability [ngForOf]="requestedServiceAvailabilityList" let-i="index">
                     <td *ngIf="availability.percentage == -1" style="color: var(--windows-title-color)">NaN</td>
-                    <td *ngIf="availability.percentage != -1" [ngStyle]="{'background-color': getAvailabilityHexColorFromPerc(availability.percentage), 'color': '#ffffff'}">{{availability.percentage.toFixed(2)}}%</td>
+                    <td *ngIf="availability.percentage != -1" [ngStyle]="{'background-color': getAvailabilityHexColorFromPerc(availability.percentage)}" style="color: var(--main-bg-color)">{{availability.percentage.toFixed(2)}}%</td>
                 </ng-template>
             </tr>
         </table>

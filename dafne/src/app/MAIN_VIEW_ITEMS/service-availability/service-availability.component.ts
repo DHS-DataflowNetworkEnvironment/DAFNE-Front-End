@@ -25,7 +25,7 @@ export class ServiceAvailabilityComponent implements OnInit {
   public availabilityDaysNumber: number = 0;
   public requestedDaysNumber: number = 0;
   public millisPerDay: number = 86400000;
-  public maxDays: number = 29;
+  public maxDays: number = 30;
   public millisPerMaxPeriod = this.millisPerDay * this.maxDays;
 
   public today = new Date();
@@ -65,6 +65,8 @@ export class ServiceAvailabilityComponent implements OnInit {
 
   public availabilityColors;
 
+  public averageColor = AppConfig.settings.averageAvailabilityColor;
+
   constructor(
     public authenticationService: AuthenticationService,
     private csvService: CsvDataService,
@@ -80,14 +82,15 @@ export class ServiceAvailabilityComponent implements OnInit {
         /* Get Local Centre */
         if (Object.values(res).filter((x) => x.local == true)[0]) {
           this.localCentre = Object.values(res).filter((x) => x.local == true)[0];
+          this.init_P5();
         } else {
           this.localCentre = {
             id: -1,
             name: "No Local",
             color: "#ffffff"
           };
+          this.alert.showErrorAlert("No local Centre is set", "Please setup one Centre as local");
         }
-        this.init_P5();
       }
     );
   }
@@ -95,7 +98,7 @@ export class ServiceAvailabilityComponent implements OnInit {
   onStartDateChanged(date) {
     let tempMillisDate = (Date.parse(date) + this.millisPerMaxPeriod);
     if (Date.parse(this.stopDate) > tempMillisDate) {
-      this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 30 days");
+      this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 31 days");
       let tempDate = new Date(tempMillisDate);
       this.stopDate = tempDate.toISOString().slice(0, 10);
     }
@@ -108,7 +111,7 @@ export class ServiceAvailabilityComponent implements OnInit {
   onStopDateChanged(date) {
     let tempMillisDate = (Date.parse(date) - this.millisPerMaxPeriod);
     if (Date.parse(this.startDate) < tempMillisDate) {
-      this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 30 days");
+      this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 31 days");
       let tempDate = new Date(tempMillisDate);
       this.startDate = tempDate.toISOString().slice(0, 10);
     }
@@ -239,7 +242,7 @@ export class ServiceAvailabilityComponent implements OnInit {
       let backgroundColor = p.color('#12222f');
       let labelBackgroundColor = p.color('#12222fcc')
       let lineColor = p.color('#aaaaaa');
-      let averageLineColor = p.color('#ffdf70');
+      let averageLineColor = p.color(this.averageColor);
 
       let valueFontSize = 20;
       let dateFontSize = 10;

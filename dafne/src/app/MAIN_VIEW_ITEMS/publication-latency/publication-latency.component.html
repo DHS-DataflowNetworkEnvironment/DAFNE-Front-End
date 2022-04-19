@@ -5,9 +5,9 @@
         <form id="filters-form">
             <div id="filters-form-row">
                 <div>
-                    <label class="form-label">Synchronizer:</label>
+                    <label class="form-label">Active Synchronizer:</label>
                     <select id="synchronizer-select" class="form-select" (change)="onFilterSyncChange($event)">
-                        <option [value]="sync" *ngFor="let sync of syncFakeList">{{sync}}</option>
+                        <option [value]="sync.Label" *ngFor="let sync of syncList">{{sync.Label}}</option>
                     </select>
                 </div>
                 <div class="date-picker">
@@ -27,8 +27,8 @@
         </form>
     </div>
     <div id="main-row-container">
-        <!-- Fake Date Title -->
-        <h5 *ngIf="showDayLatency == true" id="fake-day-title">{{showDayDate}} Latency</h5>
+        <!-- Date Title -->
+        <h5 *ngIf="showDetailLatency == true" id="detail-day-title">{{latencyDetailDate}} Latency</h5>
         <!-- Charts -->
         <div id="p5PublicationLatencyCanvas-column-div">
             <div id="p5PublicationLatencyCanvas"></div>
@@ -43,19 +43,14 @@
             <!-- Legend -->
             <hr>
             <h2>LEGEND</h2>
-            <!-- <ng-template ngFor let-color [ngForOf]="latencyColors" let-i="index"> -->
-                <!-- <div *ngIf="i>0" class="color-threshold" [ngStyle]="{'background-color': availabilityColors[availabilityColors.length-1-i].color}">&gt;<span *ngIf="i==availabilityColors.length - 1">=</span> {{availabilityColors[availabilityColors.length-1-i].threshold}}% &lt;= {{availabilityColors[availabilityColors.length-i].threshold}}%</div> -->
-                <!-- <div class="color-threshold" [ngStyle]="{'background-color': color.color}">&gt;{{color.threshold}}s &lt;= {{color.threshold}}s</div> -->
-                <div class="color-threshold" [ngStyle]="{'background-color': latencyColors[0].color}">&gt;72 hours</div>
-                <div class="color-threshold" [ngStyle]="{'background-color': latencyColors[1].color}">&gt;36 hours to 72 hours</div>
-                <div class="color-threshold" [ngStyle]="{'background-color': latencyColors[2].color}">&gt;12 hours to 36 hours</div>
-                <div class="color-threshold" [ngStyle]="{'background-color': latencyColors[3].color}">&gt;4 hours to 12 hours</div>
-                <div class="color-threshold" [ngStyle]="{'background-color': latencyColors[4].color}">&lt;4 hours</div>
-            <!-- </ng-template> -->
-            
+            <div class="color-threshold" [ngStyle]="{'background-color': latencyColors[0].color}">&gt;72 hours</div>
+            <div class="color-threshold" [ngStyle]="{'background-color': latencyColors[1].color}">&gt;36 hours to 72 hours</div>
+            <div class="color-threshold" [ngStyle]="{'background-color': latencyColors[2].color}">&gt;12 hours to 36 hours</div>
+            <div class="color-threshold" [ngStyle]="{'background-color': latencyColors[3].color}">&gt;4 hours to 12 hours</div>
+            <div class="color-threshold" [ngStyle]="{'background-color': latencyColors[4].color}">&lt;4 hours</div>
             <hr>
-            <h6 *ngIf="showDayLatency == false" style="text-align: center;">Click on a date to see hourly details</h6>
-            <button *ngIf="showDayLatency == true" id="back-to-period-button" (click)="onBackToPeriodClicked()">Back to Period</button>
+            <h6 *ngIf="showDetailLatency == false" style="text-align: center;">Click on a date to see hourly details</h6>
+            <button *ngIf="showDetailLatency == true" id="back-to-period-button" (click)="onBackToPeriodClicked()">Back to Period</button>
         </section>
     </div>
 </div>
@@ -68,24 +63,42 @@
     </div>
     <div id="table-div">
         <table id="data-table">
-            <!-- Period Latency -->
-            <thead *ngIf="showDayLatency == false">
-                <th style="color: white">Dhus_1</th>
-                <th *ngFor="let latency of publicationLatencyList">{{latency.date.slice(0,4)}}&#10;{{latency.date.slice(5)}}</th>
+            <!-- Daily Latency -->
+            <thead *ngIf="showDetailLatency == false">
+                <th style="color: white">{{localCentre.name}}</th>
+                <th *ngFor="let latency of requestedPublicationLatencyList; let i = index" style="padding: 0 0.5rem;">{{latency.day}}
+                    <div *ngIf="latency.source == 'FE'" style="color: var(--main-bg-color); font-size: 0.6rem;"><br></div>
+                    <div *ngIf="latency.source == 'BE'" style="color: lightsalmon; font-size: 0.6rem;">( BE )</div>
+                    <div *ngIf="latency.source == 'FE+BE'" style="color: lightgoldenrodyellow; font-size: 0.6rem;">( FE+BE )</div>
+                    <div *ngIf="latency.source == 'null'" style="color: grey; font-size: 0.6rem;">null</div>
+                    <div *ngIf="latency.source == ''" style="color: grey; font-size: 0.6rem;">N/A</div>
+                </th>
             </thead>
-            <tr *ngIf="showDayLatency == false">
-                <td style="color: #ffffff">Latency</td>
-                <td *ngFor="let latency of publicationLatencyList" [ngStyle]="{'background-color': getLatencyHexColorFromSeconds(latency.latency), 'color': '#ffffff'}">{{secondsToHHMMSS(latency.latency)}}</td>
+            <tr *ngIf="showDetailLatency == false">
+                <td style="color: #ffffff">Latency {{selectedFilterSyncLabel}}</td>
+                <td *ngFor="let latency of requestedPublicationLatencyList">
+                    <div *ngIf="latency.average_latency != null && latency.average_latency != -1" [ngStyle]="{'background-color': getLatencyHexColorFromSeconds(latency.average_latency)}"><span style="padding: 0 0.5rem; color: var(--main-bg-color)">{{millisToHHMMSS(latency.average_latency)}}</span></div>
+                    <div *ngIf="latency.average_latency == null" style="color: var(--windows-title-color)">N/A</div>
+                    <div *ngIf="latency.average_latency == -1" style="color: var(--windows-title-color)">null</div>
+                </td>
             </tr>
             
-            <!-- Daily Latency -->
-            <thead *ngIf="showDayLatency == true">
-                <th style="color: white">Dhus_1</th>
-                <th *ngFor="let latency of publicationDayLatencyList">{{latency.time}}:00</th>
+            <!-- Detail Latency -->
+            <thead *ngIf="showDetailLatency == true">
+                <th style="color: white">{{localCentre.name}}</th>
+                <th *ngFor="let latency of publicationDetailLatencyList; let i = index" style="padding: 0 0.5rem;">{{latency.timezone.slice(11, 16)}}
+                    <div *ngIf="latency.source == 'FE'" style="color: var(--main-bg-color); font-size: 0.6rem;"><br></div>
+                    <div *ngIf="latency.source == 'BE'" style="color: lightsalmon; font-size: 0.6rem;">( BE )</div>
+                    <div *ngIf="latency.source == 'null'" style="color: grey; font-size: 0.6rem;">N/A</div>
+                </th>
             </thead>
-            <tr *ngIf="showDayLatency == true">
-                <td style="color: #ffffff">{{showDayDate}} Latency</td>
-                <td *ngFor="let latency of publicationDayLatencyList" [ngStyle]="{'background-color': getLatencyHexColorFromSeconds(latency.latency), 'color': '#ffffff'}">{{secondsToHHMMSS(latency.latency)}}</td>
+            <tr *ngIf="showDetailLatency == true">
+                <td style="color: #ffffff">{{latencyDetailDate}} Latency {{selectedFilterSyncLabel}}</td>
+                <td *ngFor="let latency of publicationDetailLatencyList">
+                    <div *ngIf="latency.latency_fe != null" [ngStyle]="{'background-color': getLatencyHexColorFromSeconds(latency.latency_fe)}"><span style="padding: 0 0.5rem; color: var(--main-bg-color)">{{millisToHHMMSS(latency.latency_fe)}}</span></div>
+                    <div *ngIf="latency.latency_fe == null && latency.latency_be != null" [ngStyle]="{'background-color': getLatencyHexColorFromSeconds(latency.latency_be)}"><span style="padding: 0 0.5rem; color: var(--main-bg-color)">{{millisToHHMMSS(latency.latency_be)}}</span></div>
+                    <div *ngIf="latency.latency_fe == null && latency.latency_be == null" style="color: var(--windows-title-color)">N/A</div>
+                </td>
             </tr>
         </table>
     </div>

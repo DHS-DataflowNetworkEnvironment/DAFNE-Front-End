@@ -108,13 +108,12 @@
 .color-threshold {
     text-align: center;
     font-size: 12px;
-    color: white;
+    color: var(--main-bg-color);
 }
 
 .average-legend {
     text-align: center;
     font-size: 12px;
-    background-color: #ffdf70;
     color: var(--main-bg-color);
 }
 

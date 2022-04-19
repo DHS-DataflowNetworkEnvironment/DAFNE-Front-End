@@ -118,7 +118,7 @@
 .color-threshold {
     text-align: center;
     font-size: 12px;
-    color: white;
+    color: var(--main-bg-color);;
 }
 
 #back-to-period-button {
@@ -168,7 +168,7 @@
 }
 
 /* Fake Day Title */
-#fake-day-title {
+#detail-day-title {
     position: absolute;
     margin-top: 2rem;
     width: 85%;
@@ -258,7 +258,7 @@ table {
     /* table-layout: fixed ; */
     width: 100%;
 }
-table tr td:first-child, th:first-child{
+table td:first-child, th:first-child{
     padding: 0 0.5rem;
 }
 caption, th, td {
@@ -267,10 +267,11 @@ caption, th, td {
 table, th, td {
     border: 1px solid var(--table-border-color);
     /* border-collapse: collapse; */
-    padding: 0 0.5rem;
+    /* padding: 0 0.5rem; */
 }
 th {
     background-color: var(--table-header-bg-color);
+    white-space:nowrap;
 }
 
 /* Responsiveness */

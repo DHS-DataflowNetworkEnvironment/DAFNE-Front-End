@@ -274,6 +274,17 @@ export class AuthenticationService {
     ));
   }
 
+  getSynchronizersV2() {
+    // get synchronizers v2 from the back-end
+    return this.http.get<any>(AppConfig.settings.apiUrl + `/synchronizers/v2`)
+    .pipe(
+    catchError(err => {
+        console.error(err);
+        return throwError(err);
+        }
+    ));
+  }
+
 
   deleteSynchronizer(id: number, body: object) {
     // delete one sync
@@ -336,6 +347,34 @@ export class AuthenticationService {
   getServiceAvailability(id: number, body: object) {
     return this.http.post<any>(
       AppConfig.settings.apiUrl + `/centres/${id}/service/availability`,
+      body,
+      httpOptions
+    )
+    .pipe(
+    catchError(err => {
+        console.error(err);
+        return throwError(err);
+        }
+    ));
+  }
+
+  getPublicationLatency(id: number, body: object) {
+    return this.http.post<any>(
+      AppConfig.settings.apiUrl + `/centres/${id}/service/latency/daily`,
+      body,
+      httpOptions
+    )
+    .pipe(
+    catchError(err => {
+        console.error(err);
+        return throwError(err);
+        }
+    ));
+  }
+
+  getPublicationLatencyDetail(id: number, body: object) {
+    return this.http.post<any>(
+      AppConfig.settings.apiUrl + `/centres/${id}/service/latency/daily/details`,
       body,
       httpOptions
     )
