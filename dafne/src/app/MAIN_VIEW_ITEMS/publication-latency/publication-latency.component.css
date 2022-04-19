@@ -266,8 +266,6 @@ caption, th, td {
 }
 table, th, td {
     border: 1px solid var(--table-border-color);
-    /* border-collapse: collapse; */
-    /* padding: 0 0.5rem; */
 }
 th {
     background-color: var(--table-header-bg-color);
