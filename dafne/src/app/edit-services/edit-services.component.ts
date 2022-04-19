@@ -227,6 +227,7 @@ export class EditServicesComponent implements OnInit, OnDestroy {
             ) {
               valid = false;
               this.alert.showErrorAlert("Service Configuration Error", "You cannot setup two services associated to the same Centre with Single Instance or Front-End service types");
+              return;
             }
           }
         }
@@ -292,27 +293,29 @@ export class EditServicesComponent implements OnInit, OnDestroy {
         return;
       }
     });
-    let tempCentreId = this.centreList.filter(a => a.name == (<HTMLInputElement>document.getElementById('edit_centre')).value)[0].id;    
-    let tempServiceTypeId = this.serviceTypesList.filter(a => a.service_type == (<HTMLInputElement>document.getElementById('edit_service_type')).value)[0].id;
-    let tempServiceId = id;
     
-    if (tempServiceTypeId != this.serviceTypesList.filter(a => a.service_type == 'DHuS Back-End')[0].id) {
-      for (var i = 0; i < this.serviceList.length; i++) {
-        if (tempCentreId == this.centreList.filter(a => a.name == this.serviceList[i].centre)[0].id 
-          && this.serviceList[i].id != tempServiceId
-        ) {
-          if (
-            this.serviceTypesList.filter(a => a.service_type == this.serviceList[i].service_type)[0].id == this.serviceTypesList.filter(a => a.service_type == 'DHuS Front-End')[0].id ||
-            this.serviceTypesList.filter(a => a.service_type == this.serviceList[i].service_type)[0].id == this.serviceTypesList.filter(a => a.service_type == 'DHuS Single Instance')[0].id
+    if (valid) {
+      $('.modal').modal('hide');
+      let tempCentreId = this.centreList.filter(a => a.name == (<HTMLInputElement>document.getElementById('edit_centre')).value)[0].id;    
+      let tempServiceTypeId = this.serviceTypesList.filter(a => a.service_type == (<HTMLInputElement>document.getElementById('edit_service_type')).value)[0].id;
+      let tempServiceId = id;
+      
+      if (tempServiceTypeId != this.serviceTypesList.filter(a => a.service_type == 'DHuS Back-End')[0].id) {
+        for (var i = 0; i < this.serviceList.length; i++) {
+          if (tempCentreId == this.centreList.filter(a => a.name == this.serviceList[i].centre)[0].id 
+            && this.serviceList[i].id != tempServiceId
           ) {
-            valid = false;
-            this.alert.showErrorAlert("Service Configuration Error", "You cannot setup two services associated to the same Centre with Single Instance or Front-End service types");
+            if (
+              this.serviceTypesList.filter(a => a.service_type == this.serviceList[i].service_type)[0].id == this.serviceTypesList.filter(a => a.service_type == 'DHuS Front-End')[0].id ||
+              this.serviceTypesList.filter(a => a.service_type == this.serviceList[i].service_type)[0].id == this.serviceTypesList.filter(a => a.service_type == 'DHuS Single Instance')[0].id
+            ) {
+              valid = false;
+              this.alert.showErrorAlert("Service Configuration Error", "You cannot setup two services associated to the same Centre with Single Instance or Front-End service types");
+              return;
+            }
           }
         }
       }
-    }
-    if (valid) {
-      $('.modal').modal('hide');
       let body: any;
       if ((<HTMLInputElement>document.getElementById('edit_service_password')).value == '') {
         body = {
