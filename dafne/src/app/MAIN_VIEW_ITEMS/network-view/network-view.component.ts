@@ -309,7 +309,7 @@ export class NetworkViewComponent implements AfterViewInit, OnDestroy {
       id: 'icon-layer',
       data: this.allCentreList,
       pickable: true,
-      billboard: false, // false = flat on terrain, true = vertical
+      billboard: true, // false = flat on terrain, true = vertical
       getIcon: d => ({
         url: this.ICON_MAPPING[d.icon],
         width: 64,
