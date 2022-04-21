@@ -90,10 +90,17 @@ export class PublicationLatencyComponent implements OnInit {
           /* Get Synchronizers to fill the filter */
           this.authenticationService.getSynchronizersV2().subscribe(
             (res: object) => {
+              console.log("V2 RES: " + JSON.stringify(res, null, 2));
+              
               this.syncServiceUrl = res[0].serviceUrl;
               
               /* Sync List filtered for Cron == true */
-              this.syncList = res[0].synchronizers.filter((x) => x.Cron.Active == true);
+              this.syncList = [];
+              for (var i = 0; i < Object.keys(res).length; i++) {
+                var tempList = (res[i].synchronizers.filter((x) => x.Cron.Active == true));
+                this.syncList = this.syncList.concat(tempList);
+              }
+              
               this.tempSelectedFilterSyncLabel = this.syncList[0].Label;
               this.init_P5();
             }
