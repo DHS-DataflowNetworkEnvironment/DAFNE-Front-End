@@ -165,7 +165,7 @@ export class EditSyncComponent implements OnInit, OnDestroy {
       (res: object) => {
         this.syncBackendLength = Object.keys(res).length;
         this.syncBackendLengthArray = Array.from(Array(this.syncBackendLength).keys());
-        
+        this.collectionsList = [[]];
         for (var i = 0; i < this.syncBackendLength; i++) {
           this.syncList[i] = res[i].synchronizers;
           this.serviceUrlBackendList[i] = res[i].serviceUrl;  // Backend serviceUrl..
@@ -185,6 +185,7 @@ export class EditSyncComponent implements OnInit, OnDestroy {
   }
 
   public addNewSynchronizer() {
+    this.tempServiceUrlBackendNumber = undefined;
     this.currentSync = new Synchronizer();
     this.currentSync.serviceUrlBackend = "";
     this.currentSync.label = "";
@@ -219,6 +220,7 @@ export class EditSyncComponent implements OnInit, OnDestroy {
       if ((<HTMLInputElement>input).id == "add_filter_param") (<HTMLInputElement>input).value = this.currentSync.filterParam;
       if ((<HTMLInputElement>input).id == "add_geo_filter") (<HTMLInputElement>input).value = this.currentSync.geoFilter;
     });
+
     var eyeEl = document.getElementById('toggleAddSyncPassword');
     eyeEl.setAttribute('class', 'far fa-eye');
     eyeEl.style.setProperty('display', 'none');
@@ -269,6 +271,7 @@ export class EditSyncComponent implements OnInit, OnDestroy {
 
   public setNewFormServiceUrlBackend(idx: number) {
     this.currentSync.serviceUrlBackend = this.serviceUrlBackendList[idx];
+    this.tempServiceUrlBackendNumber = idx;
     let element = document.getElementById('add_service_url_backend');
     (<HTMLInputElement>element).value = this.currentSync.serviceUrlBackend;
     element.dispatchEvent(new KeyboardEvent('input', { 'bubbles': true }));
@@ -328,6 +331,7 @@ export class EditSyncComponent implements OnInit, OnDestroy {
   }
 
   public editSynchronizer(id: number, service_url_backend: string) {
+    this.tempServiceUrlBackendNumber = undefined;
     let tempSync: any;
     for (var i = 0; i < this.serviceUrlBackendList.length; i++) {
       if (this.serviceUrlBackendList[i] == service_url_backend) {
