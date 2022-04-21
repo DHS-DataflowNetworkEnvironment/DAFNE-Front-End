@@ -68,7 +68,7 @@ export class PublicationLatencyComponent implements OnInit {
   public tempSelectedFilterSyncLabel;
   public selectedFilterSyncLabel;
 
-  public syncServiceUrl: string;
+  public syncServiceUrl: Array<string>;
   public syncList;
   public tempSelectedSyncId: number;
 
@@ -90,17 +90,17 @@ export class PublicationLatencyComponent implements OnInit {
           /* Get Synchronizers to fill the filter */
           this.authenticationService.getSynchronizersV2().subscribe(
             (res: object) => {
-              console.log("V2 RES: " + JSON.stringify(res, null, 2));
-              
-              this.syncServiceUrl = res[0].serviceUrl;
-              
               /* Sync List filtered for Cron == true */
               this.syncList = [];
-              for (var i = 0; i < Object.keys(res).length; i++) {
+              
+              for (var i = 0, j = 0; i < Object.keys(res).length; i++) {
                 var tempList = (res[i].synchronizers.filter((x) => x.Cron.Active == true));
                 this.syncList = this.syncList.concat(tempList);
+                for (var k = j; k < Object.keys(this.syncList).length; k++) {                  
+                  this.syncList[k]["serviceUrl"] = res[i].serviceUrl;
+                }
+                j = Object.keys(this.syncList).length;
               }
-              
               this.tempSelectedFilterSyncLabel = this.syncList[0].Label;
               this.init_P5();
             }
@@ -119,6 +119,7 @@ export class PublicationLatencyComponent implements OnInit {
 
   onFilterSyncChange(sync) {
     this.tempSelectedFilterSyncLabel = sync.target.value;
+    //this.syncServiceUrl = this.syncList.filter;
   }
 
   onStartDateChanged(date) {
@@ -164,7 +165,7 @@ export class PublicationLatencyComponent implements OnInit {
       "stopDate": this.stopDate.concat("T23:59:59"),
       "synchId": this.tempSelectedSyncId,
       "synchLabel": this.tempSelectedFilterSyncLabel,
-      "backendUrl": this.syncServiceUrl
+      "backendUrl": this.syncList.filter((x) => x.Label == this.tempSelectedFilterSyncLabel)[0].serviceUrl
     }
     
     this.authenticationService.getPublicationLatency(this.localCentre.id, body).subscribe(
