@@ -108,6 +108,20 @@ export class PublicationLatencyComponent implements OnInit {
                 (res: any) => {
                   this.maxDaysWindow = res - 1;
                   this.millisPerMaxWindow = this.millisPerDay * this.maxDaysWindow;
+                  let tempMinDate = new Date(Date.parse(this.todayDate) - this.millisPerMaxWindow).toISOString().slice(0, 10);
+
+                  this.startDatePickerConfig = {
+                    format: "YYYY-MM-DD",
+                    firstDayOfWeek: "mo",
+                    min: tempMinDate,
+                    max: this.todayDate
+                  };
+                  this.stopDatePickerConfig = {
+                    format: "YYYY-MM-DD",
+                    firstDayOfWeek: "mo",
+                    min: tempMinDate,
+                    max: this.todayDate
+                  };
                   this.init_P5();
                 }
               );
@@ -131,7 +145,6 @@ export class PublicationLatencyComponent implements OnInit {
 
   onStartDateChanged(date) {
     let tempMillisDate = (Date.parse(date) + this.millisPerMaxPeriod);
-    let tempMillisDateWindow = (Date.parse(this.todayDate) - this.millisPerMaxWindow);
     if (Date.parse(this.stopDate) > tempMillisDate) {
       this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 31 days");
       let tempDate = new Date(tempMillisDate);
@@ -141,16 +154,10 @@ export class PublicationLatencyComponent implements OnInit {
       this.alert.showErrorAlert("Check Date Range", "Start date cannot be later than stop date");
       this.stopDate = date;
     }
-    if (Date.parse(date) < tempMillisDateWindow) {
-      this.alert.showErrorAlert("Check Date Range", "Start date cannot be earlier than max window period, which is set to " + (this.maxDaysWindow+1) + " days");
-      this.startDate = new Date(tempMillisDateWindow).toISOString().slice(0, 10);
-      this.stopDate = new Date(Date.parse(this.startDate) + this.millisPerMaxPeriod).toISOString().slice(0, 10);
-    }
   }
 
   onStopDateChanged(date) {
     let tempMillisDate = (Date.parse(date) - this.millisPerMaxPeriod);
-    let tempMillisDateWindow = (Date.parse(this.todayDate) - this.millisPerMaxWindow);
     if (Date.parse(this.startDate) < tempMillisDate) {
       this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 31 days");
       let tempDate = new Date(tempMillisDate);
@@ -159,11 +166,6 @@ export class PublicationLatencyComponent implements OnInit {
     if (Date.parse(date) < Date.parse(this.startDate)) {
       this.alert.showErrorAlert("Check Date Range", "Stop date cannot be earlier than start date");
       this.startDate = date;
-    }
-    if (Date.parse(date) < tempMillisDateWindow) {
-      this.alert.showErrorAlert("Check Date Range", "Stop date cannot be earlier than max window period, which is set to " + (this.maxDaysWindow+1) + " days");
-      this.stopDate = new Date(tempMillisDateWindow).toISOString().slice(0, 10);
-      this.startDate = this.stopDate;
     }
   }
 
