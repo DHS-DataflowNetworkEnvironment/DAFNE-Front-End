@@ -59,6 +59,7 @@ export class EditSyncComponent implements OnInit, OnDestroy {
   public tempSyncIdToDelete = -1;
   public tempSyncUrlToDelete = '';
   public serviceUrlBackendList = [];
+  public intelligentSyncSupported = [];
   public collectionsList = [[]];
   public syncBackendLength: number;
   public syncBackendLengthArray = [];
@@ -163,14 +164,19 @@ export class EditSyncComponent implements OnInit, OnDestroy {
   getSynchronizers() {
     this.authenticationService.getSynchronizers().subscribe(
       (res: object) => {
+        console.log("GET SYNCHRONIZERS: " + JSON.stringify(res, null, 2));
+        
         this.syncBackendLength = Object.keys(res).length;
         this.syncBackendLengthArray = Array.from(Array(this.syncBackendLength).keys());
         this.collectionsList = [[]];
         for (var i = 0; i < this.syncBackendLength; i++) {
           this.syncList[i] = res[i].synchronizers;
           this.serviceUrlBackendList[i] = res[i].serviceUrl;  // Backend serviceUrl..
+          this.intelligentSyncSupported[i] = res[i].intelligentSyncSupported;
+          
           for (var k = 0; k < this.syncList[i].length; k++) {
             this.syncList[i][k].ServiceUrlBackend = res[i].serviceUrl;
+            this.syncList[i][k].IntelligentSyncSupported = res[i].intelligentSyncSupported;
           }
           this.collectionsList.push([]);
           if (res[i].collections != undefined) {
@@ -270,11 +276,17 @@ export class EditSyncComponent implements OnInit, OnDestroy {
   }
 
   public setNewFormServiceUrlBackend(idx: number) {
-    this.currentSync.serviceUrlBackend = this.serviceUrlBackendList[idx];
-    this.tempServiceUrlBackendNumber = idx;
-    let element = document.getElementById('add_service_url_backend');
-    (<HTMLInputElement>element).value = this.currentSync.serviceUrlBackend;
-    element.dispatchEvent(new KeyboardEvent('input', { 'bubbles': true }));
+    if (this.intelligentSyncSupported[idx] == false) {
+      this.currentSync.serviceUrlBackend = this.serviceUrlBackendList[idx];    
+      this.tempServiceUrlBackendNumber = idx;
+      let element = document.getElementById('add_service_url_backend');
+      (<HTMLInputElement>element).value = this.currentSync.serviceUrlBackend;
+      element.dispatchEvent(new KeyboardEvent('input', { 'bubbles': true }));
+    } else {
+      this.alert.showErrorAlert("Selected service URL belongs to a DHuS version >= 3.1.x", "DAFNE 2.x does not support synchronizer creation for DHuS version >= 3.1.x");
+      let element = document.getElementById('add_service_url_backend');
+      (<HTMLInputElement>element).value = "";
+    }
   }
 
   public setTargetCollection(id: number) {
