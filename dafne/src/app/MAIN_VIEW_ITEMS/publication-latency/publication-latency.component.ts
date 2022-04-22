@@ -226,7 +226,7 @@ export class PublicationLatencyComponent implements OnInit {
       "date": date,
       "synchId": this.tempSelectedSyncId,
       "synchLabel": this.tempSelectedFilterSyncLabel,
-      "backendUrl": this.syncServiceUrl
+      "backendUrl": this.syncList.filter((x) => x.Label == this.tempSelectedFilterSyncLabel)[0].serviceUrl
     }
     console.log("Pub Lat - Request Body: " + JSON.stringify(body, null, 2));
     
