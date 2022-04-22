@@ -26,8 +26,10 @@ export class PublicationLatencyComponent implements OnInit {
   public requestedDaysNumber: number = 0;
   public latencyDetailNumber: number = 0;
   public millisPerDay = 86400000;
-  public maxDays = 30;
+  public maxDays: number = 30;  // set 30 for 31 days of latency.
   public millisPerMaxPeriod = this.millisPerDay * this.maxDays;
+  public maxDaysWindow: number;  // this should be retrieved from BE. set 89 for 90 days.
+  public millisPerMaxWindow: number;
 
   public today = new Date();
   public todayDate: string = this.today.toISOString().slice(0, 10);
@@ -102,7 +104,13 @@ export class PublicationLatencyComponent implements OnInit {
                 j = Object.keys(this.syncList).length;
               }
               this.tempSelectedFilterSyncLabel = this.syncList[0].Label;
-              this.init_P5();
+              this.authenticationService.getLatencyRollingPeriod().subscribe(
+                (res: any) => {
+                  this.maxDaysWindow = res - 1;
+                  this.millisPerMaxWindow = this.millisPerDay * this.maxDaysWindow;
+                  this.init_P5();
+                }
+              );
             }
           );
         } else {
@@ -119,38 +127,43 @@ export class PublicationLatencyComponent implements OnInit {
 
   onFilterSyncChange(sync) {
     this.tempSelectedFilterSyncLabel = sync.target.value;
-    //this.syncServiceUrl = this.syncList.filter;
   }
 
   onStartDateChanged(date) {
     let tempMillisDate = (Date.parse(date) + this.millisPerMaxPeriod);
+    let tempMillisDateWindow = (Date.parse(this.todayDate) - this.millisPerMaxWindow);
     if (Date.parse(this.stopDate) > tempMillisDate) {
       this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 31 days");
       let tempDate = new Date(tempMillisDate);
-      let dd = String(tempDate.getDate()).padStart(2, '0');
-      let mm = String(tempDate.getMonth() + 1).padStart(2, '0');
-      let yyyy = tempDate.getFullYear();
-      this.stopDate = yyyy + '-' + mm + '-' + dd;
+      this.stopDate = tempDate.toISOString().slice(0, 10);
     }
     if (Date.parse(date) > Date.parse(this.stopDate)) {
       this.alert.showErrorAlert("Check Date Range", "Start date cannot be later than stop date");
       this.stopDate = date;
     }
+    if (Date.parse(date) < tempMillisDateWindow) {
+      this.alert.showErrorAlert("Check Date Range", "Start date cannot be earlier than max window period, which is set to " + (this.maxDaysWindow+1) + " days");
+      this.startDate = new Date(tempMillisDateWindow).toISOString().slice(0, 10);
+      this.stopDate = new Date(Date.parse(this.startDate) + this.millisPerMaxPeriod).toISOString().slice(0, 10);
+    }
   }
 
   onStopDateChanged(date) {
     let tempMillisDate = (Date.parse(date) - this.millisPerMaxPeriod);
+    let tempMillisDateWindow = (Date.parse(this.todayDate) - this.millisPerMaxWindow);
     if (Date.parse(this.startDate) < tempMillisDate) {
       this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 31 days");
       let tempDate = new Date(tempMillisDate);
-      let dd = String(tempDate.getDate()).padStart(2, '0');
-      let mm = String(tempDate.getMonth() + 1).padStart(2, '0');
-      let yyyy = tempDate.getFullYear();
-      this.startDate = yyyy + '-' + mm + '-' + dd;
+      this.startDate = tempDate.toISOString().slice(0, 10);
     }
     if (Date.parse(date) < Date.parse(this.startDate)) {
       this.alert.showErrorAlert("Check Date Range", "Stop date cannot be earlier than start date");
       this.startDate = date;
+    }
+    if (Date.parse(date) < tempMillisDateWindow) {
+      this.alert.showErrorAlert("Check Date Range", "Stop date cannot be earlier than max window period, which is set to " + (this.maxDaysWindow+1) + " days");
+      this.stopDate = new Date(tempMillisDateWindow).toISOString().slice(0, 10);
+      this.startDate = this.stopDate;
     }
   }
 
@@ -228,7 +241,6 @@ export class PublicationLatencyComponent implements OnInit {
       "synchLabel": this.tempSelectedFilterSyncLabel,
       "backendUrl": this.syncList.filter((x) => x.Label == this.tempSelectedFilterSyncLabel)[0].serviceUrl
     }
-    console.log("Pub Lat - Request Body: " + JSON.stringify(body, null, 2));
     
     this.authenticationService.getPublicationLatencyDetail(this.localCentre.id, body).subscribe(
       (res) => {
@@ -237,7 +249,6 @@ export class PublicationLatencyComponent implements OnInit {
 
         if (res.centreId == this.localCentre.id) {
           this.latencyDetailNumber = res.values.length;
-          console.log("Pub Lat Detail - Response: " + JSON.stringify(res, null, 2));
           this.publicationDetailLatencyList = res.values;
 
           for (var i = 0; i < this.latencyDetailNumber; i++) {
@@ -250,7 +261,6 @@ export class PublicationLatencyComponent implements OnInit {
               this.publicationDetailLatencyList[i].source = 'null';
             }
           }
-          console.log("Pub Lat - Values: " + JSON.stringify(this.publicationDetailLatencyList, null, 2));
           this.showDetailLatency = true;
         }
       }

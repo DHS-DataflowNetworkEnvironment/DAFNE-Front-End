@@ -385,4 +385,26 @@ export class AuthenticationService {
         }
     ));
   }
+
+  getLatencyRollingPeriod() {
+    // get latency rolling period in days from the back-end
+    return this.http.get<any>(AppConfig.settings.apiUrl + `/config/latency/rollingPeriodInDays`)
+    .pipe(
+    catchError(err => {
+        console.error(err);
+        return throwError(err);
+        }
+    ));
+  }
+
+  getAvailabilityRollingPeriod() {
+    // get availability rolling period in days from the back-end
+    return this.http.get<any>(AppConfig.settings.apiUrl + `/config/availability/rollingPeriodInDays`)
+    .pipe(
+    catchError(err => {
+        console.error(err);
+        return throwError(err);
+        }
+    ));
+  }
 }
