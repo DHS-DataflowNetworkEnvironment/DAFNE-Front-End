@@ -122,7 +122,6 @@ export class PublicationLatencyComponent implements OnInit {
                     min: tempMinDate,
                     max: this.todayDate
                   };
-                  this.init_P5();
                 }
               );
             }
@@ -137,6 +136,7 @@ export class PublicationLatencyComponent implements OnInit {
         }
       }
     );
+    this.init_P5();
   }
 
   onFilterSyncChange(sync) {
@@ -170,68 +170,72 @@ export class PublicationLatencyComponent implements OnInit {
   }
 
   onFilterSubmit(): void {
-    let tempStopDate = new Date(this.stopDate);
-    let tempStartDate = new Date(this.startDate);
-    let tempTimeDifference = tempStopDate.getTime() - tempStartDate.getTime();
+    if (this.localCentre.id == -1) {
+      this.alert.showErrorAlert("No local Centre is set", "Please setup one Centre as local");
+    } else {
+      let tempStopDate = new Date(this.stopDate);
+      let tempStartDate = new Date(this.startDate);
+      let tempTimeDifference = tempStopDate.getTime() - tempStartDate.getTime();
 
-    this.tempSelectedSyncId = this.syncList.filter((x) => x.Label == this.tempSelectedFilterSyncLabel)[0].Id;
-    let body: object = {
-      "startDate": this.startDate.concat("T00:00:00"),
-      "stopDate": this.stopDate.concat("T23:59:59"),
-      "synchId": this.tempSelectedSyncId,
-      "synchLabel": this.tempSelectedFilterSyncLabel,
-      "backendUrl": this.syncList.filter((x) => x.Label == this.tempSelectedFilterSyncLabel)[0].serviceUrl
-    }
-    
-    this.authenticationService.getPublicationLatency(this.localCentre.id, body).subscribe(
-      (res) => {
-        this.latencyDaysNumber = 0;
-        if (res.centreId == this.localCentre.id) {
-          this.selectedFilterSyncLabel = this.tempSelectedFilterSyncLabel;
-          this.latencyDaysNumber = res.values.length;
-          this.requestedDaysNumber = tempTimeDifference / (1000 * 3600 * 24) + 1;
-          this.requestedPublicationLatencyList = [];
-          this.publicationLatencyList = res.values;
+      this.tempSelectedSyncId = this.syncList.filter((x) => x.Label == this.tempSelectedFilterSyncLabel)[0].Id;
+      let body: object = {
+        "startDate": this.startDate.concat("T00:00:00"),
+        "stopDate": this.stopDate.concat("T23:59:59"),
+        "synchId": this.tempSelectedSyncId,
+        "synchLabel": this.tempSelectedFilterSyncLabel,
+        "backendUrl": this.syncList.filter((x) => x.Label == this.tempSelectedFilterSyncLabel)[0].serviceUrl
+      }
+      
+      this.authenticationService.getPublicationLatency(this.localCentre.id, body).subscribe(
+        (res) => {
+          this.latencyDaysNumber = 0;
+          if (res.centreId == this.localCentre.id) {
+            this.selectedFilterSyncLabel = this.tempSelectedFilterSyncLabel;
+            this.latencyDaysNumber = res.values.length;
+            this.requestedDaysNumber = tempTimeDifference / (1000 * 3600 * 24) + 1;
+            this.requestedPublicationLatencyList = [];
+            this.publicationLatencyList = res.values;
 
-          for (var i = 0; i < this.requestedDaysNumber; i++) {
-            this.requestedPublicationLatencyList[i] = {
-              day: new Date(Date.parse(this.startDate) + (i * this.millisPerDay)).toISOString().slice(0,10),
-              centre_id: -1,
-              synch_id: -1,
-              synch_label: "",
-              average_fe: null,
-              average_be: null,
-              average_latency: null,
-              number_of_measurements: 0,
-              source: ""
-            }
-          }
-
-          for (var i = 0; i < this.requestedDaysNumber; i++) {
-            for (var k = 0; k < this.latencyDaysNumber; k++) {
-              if (this.publicationLatencyList[k].day == this.requestedPublicationLatencyList[i].day) {
-                if (this.publicationLatencyList[k].average_fe == null) {
-                  if (this.publicationLatencyList[k].average_be == null) {
-                    this.publicationLatencyList[k].source = "null";
-                    this.publicationLatencyList[k].average_latency = -1;
-                  } else {
-                    this.publicationLatencyList[k].source = "BE";
-                  }                  
-                } else if (this.publicationLatencyList[k].average_fe > this.publicationLatencyList[k].average_latency) {
-                  this.publicationLatencyList[k].source = "FE+BE";
-                } else {
-                  this.publicationLatencyList[k].source = "FE";
-                }
-                this.requestedPublicationLatencyList[i] = this.publicationLatencyList[k];
+            for (var i = 0; i < this.requestedDaysNumber; i++) {
+              this.requestedPublicationLatencyList[i] = {
+                day: new Date(Date.parse(this.startDate) + (i * this.millisPerDay)).toISOString().slice(0,10),
+                centre_id: -1,
+                synch_id: -1,
+                synch_label: "",
+                average_fe: null,
+                average_be: null,
+                average_latency: null,
+                number_of_measurements: 0,
+                source: ""
               }
             }
+
+            for (var i = 0; i < this.requestedDaysNumber; i++) {
+              for (var k = 0; k < this.latencyDaysNumber; k++) {
+                if (this.publicationLatencyList[k].day == this.requestedPublicationLatencyList[i].day) {
+                  if (this.publicationLatencyList[k].average_fe == null) {
+                    if (this.publicationLatencyList[k].average_be == null) {
+                      this.publicationLatencyList[k].source = "null";
+                      this.publicationLatencyList[k].average_latency = -1;
+                    } else {
+                      this.publicationLatencyList[k].source = "BE";
+                    }                  
+                  } else if (this.publicationLatencyList[k].average_fe > this.publicationLatencyList[k].average_latency) {
+                    this.publicationLatencyList[k].source = "FE+BE";
+                  } else {
+                    this.publicationLatencyList[k].source = "FE";
+                  }
+                  this.requestedPublicationLatencyList[i] = this.publicationLatencyList[k];
+                }
+              }
+            }
+            this.showDetailLatency = false;
+            this.p5Chart.setClickTimeoutId(undefined);
+            this.p5Chart.windowResized();
           }
-          this.showDetailLatency = false;
-          this.p5Chart.setClickTimeoutId(undefined);
-          this.p5Chart.windowResized();
         }
-      }
-    );
+      );
+    }
   }
 
   onDetailLatencyReq(date: string) {
@@ -510,6 +514,8 @@ export class PublicationLatencyComponent implements OnInit {
             maxValue = this.publicationLatencyList[i].average_latency;
           }
         }
+        if (maxValue == 0) maxValue = this.latencyColors[0].threshold;
+
         let sectionXFilledDim = (chartXDim / this.requestedDaysNumber) / sectionScaleSingle;
         let sectionXFilledDim2 = sectionXFilledDim / 2;
         let barGap = sectionXFilledDim / barGapScale;
@@ -620,7 +626,8 @@ export class PublicationLatencyComponent implements OnInit {
             maxValue = this.publicationLatencyList[i].average_latency;
           }
         }
-
+        if (maxValue == 0) maxValue = this.latencyColors[0].threshold;
+        
         let xpoint: Array<number> = [];
         let ypoint: Array<number> = [];
         let sectionXFilledDim = (chartXDim / this.requestedDaysNumber) / sectionScaleSingle;
@@ -733,7 +740,8 @@ export class PublicationLatencyComponent implements OnInit {
             maxValue = this.publicationDetailLatencyList[i].latency_be;
           }
         }
-
+        if (maxValue == 0) maxValue = this.latencyColors[0].threshold;
+        
         let sectionXFilledDim = (chartXDim / this.latencyDetailNumber) / sectionScaleSingle;
         let sectionXFilledDim2 = sectionXFilledDim / 2;
         let barGap = sectionXFilledDim / barGapScale;
@@ -831,7 +839,8 @@ export class PublicationLatencyComponent implements OnInit {
             maxValue = this.publicationDetailLatencyList[i].latency_be;
           }
         }
-
+        if (maxValue == 0) maxValue = this.latencyColors[0].threshold;
+        
         let xpoint: Array<number> = [];
         let ypoint: Array<number> = [];
         
