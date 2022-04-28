@@ -71,14 +71,14 @@
                     <div *ngIf="latency.source == 'BE'" style="color: lightsalmon; font-size: 0.6rem;">( BE )</div>
                     <div *ngIf="latency.source == 'FE+BE'" style="color: lightgoldenrodyellow; font-size: 0.6rem;">( FE+BE )</div>
                     <div *ngIf="latency.source == 'null'" style="color: grey; font-size: 0.6rem;">null</div>
-                    <div *ngIf="latency.source == ''" style="color: grey; font-size: 0.6rem;">N/A</div>
+                    <div *ngIf="latency.source == ''" style="color: grey; font-size: 0.6rem;">NaN</div>
                 </th>
             </thead>
             <tr *ngIf="showDetailLatency == false">
                 <td style="color: #ffffff">Latency {{selectedFilterSyncLabel}}</td>
                 <td *ngFor="let latency of requestedPublicationLatencyList">
                     <div *ngIf="latency.average_latency != null && latency.average_latency != -1" [ngStyle]="{'background-color': getLatencyHexColorFromSeconds(latency.average_latency)}"><span style="padding: 0 0.5rem; color: var(--main-bg-color)">{{millisToHHMMSS(latency.average_latency)}}</span></div>
-                    <div *ngIf="latency.average_latency == null" style="color: var(--windows-title-color)">N/A</div>
+                    <div *ngIf="latency.average_latency == null" style="color: var(--windows-title-color)">NaN</div>
                     <div *ngIf="latency.average_latency == -1" style="color: var(--windows-title-color)">null</div>
                 </td>
             </tr>
@@ -89,7 +89,7 @@
                 <th *ngFor="let latency of publicationDetailLatencyList; let i = index" style="padding: 0 0.5rem;">{{latency.timezone.slice(11, 16)}}
                     <div *ngIf="latency.source == 'FE'" style="color: var(--main-bg-color); font-size: 0.6rem;"><br></div>
                     <div *ngIf="latency.source == 'BE'" style="color: lightsalmon; font-size: 0.6rem;">( BE )</div>
-                    <div *ngIf="latency.source == 'null'" style="color: grey; font-size: 0.6rem;">N/A</div>
+                    <div *ngIf="latency.source == 'null'" style="color: grey; font-size: 0.6rem;">NaN</div>
                 </th>
             </thead>
             <tr *ngIf="showDetailLatency == true">
@@ -97,7 +97,7 @@
                 <td *ngFor="let latency of publicationDetailLatencyList">
                     <div *ngIf="latency.latency_fe != null" [ngStyle]="{'background-color': getLatencyHexColorFromSeconds(latency.latency_fe)}"><span style="padding: 0 0.5rem; color: var(--main-bg-color)">{{millisToHHMMSS(latency.latency_fe)}}</span></div>
                     <div *ngIf="latency.latency_fe == null && latency.latency_be != null" [ngStyle]="{'background-color': getLatencyHexColorFromSeconds(latency.latency_be)}"><span style="padding: 0 0.5rem; color: var(--main-bg-color)">{{millisToHHMMSS(latency.latency_be)}}</span></div>
-                    <div *ngIf="latency.latency_fe == null && latency.latency_be == null" style="color: var(--windows-title-color)">N/A</div>
+                    <div *ngIf="latency.latency_fe == null && latency.latency_be == null" style="color: var(--windows-title-color)">NaN</div>
                 </td>
             </tr>
         </table>
