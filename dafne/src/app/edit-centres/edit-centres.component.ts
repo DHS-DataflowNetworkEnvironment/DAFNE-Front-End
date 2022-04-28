@@ -109,8 +109,8 @@ export class EditCentresComponent implements OnInit, OnDestroy {
 
   public addNewCentre() {
     this.tempCentre.name = '';
-    this.tempCentre.latitude = '0.0';
-    this.tempCentre.longitude = '0.0';
+    this.tempCentre.latitude = '';
+    this.tempCentre.longitude = '';
     this.tempCentre.color = this.getRandomColor();
     this.tempCentre.local = false;
     this.tempCentre.description = '';
