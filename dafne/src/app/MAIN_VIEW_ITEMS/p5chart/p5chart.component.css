@@ -234,15 +234,18 @@
 table {
     width: 100%;
 }
+table td:first-child, th:first-child{
+    padding: 0 0.5rem;
+}
 caption, th, td {
     text-align: center;
 }
 table th, td {
     border: 1px solid var(--table-border-color);
-    padding: 0 0.5rem;
 }
 th {
     background-color: var(--table-header-bg-color);
+    white-space:nowrap;
 }
 
 /* Responsiveness */

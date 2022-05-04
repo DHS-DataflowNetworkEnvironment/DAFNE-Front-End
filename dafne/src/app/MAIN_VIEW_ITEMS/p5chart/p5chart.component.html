@@ -79,7 +79,7 @@
         <table id="data-table">
             <thead>
                 <th style="color: white">{{missionName}} {{platformNumber}} ({{productType}})</th>
-                <th *ngFor="let column of completenessDataList">{{column.date}}</th>
+                <th *ngFor="let column of completenessDataList" style="padding: 0 0.5rem;">{{column.date}}</th>
             </thead>
             <tr *ngFor="let centre of serviceAllCentreList; let i=index">
                 <td [ngStyle]="{'color': centre.color }">{{centre.name}}</td>
