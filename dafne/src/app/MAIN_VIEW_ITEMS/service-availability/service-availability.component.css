@@ -209,7 +209,7 @@
 table {
     width: 100%;
 }
-table th, td{
+table td:first-child, th:first-child{
     padding: 0 0.5rem;
 }
 caption, th, td {
@@ -220,6 +220,7 @@ table, th, td {
 }
 th {
     background-color: var(--table-header-bg-color);
+    white-space:nowrap;
 }
 
 

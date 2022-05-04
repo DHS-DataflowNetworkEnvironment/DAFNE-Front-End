@@ -56,7 +56,7 @@
             <thead>
                 <th style="color: white">{{localCentre.name}}</th>
                 <ng-template ngFor let-availability [ngForOf]="requestedServiceAvailabilityList" let-i="index">
-                    <th>{{availability.date}}</th>
+                    <th style="padding: 0 0.5rem;">{{availability.date}}</th>
                 </ng-template>
             </thead>
             <tr>

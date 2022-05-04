@@ -167,7 +167,7 @@
     flex-shrink: 1;
 }
 
-/* Fake Day Title */
+/* Day Title */
 #detail-day-title {
     position: absolute;
     margin-top: 2rem;
@@ -255,7 +255,6 @@
     overflow-y: auto;
 }
 table {
-    /* table-layout: fixed ; */
     width: 100%;
 }
 table td:first-child, th:first-child{
