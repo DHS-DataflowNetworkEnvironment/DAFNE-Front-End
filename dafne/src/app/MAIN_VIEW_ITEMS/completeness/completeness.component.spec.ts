@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { P5chartComponent } from './p5chart.component';
+import { CompletenessComponent } from './completeness.component';
 
-describe('P5chartComponent', () => {
-  let component: P5chartComponent;
-  let fixture: ComponentFixture<P5chartComponent>;
+describe('CompletenessComponent', () => {
+  let component: CompletenessComponent;
+  let fixture: ComponentFixture<CompletenessComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ P5chartComponent ]
+      declarations: [ CompletenessComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(P5chartComponent);
+    fixture = TestBed.createComponent(CompletenessComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

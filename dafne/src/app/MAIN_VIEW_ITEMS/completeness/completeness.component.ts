@@ -18,11 +18,11 @@ $(window).resize(function() {
 });
 
 @Component({
-  selector: 'app-p5chart',
-  templateUrl: './p5chart.component.html',
-  styleUrls: ['./p5chart.component.css']
+  selector: 'app-completeness',
+  templateUrl: './completeness.component.html',
+  styleUrls: ['./completeness.component.css']
 })
-export class P5chartComponent implements OnInit, AfterViewInit, OnDestroy {
+export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
   navigationSubscription;
 
   public p5Chart;

@@ -8,7 +8,7 @@ import { FooterComponent } from './footer/footer.component';
 import { UniqueNameFilterPipe } from './unique-name-filter.pipe';
 import { MatIconModule } from '@angular/material/icon';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { P5chartComponent } from './MAIN_VIEW_ITEMS/p5chart/p5chart.component';
+import { CompletenessComponent } from './MAIN_VIEW_ITEMS/completeness/completeness.component';
 import { LoginComponent } from './login/login.component';
 import { ArchiveInfoComponent } from './SIDEBAR_ITEMS/archive-info/archive-info.component';
 import { DataSourceInfoComponent } from './SIDEBAR_ITEMS/data-source-info/data-source-info.component';
@@ -49,7 +49,7 @@ export function initializeApp(
     HeaderComponent,
     FooterComponent,
     UniqueNameFilterPipe,
-    P5chartComponent,
+    CompletenessComponent,
     LoginComponent,
     ArchiveInfoComponent,
     DataSourceInfoComponent,
