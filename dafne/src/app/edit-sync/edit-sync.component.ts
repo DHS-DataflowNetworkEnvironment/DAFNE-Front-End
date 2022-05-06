@@ -164,8 +164,6 @@ export class EditSyncComponent implements OnInit, OnDestroy {
   getSynchronizers() {
     this.authenticationService.getSynchronizers().subscribe(
       (res: object) => {
-        console.log("GET SYNCHRONIZERS: " + JSON.stringify(res, null, 2));
-        
         this.syncBackendLength = Object.keys(res).length;
         this.syncBackendLengthArray = Array.from(Array(this.syncBackendLength).keys());
         this.collectionsList = [[]];

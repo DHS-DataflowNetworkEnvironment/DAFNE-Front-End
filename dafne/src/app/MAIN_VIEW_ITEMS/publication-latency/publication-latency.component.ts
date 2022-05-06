@@ -726,7 +726,7 @@ export class PublicationLatencyComponent implements OnInit {
         for (var i = 0; i < nLines; i++) {
           p.fill(lineColor);
           p.noStroke();
-          p.text(this.secondsToHHMMSS(p.int(maxValue / (nLines / (i + 1)))), xCenter - chartXDim2 - 15, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines + 1);
+          p.text(this.millisToHHMMSS(maxValue / (nLines / (i + 1))), xCenter - chartXDim2 - 15, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines + 1);
           p.stroke(lineColor);
           p.line(xCenter - chartXDim2 - 5, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines, xCenter - chartXDim2, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines)
         }
