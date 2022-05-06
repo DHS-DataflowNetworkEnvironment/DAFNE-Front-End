@@ -93,7 +93,7 @@
                 </th>
             </thead>
             <tr *ngIf="showDetailLatency == true">
-                <td style="color: #ffffff">{{latencyDetailDate}} Latency {{selectedFilterSyncLabel}}</td>
+                <td style="color: #ffffff; white-space:nowrap;">{{latencyDetailDate}} Latency {{selectedFilterSyncLabel}}</td>
                 <td *ngFor="let latency of publicationDetailLatencyList">
                     <div *ngIf="latency.latency_fe != null" [ngStyle]="{'background-color': getLatencyHexColorFromSeconds(latency.latency_fe)}"><span style="padding: 0 0.5rem; color: var(--main-bg-color)">{{millisToHHMMSS(latency.latency_fe)}}</span></div>
                     <div *ngIf="latency.latency_fe == null && latency.latency_be != null" [ngStyle]="{'background-color': getLatencyHexColorFromSeconds(latency.latency_be)}"><span style="padding: 0 0.5rem; color: var(--main-bg-color)">{{millisToHHMMSS(latency.latency_be)}}</span></div>
