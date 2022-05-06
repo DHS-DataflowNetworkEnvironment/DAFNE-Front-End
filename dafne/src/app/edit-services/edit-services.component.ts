@@ -199,6 +199,12 @@ export class EditServicesComponent implements OnInit, OnDestroy {
     var eyeEl = document.getElementById('toggleAddPassword');
     eyeEl.setAttribute('class', 'far fa-eye');
     eyeEl.style.setProperty('display', 'none');
+    let cleanInputs = document.querySelectorAll('#addServiceForm input.form-control');
+    cleanInputs.forEach((input) => {
+      if (input.className == "form-control invalid") {
+        input.className = "form-control";
+      }
+    });
     $("#addServiceModal").modal('toggle');
   }
 

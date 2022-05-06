@@ -228,6 +228,12 @@ export class EditSyncComponent implements OnInit, OnDestroy {
     var eyeEl = document.getElementById('toggleAddSyncPassword');
     eyeEl.setAttribute('class', 'far fa-eye');
     eyeEl.style.setProperty('display', 'none');
+    let cleanInputs = document.querySelectorAll('#addSyncForm input.form-control');
+    cleanInputs.forEach((input) => {
+      if (input.className == "form-control invalid") {
+        input.className = "form-control";
+      }
+    });
     $("#addSynchronizerModal").modal('toggle');
   }
 

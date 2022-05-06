@@ -122,6 +122,12 @@ export class EditCentresComponent implements OnInit, OnDestroy {
       if ((<HTMLInputElement>input).id == "add_local") (<HTMLInputElement>input).checked = this.tempCentre.local;
       if ((<HTMLInputElement>input).id == "add_description") (<HTMLInputElement>input).value = this.tempCentre.description;
     });
+    let cleanInputs = document.querySelectorAll('#addCentreForm input.form-control');
+    cleanInputs.forEach((input) => {
+      if (input.className == "form-control invalid") {
+        input.className = "form-control";
+      }
+    });
     $("#addCentreModal").modal('toggle');
   }
 
