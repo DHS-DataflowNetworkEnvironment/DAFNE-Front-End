@@ -294,7 +294,7 @@ export class EditSyncComponent implements OnInit, OnDestroy {
   }
 
   public setTargetCollection(id: number) {
-    this.currentSync.targetCollection = this.collectionsList[id];
+    this.currentSync.targetCollection = this.collectionsList[this.tempServiceUrlBackendNumber][id];
   }
 
   public setNewFormRequest(request) {
