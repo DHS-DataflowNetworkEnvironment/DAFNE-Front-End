@@ -163,7 +163,13 @@ export class EditSyncComponent implements OnInit, OnDestroy {
 
   getSynchronizers() {
     this.authenticationService.getSynchronizers().subscribe(
-      (res: object) => {
+      (res: any) => {
+        /* Check and delete objects with empty sync list */
+        for (var i = 0; i < Object.keys(res).length; i++) {
+          if (res[i].synchronizers.length == 0) {
+            res.splice(i, 1);
+          }
+        }
         this.syncBackendLength = Object.keys(res).length;
         this.syncBackendLengthArray = Array.from(Array(this.syncBackendLength).keys());
         this.collectionsList = [[]];
@@ -171,13 +177,12 @@ export class EditSyncComponent implements OnInit, OnDestroy {
           this.syncList[i] = res[i].synchronizers;
           this.serviceUrlBackendList[i] = res[i].serviceUrl;  // Backend serviceUrl..
           this.intelligentSyncSupported[i] = res[i].intelligentSyncSupported;
-          
           for (var k = 0; k < this.syncList[i].length; k++) {
             this.syncList[i][k].ServiceUrlBackend = res[i].serviceUrl;
             this.syncList[i][k].IntelligentSyncSupported = res[i].intelligentSyncSupported;
           }
           this.collectionsList.push([]);
-          if (res[i].collections != undefined) {
+          if ("collections" in res[i]) {
             res[i].collections.forEach((item, index) => {
               this.collectionsList[i].push(item.Name);
             });

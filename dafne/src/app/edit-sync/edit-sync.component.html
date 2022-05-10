@@ -17,23 +17,23 @@
                     <th *ngIf="this.authenticationService.currentUser.isAdmin" id="actions-header">Actions</th>
                 </tr>
                 <tbody *ngFor="let arr of syncBackendLengthArray; let i = index">
-                    <tr *ngFor="let sync of syncList[i]">
-                        <td class="cell-label">{{sync.Label}}</td>
-                        <td class="cell-service_url_backend">{{sync.ServiceUrlBackend}}</td>
-                        <td class="cell-service_url">{{sync.ServiceUrl}}</td>
-                        <td class="cell-copy_product">{{sync.CopyProduct}}</td>
-                        <td class="cell-schedule">{{sync.Schedule}}</td>
-                        <td class="cell-status">{{sync.Status}}</td>
-                        <td *ngIf="this.authenticationService.currentUser.isAdmin && sync.IntelligentSyncSupported == false" class="cell-actions" id="actions-cell">
-                            <i class="fas fa-play action" style="color: rgb(0, 255, 0)" (click)="startSynchronizer(sync.Id, 'start', sync.ServiceUrlBackend)"></i>
-                            <i class="fas fa-stop action" style="color: rgb(255, 0, 0)" (click)="startSynchronizer(sync.Id, 'stop', sync.ServiceUrlBackend)"></i>
-                            <i class="fas fa-pen action" style="color: orange" (click)="editSynchronizer(sync.Id, sync.ServiceUrlBackend)"></i>
-                            <i class="fas fa-trash action" style="color: red" (click)="deleteSynchronizer(sync.Id, sync.ServiceUrlBackend)"></i>
-                        </td>
-                        <td *ngIf="sync.IntelligentSyncSupported == true" id="actions-cell">
-                            <span>Actions not yet available for DHuS version >= 3.1.x</span>
-                        </td>
-                    </tr>
+                        <tr *ngFor="let sync of syncList[i]">
+                            <td class="cell-label">{{sync.Label}}</td>
+                            <td class="cell-service_url_backend">{{sync.ServiceUrlBackend}}</td>
+                            <td class="cell-service_url">{{sync.ServiceUrl}}</td>
+                            <td class="cell-copy_product">{{sync.CopyProduct}}</td>
+                            <td class="cell-schedule">{{sync.Schedule}}</td>
+                            <td class="cell-status">{{sync.Status}}</td>
+                            <td *ngIf="this.authenticationService.currentUser.isAdmin && sync.IntelligentSyncSupported == false" class="cell-actions" id="actions-cell">
+                                <i class="fas fa-play action" style="color: rgb(0, 255, 0)" (click)="startSynchronizer(sync.Id, 'start', sync.ServiceUrlBackend)"></i>
+                                <i class="fas fa-stop action" style="color: rgb(255, 0, 0)" (click)="startSynchronizer(sync.Id, 'stop', sync.ServiceUrlBackend)"></i>
+                                <i class="fas fa-pen action" style="color: orange" (click)="editSynchronizer(sync.Id, sync.ServiceUrlBackend)"></i>
+                                <i class="fas fa-trash action" style="color: red" (click)="deleteSynchronizer(sync.Id, sync.ServiceUrlBackend)"></i>
+                            </td> 
+                            <td *ngIf="sync.IntelligentSyncSupported == true" id="actions-cell">
+                                <span>Actions not yet available for DHuS version >= 3.1.x</span>
+                            </td>
+                        </tr>
                 </tbody>
             </table>
             <div *ngIf="isLocalConfigured == false" id="local-advise">Please configure a Local Centre</div>
