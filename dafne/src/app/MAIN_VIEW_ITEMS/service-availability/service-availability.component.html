@@ -28,15 +28,15 @@
         </div>
         <!-- Selectors -->
         <section id="selectors-container">
-            <h2>CHART</h2>
+            <h2 id="buttons-title">CHART</h2>
             <button (click)="chartChangeTo('Bar Chart')">Bar Chart</button>
             <button (click)="chartChangeTo('Calendar Chart')">Calendar Chart</button>
-            <hr>
-            <h2>LEGEND</h2>
+
+            <h2 id="legend-title">LEGEND</h2>
             <ng-template ngFor let-color [ngForOf]="availabilityColors" let-i="index">
                 <div *ngIf="i>0" class="color-threshold" [ngStyle]="{'background-color': availabilityColors[availabilityColors.length-1-i].color}">&gt;<span *ngIf="i==availabilityColors.length - 1">=</span> {{availabilityColors[availabilityColors.length-1-i].threshold}}% &lt;= {{availabilityColors[availabilityColors.length-i].threshold}}%</div>
             </ng-template>
-            <br> 
+
             <div class="average-legend" [ngStyle]="{'background-color': averageColor}">Average:
                 <span *ngIf="averageServiceAvailability >= 0"> {{averageServiceAvailability.toFixed(2)}}%</span>
                 <span *ngIf="averageServiceAvailability < 0"> ---</span>
@@ -77,7 +77,8 @@
                 <td style="color: var(--main-text-color)">Availability</td>
                 <ng-template ngFor let-availability [ngForOf]="requestedServiceAvailabilityList" let-i="index">
                     <td *ngIf="availability.percentage == -1" style="color: var(--windows-title-color)">NaN</td>
-                    <td *ngIf="availability.percentage != -1" [ngStyle]="{'background-color': getAvailabilityHexColorFromPerc(availability.percentage)}" style="color: var(--main-bg-color)">{{availability.percentage.toFixed(2)}}%</td>
+                    <td *ngIf="availability.percentage == 0" [ngStyle]="{'background-color': getAvailabilityHexColorFromPerc(availability.percentage)}" style="color: var(--main-bg-color)">{{availability.percentage.toFixed(2)}}%</td>
+                    <td *ngIf="availability.percentage > 0" [ngStyle]="{'background-color': getAvailabilityHexColorFromPerc(availability.percentage)}" style="color: var(--main-bg-color)">{{availability.percentage.toFixed(2)}}%</td>
                 </ng-template>
             </tr>
         </table>

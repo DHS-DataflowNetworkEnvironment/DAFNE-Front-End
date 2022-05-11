@@ -386,8 +386,11 @@ export class ServiceAvailabilityComponent implements OnInit {
           p.line(xCenter - chartXDim2 + (i + 1) * chartXDim / this.requestedDaysNumber, yCenter + chartYDim2 + 5, xCenter - chartXDim2 + (i + 1) * chartXDim / this.requestedDaysNumber, yCenter + chartYDim2);
 
           /* Bars */
-          p.rectMode(p.CORNER);          
-          if (this.requestedServiceAvailabilityList[i].percentage != -1) {
+          p.rectMode(p.CORNER);
+          if (this.requestedServiceAvailabilityList[i].percentage == 0) {
+            p.stroke(this.getAvailabilityIntsColorFromPerc(this.requestedServiceAvailabilityList[i].percentage));
+            p.line(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2, sectionXCenter + sectionXFilledDim2, yCenter + chartYDim2);
+          } else if (this.requestedServiceAvailabilityList[i].percentage > 0) {
             p.fill(this.getAvailabilityIntsColorFromPerc(this.requestedServiceAvailabilityList[i].percentage));
             p.noStroke();
             p.rect(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2, sectionXFilledDim, -((this.requestedServiceAvailabilityList[i].percentage < 0 ? 0 : this.requestedServiceAvailabilityList[i].percentage) * chartYDim / maxValue));
@@ -451,14 +454,13 @@ export class ServiceAvailabilityComponent implements OnInit {
                 p.fill(20);
                 p.rect(xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2*dayYDim + k * dayYDim, dayXDim, dayYDim);
                 p.noStroke();
-                p.fill(labelBackgroundColor);
+                p.fill(0,150);
                 p.rect(xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2*dayYDim + k * dayYDim - dayYDim/4.0, dayXDim / 1.2, dayYDim / 4, 5);
                 p.fill(200);
                 p.noStroke();
                 p.textSize(dateFontSize);
                 p.text(this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].date, xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2 * dayYDim + k * dayYDim + 1 - dayYDim/4.0);
                 p.fill(100);
-                p.textSize(textFontSize);
                 p.textSize(valueFontSize);
                 p.text("NaN", xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2 * dayYDim + k * dayYDim + 1 + dayYDim/5.5);
               }
@@ -468,19 +470,19 @@ export class ServiceAvailabilityComponent implements OnInit {
         for (var i = 0; i < 7; i++) {
           for (var k = 0; k < this.rowNumber; k++) {
             if ((i+k*7) >= this.weekdayShift && (i+k*7) < (this.weekdayShift + this.requestedDaysNumber)) {
-              if (this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].percentage != -1 ) {
+              if (this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].percentage >= 0 ) {
                 p.stroke(255);
                 p.fill(this.getAvailabilityIntsColorFromPerc(this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].percentage));
                 p.rect(xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2*dayYDim + k * dayYDim, dayXDim, dayYDim);
                 p.noStroke();
-                p.fill(0,100);
+                p.fill(0,150);
                 p.rect(xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2*dayYDim + k * dayYDim - dayYDim/4.0, dayXDim / 1.2, dayYDim / 4, 5);
                 p.fill(200);
                 p.noStroke();
                 p.textSize(dateFontSize);
                 p.text(this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].date, xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2 * dayYDim + k * dayYDim + 1 - dayYDim/4.0);
-                p.textSize(textFontSize);
                 p.textSize(valueFontSize);
+                p.fill(30);
                 p.text(this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].percentage.toFixed(2)+"%", xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2 * dayYDim + k * dayYDim + 1 + dayYDim/5.5);
               }
             }
@@ -520,6 +522,7 @@ export class ServiceAvailabilityComponent implements OnInit {
         return this.availabilityColors[i].color;
       }
     }
+    if (perc == 0) return this.availabilityColors[0].color;
     return "#000000";
   }
   getAvailabilityIntsColorFromPerc(perc: number) {
@@ -528,6 +531,7 @@ export class ServiceAvailabilityComponent implements OnInit {
         return this.rgbConvertToArray(this.availabilityColors[i].color);
       }
     }
+    if (perc == 0) return this.rgbConvertToArray(this.availabilityColors[0].color);
     return [0, 0, 0];
   }
 }
