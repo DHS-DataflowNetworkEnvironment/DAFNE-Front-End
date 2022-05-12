@@ -113,7 +113,7 @@
                         </div>
                         <div class="mb-1 ml-auto">
                             <label for="edit_service_type" class="form-label">Service type</label>
-                            <input type="text" class="form-control" id="edit_service_type" [value]="service.service_type" onkeydown="return false">
+                            <input type="text" class="form-control" id="edit_service_type" [(ngModel)]="service.service_type" name="edit_service_type" onkeydown="return false">
                             <small id="serviceTypeHelp" class="form-text">Please select a service type</small>
                             <i id="service-type-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
                             <ul class="dropdown-menu" aria-labelledby="service-type-dropdown">
@@ -126,7 +126,7 @@
                     <div class="input-group mb-1">
                         <div class="mb-1">
                             <label for="edit_service_username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="edit_service_username" [value]="service.username">
+                            <input type="text" class="form-control" id="edit_service_username" [(ngModel)]="service.username" name="edit_service_username">
                             <small id="usernameHelp" class="form-text">Length: 1 - 60 characters</small>
                         </div>
                         <div class="mb-1 ml-auto">
@@ -139,12 +139,12 @@
                     <div class="input-group mb-1">
                         <div class="mb-1">
                             <label for="edit_service_url" class="form-label">Service URL</label>
-                            <input type="text" class="form-control" id="edit_service_url" [value]="service.service_url">
+                            <input type="text" class="form-control" id="edit_service_url" [(ngModel)]="service.service_url" name="edit_service_url">
                             <small id="serviceUrlHelp" class="form-text">Length: 1 - 256 characters.<br>Invalid characters: , ; and SPACE</small>
                         </div>
                         <div class="mb-1 ml-auto">
                             <label for="edit_centre" class="form-label">Centre</label>
-                            <input type="text" class="form-control" id="edit_centre" [value]="service.centre" onkeydown="return false">
+                            <input type="text" class="form-control" id="edit_centre" [(ngModel)]="service.centre" name="edit_centre" onkeydown="return false">
                             <small id="centreHelp" class="form-text">Please select a centre</small>
                             <i id="centre-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
                             <ul class="dropdown-menu" aria-labelledby="centre-dropdown">

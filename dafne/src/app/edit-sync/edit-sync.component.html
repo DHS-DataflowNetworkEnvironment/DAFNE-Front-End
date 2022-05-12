@@ -193,25 +193,25 @@
                         </div>
                         <div class="mb-1 ml-auto">
                             <label for="edit_service_url_backend" class="form-label">Back-End URL</label>
-                            <input type="text" class="form-control" id="edit_service_url_backend" [value]="currentSync.serviceUrlBackend" onkeydown="return false" disabled>
+                            <input type="text" class="form-control" id="edit_service_url_backend" [(ngModel)]="currentSync.serviceUrlBackend" name="edit_service_url_backend" onkeydown="return false" disabled>
                         </div>
                     </div>
                     <div class="input-group mb-1">
                         <div class="mb-1">
                             <label for="edit_label" class="form-label">Label</label>
-                            <input type="text" class="form-control" id="edit_label" [value]="currentSync.label">
+                            <input type="text" class="form-control" id="edit_label" [(ngModel)]="currentSync.label" name="edit_label">
                             <small id="labelHelp" class="form-text">Length: 1 - 60 characters</small>
                         </div>
                         <div class="mb-1 ml-auto">
                             <label for="edit_service_url_sync" class="form-label">Service URL</label>
-                            <input type="text" class="form-control" id="edit_service_url_sync" [value]="currentSync.serviceUrl">
+                            <input type="text" class="form-control" id="edit_service_url_sync" [(ngModel)]="currentSync.serviceUrl" name="edit_service_url_sync">
                             <small id="serviceUrlSyncHelp" class="form-text">Length: 1 - 256 characters.<br>Invalid characters: , ; and SPACE</small>
                         </div>
                     </div>
                     <div class="input-group mb-1">
                         <div class="mb-1">
                             <label for="edit_sync_service_login" class="form-label">Service Login</label>
-                            <input type="text" class="form-control" id="edit_sync_service_login" [value]="currentSync.serviceLogin">
+                            <input type="text" class="form-control" id="edit_sync_service_login" [(ngModel)]="currentSync.serviceLogin" name="edit_sync_service_login">
                             <small id="serviceLoginHelp" class="form-text">Length: 1 - 60 characters</small>
                         </div>
                         <div class="mb-1 ml-auto">
@@ -224,12 +224,12 @@
                     <div class="input-group mb-1">
                         <div class="mb-1">
                             <label for="edit_schedule" class="form-label">Schedule</label>
-                            <input type="text" class="form-control" id="edit_schedule" [value]="currentSync.schedule">
+                            <input type="text" class="form-control" id="edit_schedule" [(ngModel)]="currentSync.schedule" name="edit_schedule">
                             <small id="scheduleHelp" class="form-text">Insert a valid CRON string.<br>Valid characters: 0-9 * , - / ? and SPACE</small>
                         </div>
                         <div class="mb-1 ml-auto copy_product_div">
                             <label for="edit_copy_product" class="form-label">Copy product</label>
-                            <input type="text" class="form-control" id="edit_copy_product" [value]="currentSync.copyProduct" onkeydown="return false">
+                            <input type="text" class="form-control" id="edit_copy_product" [(ngModel)]="currentSync.copyProduct" name="edit_copy_product" onkeydown="return false">
                             <i id="edit_copy_product-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
                                 <ul class="dropdown-menu" aria-labelledby="sync-dropdown">
                                     <li><a class="dropdown-item" (click)="editCopyProduct('true')">true</a></li>
@@ -240,12 +240,12 @@
                     <div class="input-group mb-1">
                         <div class="mb-1">
                             <label for="edit_page_size" class="form-label">Page size</label>
-                            <input type="text" class="form-control" id="edit_page_size" [value]="currentSync.pageSize">
+                            <input type="text" class="form-control" id="edit_page_size" [(ngModel)]="currentSync.pageSize" name="edit_page_size">
                             <small id="pageSizeHelp" class="form-text">Number: 1 to 199</small>
                         </div>
                         <div class="mb-1 ml-auto">
                             <label for="edit_request" class="form-label">Request</label>
-                            <input type="text" class="form-control" id="edit_request" [value]="currentSync.request" onkeydown="return false">
+                            <input type="text" class="form-control" id="edit_request" [(ngModel)]="currentSync.request" name="edit_request" onkeydown="return false">
                             <i id="edit_request-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
                                 <ul class="dropdown-menu" aria-labelledby="sync-dropdown">
                                     <li><a class="dropdown-item" (click)="setNewFormRequest('start')">start</a></li>
@@ -256,12 +256,12 @@
                     <div class="input-group mb-1">
                         <div class="mb-1">
                             <label for="edit_source_collection" class="form-label">Source collection</label>
-                            <input type="text" class="form-control" id="edit_source_collection" [value]="currentSync.sourceCollection">
+                            <input type="text" class="form-control" id="edit_source_collection" [(ngModel)]="currentSync.sourceCollection" name="edit_source_collection">
                             <small id="sourceCollectionHelp" class="form-text">Anything</small>
                         </div>
                         <div class="mb-1 ml-auto">
                             <label for="edit_target_collection" class="form-label">Target Collection</label>
-                            <input type="text" class="form-control" id="edit_target_collection" [value]="currentSync.targetCollection" onkeydown="return false">
+                            <input type="text" class="form-control" id="edit_target_collection" [(ngModel)]="currentSync.targetCollection" name="edit_target_collection" onkeydown="return false">
                             <i id="edit_target_collection-dropdown" class="fas fa-angle-down" data-bs-toggle="dropdown"></i>
                             <ul class="dropdown-menu" aria-labelledby="sync-dropdown">
                                 <li *ngFor="let collection of collectionsList[tempServiceUrlBackendNumber]; let k = index">
@@ -273,24 +273,24 @@
                     <div class="input-group mb-1">
                         <div class="mb-1">
                             <label for="edit_remote_incoming" class="form-label">Remote incoming</label>
-                            <input type="text" class="form-control" id="edit_remote_incoming" [value]="currentSync.remoteIncoming">
+                            <input type="text" class="form-control" id="edit_remote_incoming" [(ngModel)]="currentSync.remoteIncoming" name="edit_remote_incoming">
                             <small id="remoteIncomingHelp" class="form-text">Anything</small>
                         </div>
                         <div class="mb-1 ml-auto">
                             <label for="edit_last_creation_date" class="form-label">Last creation date</label>
-                            <input type="text" class="form-control" id="edit_last_creation_date" [value]="parseJsonDate(currentSync.lastCreationDate)">
+                            <input type="text" class="form-control" id="edit_last_creation_date" [(ngModel)]="lastCreationDateParsed" name="edit_last_creation_date">
                             <small id="lastCreationDateHelp" class="form-text">Insert a valid data string: YYYY-MM-DD<br>or YYYY-MM-DDTHH:MM:SS.mmm</small>
                         </div>
                     </div>
                     <div class="input-group mb-1">
                         <div class="mb-1">
                             <label for="edit_filter_param" class="form-label">Filter param</label>
-                            <input type="text" class="form-control" id="edit_filter_param" [value]="currentSync.filterParam">
+                            <input type="text" class="form-control" id="edit_filter_param" [(ngModel)]="currentSync.filterParam" name="edit_filter_param">
                             <small id="filterParamHelp" class="form-text">Anything</small>
                         </div>
                         <div class="mb-1 ml-auto">
                             <label for="edit_geo_filter" class="form-label">Geo filter</label>
-                            <input type="text" class="form-control" id="edit_geo_filter" [value]="currentSync.geoFilter">
+                            <input type="text" class="form-control" id="edit_geo_filter" [(ngModel)]="currentSync.geoFilter" name="edit_geo_filter">
                             <small id="geoFilterHelp" class="form-text">Anything</small>
                         </div>
                     </div>

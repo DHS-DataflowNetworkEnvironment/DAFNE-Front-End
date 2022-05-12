@@ -182,6 +182,13 @@ export class EditCentresComponent implements OnInit, OnDestroy {
   }
 
   public editCentre(id: number) {
+    let cleanInputs = document.querySelectorAll('#editCentreForm input.form-control');
+    cleanInputs.forEach((input) => {
+      if (input.className == "form-control invalid") {
+        input.className = "form-control";
+      }
+    });
+    this.tempCentre = new Centre();
     this.tempCentre.id = this.centreList.filter(a => a.id === id)[0].id;
     this.tempCentre.name = this.centreList.filter(a => a.id === id)[0].name;
     this.tempCentre.description = this.centreList.filter(a => a.id === id)[0].description;

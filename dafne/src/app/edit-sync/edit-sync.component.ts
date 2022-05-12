@@ -70,6 +70,8 @@ export class EditSyncComponent implements OnInit, OnDestroy {
     color: "#ffffff"
   };
 
+  public lastCreationDateParsed: string;
+
   constructor(
     public authenticationService: AuthenticationService,
     private router: Router,
@@ -351,7 +353,14 @@ export class EditSyncComponent implements OnInit, OnDestroy {
     return undefined;
   }
 
+  
   public editSynchronizer(id: number, service_url_backend: string) {
+    let cleanInputs = document.querySelectorAll('#editSyncForm input.form-control');
+    cleanInputs.forEach((input) => {
+      if (input.className == "form-control invalid") {
+        input.className = "form-control";
+      }
+    });
     this.tempServiceUrlBackendNumber = undefined;
     let tempSync: any;
     for (var i = 0; i < this.serviceUrlBackendList.length; i++) {
@@ -377,6 +386,7 @@ export class EditSyncComponent implements OnInit, OnDestroy {
     this.currentSync.lastCreationDate = tempSync.LastCreationDate;
     this.currentSync.filterParam = tempSync.FilterParam;
     this.currentSync.geoFilter = tempSync.GeoFilter;
+    this.lastCreationDateParsed = this.parseJsonDate(this.currentSync.lastCreationDate);
 
     var passwordEl = document.getElementById('edit_sync_service_password');
     (<HTMLInputElement>passwordEl).value = null;
