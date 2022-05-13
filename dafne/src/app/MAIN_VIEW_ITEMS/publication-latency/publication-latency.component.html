@@ -5,7 +5,7 @@
         <form id="filters-form">
             <div id="filters-form-row">
                 <div>
-                    <label class="form-label">Active Synchronizer:</label>
+                    <label class="form-label">Synchronizer:</label>
                     <select id="synchronizer-select" class="form-select" (change)="onFilterSyncChange($event)">
                         <option [value]="sync.Label" *ngFor="let sync of syncList">{{sync.Label}}</option>
                     </select>
