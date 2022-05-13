@@ -93,9 +93,7 @@ export class PublicationLatencyComponent implements OnInit {
           this.authenticationService.getSynchronizersV2().subscribe(
             (res: object) => {
               /* Sync List filtered for Cron == true */
-              this.syncList = [];
-              console.log("GET_SYNC_V2: " + JSON.stringify(res, null, 2));
-              
+              this.syncList = [];              
               for (var i = 0, j = 0; i < Object.keys(res).length; i++) {
                 var tempList = res[i].synchronizers;
                 this.syncList = this.syncList.concat(tempList);
@@ -104,7 +102,6 @@ export class PublicationLatencyComponent implements OnInit {
                 }
                 j = Object.keys(this.syncList).length;
               }
-              console.log("SyncList: " + JSON.stringify(this.syncList, null, 2));
               this.tempSelectedFilterSyncLabel = this.syncList[0].Label;
               this.authenticationService.getLatencyRollingPeriod().subscribe(
                 (res: any) => {
@@ -523,9 +520,9 @@ export class PublicationLatencyComponent implements OnInit {
         let barGap = sectionXFilledDim / barGapScale;
 
         /* Threshold Lines */
-        for (var i = 0; i < this.latencyColors.length; i++) {
+        for (var i = 0; i < this.latencyColors.length - 1; i++) {
           p.noFill();
-          p.stroke(this.rgbConvertToArray(this.latencyColors[i].color));
+          p.stroke(this.rgbConvertToArray(this.latencyColors[i+1].color));
           if (this.latencyColors[i].threshold * chartYDim / maxValue <= chartYDim) {
             p.line(xCenter - chartXDim2, yCenter + chartYDim2 - this.latencyColors[i].threshold * chartYDim / maxValue, xCenter + chartXDim2, yCenter + chartYDim2 - this.latencyColors[i].threshold * chartYDim / maxValue);
           }
@@ -637,9 +634,9 @@ export class PublicationLatencyComponent implements OnInit {
         let barGap = sectionXFilledDim / barGapScale;
 
         /* Threshold Lines */
-        for (var i = 0; i < this.latencyColors.length; i++) {
+        for (var i = 0; i < this.latencyColors.length - 1; i++) {
           p.noFill();
-          p.stroke(this.rgbConvertToArray(this.latencyColors[i].color));
+          p.stroke(this.rgbConvertToArray(this.latencyColors[i + 1].color));
           if (this.latencyColors[i].threshold * chartYDim / maxValue <= chartYDim) {
             p.line(xCenter - chartXDim2, yCenter + chartYDim2 - this.latencyColors[i].threshold * chartYDim / maxValue, xCenter + chartXDim2, yCenter + chartYDim2 - this.latencyColors[i].threshold * chartYDim / maxValue);
           }
