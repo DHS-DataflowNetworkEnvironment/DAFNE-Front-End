@@ -584,13 +584,12 @@ export class PublicationLatencyComponent implements OnInit {
           
           p.noStroke();
           p.rect(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2, sectionXFilledDim, -((this.requestedPublicationLatencyList[i].average_latency < 0 ? 0 : this.requestedPublicationLatencyList[i].average_latency * chartYDim / maxValue)));
-          
+
           if (p.mouseX > sectionXCenter - (chartXDim / this.requestedDaysNumber)/2 + tx && p.mouseX < sectionXCenter + (chartXDim / this.requestedDaysNumber)/2 + tx
               && p.mouseY > yCenter - chartYDim2 + ty && p.mouseY < yCenter + chartYDim2 + sinOfAngle + 2*dateFontSize + ty) {
             p.stroke(230);
             p.fill(255, 30);
             p.rect(sectionXCenter - sectionXFilledDim2, yCenter - chartYDim2, sectionXFilledDim, chartYDim + sinOfAngle + 2*dateFontSize);
-            this.mouseIsOnList = Array.apply(false, Array(30)).map(function () {});
             this.mouseIsOnList[i] = true;
           }
         } 
@@ -698,7 +697,6 @@ export class PublicationLatencyComponent implements OnInit {
             p.stroke(230);
             p.fill(255, 30);
             p.rect(sectionXCenter - sectionXFilledDim2, yCenter - chartYDim2, sectionXFilledDim, chartYDim + sinOfAngle + 2*dateFontSize);
-            this.mouseIsOnList = Array.apply(false, Array(30)).map(function () {});
             this.mouseIsOnList[i] = true;
           }
 
@@ -754,7 +752,7 @@ export class PublicationLatencyComponent implements OnInit {
           }
         }
 
-        for (var i = 0; i < this.latencyDetailNumber; i++) {
+        for (var i = 0; i < this.latencyDetailNumber; ( this.latencyDetailNumber > 100 ? (i = i + Math.round(this.latencyDetailNumber / 100 + 1)) : i++)) {
           let sectionXCenter = xCenter - chartXDim2 + chartXDim / (2 * this.latencyDetailNumber) + i * chartXDim / this.latencyDetailNumber;
 
           /* xAxis Text */
@@ -787,6 +785,9 @@ export class PublicationLatencyComponent implements OnInit {
           }
           p.text(tempText, 0, 0);
           p.pop();
+        }
+        for (var i = 0; i < this.latencyDetailNumber; i++) {
+          let sectionXCenter = xCenter - chartXDim2 + chartXDim / (2 * this.latencyDetailNumber) + i * chartXDim / this.latencyDetailNumber;
 
           p.noFill();
           p.stroke(lineColor);
@@ -807,6 +808,7 @@ export class PublicationLatencyComponent implements OnInit {
           p.noStroke();
           p.rect(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2, sectionXFilledDim, -((this.publicationDetailLatencyList[i].latency_be < 0 ? 0 : this.publicationDetailLatencyList[i].latency_be) * chartYDim / maxValue));
         } 
+
         /* Scheme */
         p.rectMode(p.CENTER);
         p.textAlign(p.RIGHT, p.CENTER);
@@ -872,11 +874,18 @@ export class PublicationLatencyComponent implements OnInit {
           p.noFill();
           if (i == 0) p.curveVertex(xpoint[i], ypoint[i]);
           p.curveVertex(xpoint[i], ypoint[i]);          
-          if (i == this.latencyDetailNumber - 1) p.curveVertex(xpoint[i], ypoint[i]);        
+          if (i == this.latencyDetailNumber - 1) p.curveVertex(xpoint[i], ypoint[i]);
         }
         p.endShape();
 
         for (var i = 0; i < this.latencyDetailNumber; i++) {
+          let sectionXCenter = xCenter - chartXDim2 + chartXDim / (2 * this.latencyDetailNumber) + i * chartXDim / this.latencyDetailNumber;
+          /* xAxis Lines */
+          p.stroke(lineColor);
+          p.line(xCenter - chartXDim2 + (i + 1) * chartXDim / this.latencyDetailNumber, yCenter + chartYDim2 + 5, xCenter - chartXDim2 + (i + 1) * chartXDim / this.latencyDetailNumber, yCenter + chartYDim2);
+        }
+
+        for (var i = 0; i < this.latencyDetailNumber; ( this.latencyDetailNumber > 100 ? (i = i + Math.round(this.latencyDetailNumber / 100 + 1)) : i++)) {
           let sectionXCenter = xCenter - chartXDim2 + chartXDim / (2 * this.latencyDetailNumber) + i * chartXDim / this.latencyDetailNumber;
           /* Rotate Dates */
           let tempText = this.publicationDetailLatencyList[i].timezone.slice(11, 16);
@@ -907,10 +916,6 @@ export class PublicationLatencyComponent implements OnInit {
           }
           p.text(tempText, 0, 0);
           p.pop();
-
-          /* xAxis Lines */
-          p.stroke(lineColor);
-          p.line(xCenter - chartXDim2 + (i + 1) * chartXDim / this.latencyDetailNumber, yCenter + chartYDim2 + 5, xCenter - chartXDim2 + (i + 1) * chartXDim / this.latencyDetailNumber, yCenter + chartYDim2);
         }
 
         /* Scheme */
