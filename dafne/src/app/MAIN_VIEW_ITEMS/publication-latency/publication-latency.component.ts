@@ -644,8 +644,6 @@ export class PublicationLatencyComponent implements OnInit {
 
         p.curveTightness(1.0);
         p.beginShape();
-        p.curveVertex(xCenter - chartXDim2 + sectionXFilledDim2, yCenter + chartYDim2);
-        p.curveVertex(xCenter - chartXDim2 + sectionXFilledDim2, yCenter + chartYDim2);
         p.rectMode(p.CORNER);
 
         for (var i = 0; i < this.requestedDaysNumber; i++) {
@@ -654,10 +652,15 @@ export class PublicationLatencyComponent implements OnInit {
           ypoint[i] = yCenter + chartYDim2 -((this.requestedPublicationLatencyList[i].average_latency < 0 ? 0 : this.requestedPublicationLatencyList[i].average_latency) * chartYDim / maxValue);
           
           /* Draw Curve */
-          p.stroke(255,255,0);
-          p.fill(255, 255, 255, 20);
+          p.stroke(0,255,255);
+          if (i == 0) p.curveVertex(xpoint[i], ypoint[i]);
           p.curveVertex(xpoint[i], ypoint[i]);          
+          if (i == this.requestedDaysNumber - 1) p.curveVertex(xpoint[i], ypoint[i]);
+        }
+        p.endShape();
 
+        for (var i = 0; i < this.requestedDaysNumber; i++) {
+          let sectionXCenter = xCenter - chartXDim2 + chartXDim / (2 * this.requestedDaysNumber) + i * chartXDim / this.requestedDaysNumber;
           /* Rotate Dates */
           let tempText = this.requestedPublicationLatencyList[i].day;
           let tempRadium = (sectionXFilledDim - (2 * barGap) - dateFontSize);
@@ -704,9 +707,6 @@ export class PublicationLatencyComponent implements OnInit {
           p.stroke(lineColor);
           p.line(xCenter - chartXDim2 + (i + 1) * chartXDim / this.requestedDaysNumber, yCenter + chartYDim2 + 5, xCenter - chartXDim2 + (i + 1) * chartXDim / this.requestedDaysNumber, yCenter + chartYDim2);
         }
-        p.curveVertex(xCenter + chartXDim2 - sectionXFilledDim2, yCenter + chartYDim2);
-        p.curveVertex(xCenter + chartXDim2 - sectionXFilledDim2, yCenter + chartYDim2); 
-        p.endShape();
 
         /* Scheme */
         p.textAlign(p.RIGHT, p.CENTER);
@@ -859,9 +859,7 @@ export class PublicationLatencyComponent implements OnInit {
         p.curveTightness(1.0);
         p.beginShape();
         p.stroke(255,255,0);
-        p.fill(255, 255, 255, 20);
-        p.curveVertex(xCenter - chartXDim2 + sectionXFilledDim2, yCenter + chartYDim2);
-        p.curveVertex(xCenter - chartXDim2 + sectionXFilledDim2, yCenter + chartYDim2);
+        p.noFill();
         p.rectMode(p.CORNER);
 
         for (var i = 0; i < this.latencyDetailNumber; i++) {
@@ -870,10 +868,16 @@ export class PublicationLatencyComponent implements OnInit {
           ypoint[i] = yCenter + chartYDim2 -((this.publicationDetailLatencyList[i].latency_be < 0 ? 0 : this.publicationDetailLatencyList[i].latency_be) * chartYDim / maxValue);
           
           /* Draw Curve */
-          p.stroke(255,255,0);
-          p.fill(255, 255, 255, 20);
+          p.stroke(0,255,255);
+          p.noFill();
+          if (i == 0) p.curveVertex(xpoint[i], ypoint[i]);
           p.curveVertex(xpoint[i], ypoint[i]);          
+          if (i == this.latencyDetailNumber - 1) p.curveVertex(xpoint[i], ypoint[i]);        
+        }
+        p.endShape();
 
+        for (var i = 0; i < this.latencyDetailNumber; i++) {
+          let sectionXCenter = xCenter - chartXDim2 + chartXDim / (2 * this.latencyDetailNumber) + i * chartXDim / this.latencyDetailNumber;
           /* Rotate Dates */
           let tempText = this.publicationDetailLatencyList[i].timezone.slice(11, 16);
           let tempRadium = (sectionXFilledDim - (2 * barGap) - dateFontSize);
@@ -908,9 +912,6 @@ export class PublicationLatencyComponent implements OnInit {
           p.stroke(lineColor);
           p.line(xCenter - chartXDim2 + (i + 1) * chartXDim / this.latencyDetailNumber, yCenter + chartYDim2 + 5, xCenter - chartXDim2 + (i + 1) * chartXDim / this.latencyDetailNumber, yCenter + chartYDim2);
         }
-        p.curveVertex(xCenter + chartXDim2 - sectionXFilledDim2, yCenter + chartYDim2);
-        p.curveVertex(xCenter + chartXDim2 - sectionXFilledDim2, yCenter + chartYDim2); 
-        p.endShape();
 
         /* Scheme */
         p.textAlign(p.RIGHT, p.CENTER);
