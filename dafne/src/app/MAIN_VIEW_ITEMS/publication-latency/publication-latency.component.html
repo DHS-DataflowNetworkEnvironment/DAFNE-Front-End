@@ -70,8 +70,8 @@
                     <div *ngIf="latency.source == 'FE'" style="color: var(--main-bg-color); font-size: 0.6rem;"><br></div>
                     <div *ngIf="latency.source == 'BE'" style="color: lightsalmon; font-size: 0.6rem;">( BE )</div>
                     <div *ngIf="latency.source == 'FE+BE'" style="color: lightgoldenrodyellow; font-size: 0.6rem;">( FE+BE )</div>
-                    <div *ngIf="latency.source == 'null'" style="color: grey; font-size: 0.6rem;">NaN</div>
-                    <div *ngIf="latency.source == ''" style="color: grey; font-size: 0.6rem;">NaN</div>
+                    <div *ngIf="latency.source == 'null'" style="color: grey; font-size: 0.6rem;"><br></div>
+                    <div *ngIf="latency.source == ''" style="color: grey; font-size: 0.6rem;"><br></div>
                 </th>
             </thead>
             <tr *ngIf="showDetailLatency == false">
@@ -89,7 +89,7 @@
                 <th *ngFor="let latency of publicationDetailLatencyList; let i = index" style="padding: 0 0.5rem;">{{latency.timezone.slice(11, 16)}}
                     <div *ngIf="latency.source == 'FE'" style="color: var(--main-bg-color); font-size: 0.6rem;"><br></div>
                     <div *ngIf="latency.source == 'BE'" style="color: lightsalmon; font-size: 0.6rem;">( BE )</div>
-                    <div *ngIf="latency.source == 'null'" style="color: grey; font-size: 0.6rem;">NaN</div>
+                    <div *ngIf="latency.source == 'null'" style="color: grey; font-size: 0.6rem;"><br></div>
                 </th>
             </thead>
             <tr *ngIf="showDetailLatency == true">
