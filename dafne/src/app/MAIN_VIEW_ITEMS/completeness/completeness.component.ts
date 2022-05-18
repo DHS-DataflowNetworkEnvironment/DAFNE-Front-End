@@ -477,8 +477,12 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
       
       function applyScale(s) {
         sf = sf * s;
-        tx = p.mouseX * (1-s) + tx * s;
-        ty = p.mouseY * (1-s) + ty * s;
+        if (sf < 0.65) {
+          sf = 0.65;
+        } else {
+          tx = p.mouseX * (1-s) + tx * s;
+          ty = p.mouseY * (1-s) + ty * s;
+        }        
       }
 
       function wheelZoom(e) {

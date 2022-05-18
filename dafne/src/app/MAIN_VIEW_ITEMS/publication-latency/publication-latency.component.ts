@@ -473,8 +473,12 @@ export class PublicationLatencyComponent implements OnInit {
 
       function applyScale(s) {
         sf = sf * s;
-        tx = p.mouseX * (1-s) + tx * s;
-        ty = p.mouseY * (1-s) + ty * s;
+        if (sf < 0.65) {
+          sf = 0.65;
+        } else {
+          tx = p.mouseX * (1-s) + tx * s;
+          ty = p.mouseY * (1-s) + ty * s;
+        }        
       }
 
       function wheelZoom(e) {
@@ -752,7 +756,8 @@ export class PublicationLatencyComponent implements OnInit {
           }
         }
 
-        for (var i = 0; i < this.latencyDetailNumber; ( this.latencyDetailNumber > 100 ? (i = i + Math.round(this.latencyDetailNumber / 100 + 1)) : i++)) {
+        let datePrintAddendum = Math.ceil(((this.latencyDetailNumber * 2) / 100) * (1/sf));
+        for (var i = 0; i < this.latencyDetailNumber; i = i + datePrintAddendum) { 
           let sectionXCenter = xCenter - chartXDim2 + chartXDim / (2 * this.latencyDetailNumber) + i * chartXDim / this.latencyDetailNumber;
 
           /* xAxis Text */
@@ -885,7 +890,8 @@ export class PublicationLatencyComponent implements OnInit {
           p.line(xCenter - chartXDim2 + (i + 1) * chartXDim / this.latencyDetailNumber, yCenter + chartYDim2 + 5, xCenter - chartXDim2 + (i + 1) * chartXDim / this.latencyDetailNumber, yCenter + chartYDim2);
         }
 
-        for (var i = 0; i < this.latencyDetailNumber; ( this.latencyDetailNumber > 100 ? (i = i + Math.round(this.latencyDetailNumber / 100 + 1)) : i++)) {
+        let datePrintAddendum = Math.ceil(((this.latencyDetailNumber * 2) / 100) * (1/sf));
+        for (var i = 0; i < this.latencyDetailNumber; i = i + datePrintAddendum) { 
           let sectionXCenter = xCenter - chartXDim2 + chartXDim / (2 * this.latencyDetailNumber) + i * chartXDim / this.latencyDetailNumber;
           /* Rotate Dates */
           let tempText = this.publicationDetailLatencyList[i].timezone.slice(11, 16);
