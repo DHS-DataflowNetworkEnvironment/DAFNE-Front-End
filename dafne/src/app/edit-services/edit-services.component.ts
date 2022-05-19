@@ -275,9 +275,7 @@ export class EditServicesComponent implements OnInit, OnDestroy {
   public editService(id: number) {
     let cleanInputs = document.querySelectorAll('#editServiceForm input.form-control');
     cleanInputs.forEach((input) => {
-      if (input.className == "form-control invalid") {
-        input.className = "form-control";
-      }
+      input.className = "form-control";
     });
     this.service.id = this.serviceList.filter(a => a.id === id)[0].id;
     this.service.username = this.serviceList.filter(a => a.id === id)[0].username;

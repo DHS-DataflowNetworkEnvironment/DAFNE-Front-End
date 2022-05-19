@@ -357,9 +357,7 @@ export class EditSyncComponent implements OnInit, OnDestroy {
   public editSynchronizer(id: number, service_url_backend: string) {
     let cleanInputs = document.querySelectorAll('#editSyncForm input.form-control');
     cleanInputs.forEach((input) => {
-      if (input.className == "form-control invalid") {
-        input.className = "form-control";
-      }
+      input.className = "form-control";
     });
     this.tempServiceUrlBackendNumber = undefined;
     let tempSync: any;
