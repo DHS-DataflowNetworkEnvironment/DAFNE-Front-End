@@ -748,9 +748,9 @@ export class PublicationLatencyComponent implements OnInit {
         let barGap = sectionXFilledDim / barGapScale;
 
         /* Threshold Lines */
-        for (var i = 0; i < this.latencyColors.length; i++) {
+        for (var i = 0; i < this.latencyColors.length - 1; i++) {
           p.noFill();
-          p.stroke(this.rgbConvertToArray(this.latencyColors[i].color));
+          p.stroke(this.rgbConvertToArray(this.latencyColors[i + 1].color));
           if (this.latencyColors[i].threshold * chartYDim / maxValue <= chartYDim) {
             p.line(xCenter - chartXDim2, yCenter + chartYDim2 - this.latencyColors[i].threshold * chartYDim / maxValue, xCenter + chartXDim2, yCenter + chartYDim2 - this.latencyColors[i].threshold * chartYDim / maxValue);
           }
@@ -855,9 +855,9 @@ export class PublicationLatencyComponent implements OnInit {
         let barGap = sectionXFilledDim / barGapScale;
 
         /* Threshold Lines */
-        for (var i = 0; i < this.latencyColors.length; i++) {
+        for (var i = 0; i < this.latencyColors.length - 1; i++) {
           p.noFill();
-          p.stroke(this.rgbConvertToArray(this.latencyColors[i].color));
+          p.stroke(this.rgbConvertToArray(this.latencyColors[i + 1].color));
           if (this.latencyColors[i].threshold * chartYDim / maxValue <= chartYDim) {
             p.line(xCenter - chartXDim2, yCenter + chartYDim2 - this.latencyColors[i].threshold * chartYDim / maxValue, xCenter + chartXDim2, yCenter + chartYDim2 - this.latencyColors[i].threshold * chartYDim / maxValue);
           }
