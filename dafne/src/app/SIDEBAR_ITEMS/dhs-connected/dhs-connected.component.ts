@@ -1,19 +1,33 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AuthenticationService } from '../../services/authentication.service';
+import { MessageService } from '../../services/message.service';
 
 @Component({
   selector: 'app-dhs-connected',
   templateUrl: './dhs-connected.component.html',
   styleUrls: ['./dhs-connected.component.css']
 })
-export class DhsConnectedComponent implements OnInit {
-  
+export class DhsConnectedComponent implements OnInit, OnDestroy {
+  private autorefreshSubscription;
   public numOfDhsConnected;
   private localId: number;  
-  constructor(private authenticationService: AuthenticationService) { }
+  constructor(
+    private authenticationService: AuthenticationService,
+    private messageService: MessageService
+  ) { 
+    this.autorefreshSubscription = this.messageService.invokeAutoRefresh.subscribe(() => {
+      this.ngOnInit();
+    });
+  }
 
   ngOnInit(): void {
     this.getDHSConnected();
+  }
+
+  ngOnDestroy(): void {
+    if (this.autorefreshSubscription != undefined) {
+      this.autorefreshSubscription.unsubscribe();
+    }
   }
 
   getDHSConnected():any {

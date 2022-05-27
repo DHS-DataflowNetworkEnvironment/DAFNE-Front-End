@@ -1,0 +1,86 @@
+<div id="chart-title">Service Availability</div>
+<div id="main-column-container">
+    <!-- Filter header -->
+    <div id="filters-form-container">
+        <form id="filters-form">
+            <div id="filters-form-row">
+                <div class="date-picker">
+                    <label class="form-label">Start Date:</label>
+                    <dp-date-picker class="" theme="dp-material" id="filter-start-date" name="filter-start-date"
+                        [(ngModel)]="startDate" (ngModelChange)="onStartDateChanged($event)" [config]="startDatePickerConfig" placeholder="YYYY-MM-DD">
+                    </dp-date-picker>
+                </div>
+                <div class="date-picker">
+                    <label class="form-label">Stop Date:</label>
+                    <dp-date-picker class="" theme="dp-material" id="filter-stop-date" name="filter-stop-date"
+                        [(ngModel)]="stopDate" (ngModelChange)="onStopDateChanged($event)" [config]="stopDatePickerConfig" placeholder="YYYY-MM-DD">
+                    </dp-date-picker>
+                </div>
+                <button type="submit" class="btn btn-primary col-1" id="filter-submit-button" (click)="onFilterSubmit()">Filter</button>
+            </div>
+        </form>
+    </div>
+    <div id="main-row-container">
+        <!-- Charts -->
+        <div id="p5ServiceAvailabilityCanvas-column-div">
+            <div id="p5ServiceAvailabilityCanvas"></div>
+            <i class="fa fa-grip-lines" id="table-toggle-button" aria-hidden="false" (click)="toggleTable()"></i>
+        </div>
+        <!-- Selectors -->
+        <section id="selectors-container">
+            <h2 id="buttons-title">CHART</h2>
+            <button (click)="chartChangeTo('Bar Chart')">Bar Chart</button>
+            <button (click)="chartChangeTo('Calendar Chart')">Calendar Chart</button>
+
+            <h2 id="legend-title">LEGEND</h2>
+            <ng-template ngFor let-color [ngForOf]="availabilityColors" let-i="index">
+                <div *ngIf="i>0" class="color-threshold" [ngStyle]="{'background-color': availabilityColors[availabilityColors.length-1-i].color}">&gt;<span *ngIf="i==availabilityColors.length - 1">=</span> {{availabilityColors[availabilityColors.length-1-i].threshold}}% &lt;= {{availabilityColors[availabilityColors.length-i].threshold}}%</div>
+            </ng-template>
+
+            <div class="average-legend" [ngStyle]="{'background-color': averageColor}">Average:
+                <span *ngIf="averageServiceAvailability >= 0"> {{averageServiceAvailability.toFixed(2)}}%</span>
+                <span *ngIf="averageServiceAvailability < 0"> ---</span>
+            </div>
+        </section>
+    </div>
+</div>
+
+<!-- Data Table -->
+<div class="data-table-container" id="data-table-container">
+    <div id="export-div">
+        <label for="export-button">Click to export data in csv format</label>
+        <button id="export-button" (click)="saveAsCSV()">Export</button>
+    </div>
+    <div id="table-div">
+        <table id="data-table">
+            <thead>
+                <th style="color: white">{{localCentre.name}}</th>
+                <ng-template ngFor let-availability [ngForOf]="requestedServiceAvailabilityList" let-i="index">
+                    <th style="padding: 0 0.5rem;">{{availability.date}}</th>
+                </ng-template>
+            </thead>
+            <tr>
+                <td style="color: var(--main-text-color)">TotalRequests</td>
+                <ng-template ngFor let-availability [ngForOf]="requestedServiceAvailabilityList" let-i="index">
+                    <td *ngIf="availability.percentage == -1" style="color: var(--windows-title-color)">NaN</td>
+                    <td *ngIf="availability.percentage != -1" style="color: var(--main-text-color)">{{availability.totalRequests}}</td>
+                </ng-template>
+            </tr>
+            <tr>
+                <td class="first-column" style="color: var(--main-text-color)">SuccessResponses</td>
+                <ng-template ngFor let-availability [ngForOf]="requestedServiceAvailabilityList" let-i="index">
+                    <td *ngIf="availability.percentage == -1" style="color: var(--windows-title-color)">NaN</td>
+                    <td *ngIf="availability.percentage != -1" style="color: var(--main-text-color)">{{availability.successResponses}}</td>
+                </ng-template>
+            </tr>
+            <tr>
+                <td style="color: var(--main-text-color)">Availability</td>
+                <ng-template ngFor let-availability [ngForOf]="requestedServiceAvailabilityList" let-i="index">
+                    <td *ngIf="availability.percentage == -1" style="color: var(--windows-title-color)">NaN</td>
+                    <td *ngIf="availability.percentage == 0" [ngStyle]="{'background-color': getAvailabilityHexColorFromPerc(availability.percentage)}" style="color: var(--main-bg-color)">{{availability.percentage.toFixed(2)}}%</td>
+                    <td *ngIf="availability.percentage > 0" [ngStyle]="{'background-color': getAvailabilityHexColorFromPerc(availability.percentage)}" style="color: var(--main-bg-color)">{{availability.percentage.toFixed(2)}}%</td>
+                </ng-template>
+            </tr>
+        </table>
+    </div>
+</div>

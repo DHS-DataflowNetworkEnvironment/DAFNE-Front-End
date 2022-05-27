@@ -14,8 +14,9 @@ import { MessageService } from '../../services/message.service';
   styleUrls: ['./network-view.component.css']
 })
 export class NetworkViewComponent implements AfterViewInit, OnDestroy {
-  navigationSubscription;
-  private pageRefreshed: boolean = false;
+  private autorefreshSubscription;
+  private navigationSubscription;
+  private pageRefreshed: boolean = true;
   public mapTitle = 'Network View - Active Data Sources';
   private mapType = 'homeView';
   private mapTypePrec = 'homeView';
@@ -41,12 +42,17 @@ export class NetworkViewComponent implements AfterViewInit, OnDestroy {
   ) {
     this.navigationSubscription = this.router.events.subscribe((e: any) => {
       if (e instanceof NavigationEnd) {
-        //console.log("PAGE REFRESHED: " + this.pageRefreshed);
         if (this.pageRefreshed == false) {
           this.pageRefreshed = true;
-          //console.log("REFRESHING NETWORK VIEW PAGE");
-          this.ngOnInit_();
+          this.ngOnInit();
         }
+      }
+    });
+
+    this.autorefreshSubscription = this.messageService.invokeAutoRefresh.subscribe(() => {    
+      if (this.pageRefreshed == false) {
+        this.pageRefreshed = true;
+        this.ngOnInit();
       }
     });
   }
@@ -73,16 +79,16 @@ export class NetworkViewComponent implements AfterViewInit, OnDestroy {
     place: 'assets/icons/place_black_48dp.svg'
   };
 
-  ngOnInit_(): any {
-    if (this.sub) {
+  ngOnInit(): any {
+    if (this.sub != undefined) {
       this.sub.unsubscribe();
     }
+
+    this.messageService.showSpinner(true);
     this.sub = this.activatedroute.paramMap.subscribe(params => {
       var tempMapType = params.get('mapType');
       this.mapType = (tempMapType != null) ? tempMapType : 'homeView';
-      //console.log("MAPTYPE: " + this.mapType + " - PREC: " + this.mapTypePrec);
       if (this.mapType != this.mapTypePrec) {
-        //console.log("MAPTYPE Not equals..");
       }
       this.mapTypePrec = this.mapType;
       if (this.mapType == 'homeView') {
@@ -113,19 +119,19 @@ export class NetworkViewComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // avoid memory leaks here by cleaning up after ourselves. If we  
-    // don't then we will continue to run our initialiseInvites()   
-    // method on every navigationEnd event.
-    if (this.navigationSubscription) {
+    if (this.navigationSubscription != undefined) {
       this.navigationSubscription.unsubscribe();
     }
-    if (this.sub) {
+    if (this.sub != undefined) {
       this.sub.unsubscribe();
+    }
+    if (this.autorefreshSubscription != undefined) {
+      this.autorefreshSubscription.unsubscribe();
     }
   }
 
   refreshPage() {
-    this.router.navigate(['/dafne', { outlets: { centralBodyRouter: ['network-component', this.mapType]}}], { skipLocationChange: true });
+    this.router.navigate(['/gui', { outlets: { centralBodyRouter: ['network-component', this.mapType]}}], { skipLocationChange: true });
   }
 
   windowResize() {
@@ -175,7 +181,6 @@ export class NetworkViewComponent implements AfterViewInit, OnDestroy {
         this.allCentreList.sort(this.getSortOrder("id"));
         this.checkLatLonPos(this.allCentreList);
 
-        //console.log("LOCAL_ID: " + this.localId);
         this.authenticationService.getMapDataSourcesInfo(this.localId).subscribe(
           (res: object) => {
             this.data_source = res;
@@ -213,12 +218,9 @@ export class NetworkViewComponent implements AfterViewInit, OnDestroy {
         this.allCentreList.sort(this.getSortOrder("id"));
         this.checkLatLonPos(this.allCentreList);
 
-        //console.log("LOCAL_ID: " + this.localId);
         this.authenticationService.getMapDHSConnected(this.localId).subscribe(
           (res: object) => {
             this.data_source = res;
-            //console.log("DATA SOURCE: " + JSON.stringify(this.data_source, null, 2));
-
             if (Object.values(res).filter((x) => x.local === true)[0]) {
               this.localCentre = Object.values(res).filter((x) => x.local === true)[0];
             } else {
@@ -238,17 +240,13 @@ export class NetworkViewComponent implements AfterViewInit, OnDestroy {
   }
 
   checkLatLonPos(list) {
-    /* Check if two centres are close and chenge label anchor conseguently */
+    /* Check if two centres are close and change label anchor consequently */
     let latitudeWindowCheck: number = 0.5;
     let longitudeWindowCheck: number = 10.0;
     for (var i = 0; i < list.length; i++) {
-      //console.log("list " + i + " Latitude: " + list[i].latitude);
-      //console.log("list " + i + " Longitude: " + list[i].longitude);
       if (list[i].hasOwnProperty('textAnchor') == false) {
         list[i]['textAnchor'] = 'end';
-        //console.log("ADDED LIST " + i + " 'textAnchor' property, and set to: " + list[i].textAnchor);
       } else {
-        //console.log("LIST " + i + " already has 'textAnchor' property, set to: " + list[i].textAnchor);
       }
       for (var k = 0; k < i; k++) {
         if (
@@ -256,7 +254,6 @@ export class NetworkViewComponent implements AfterViewInit, OnDestroy {
           list[i].longitude - list[k].longitude < longitudeWindowCheck
         ) {
           list[i].textAnchor = 'start';
-          //console.log("LIST " + i + " CHANGED 'textAnchor' property, set to: " + list[i].textAnchor);
         }
       }
     }
@@ -293,7 +290,7 @@ export class NetworkViewComponent implements AfterViewInit, OnDestroy {
     (Mapboxgl as any).accessToken = environment.mapboxKey;
     this.map = new Mapboxgl.Map({
       interactive: true,
-      container: 'map-content', // 'map' // container ID
+      container: 'map-content', // container ID
       style: 'mapbox://styles/alia-space/ckv8beuxo066514s0n5zoe2xa',
       center: [this.INITIAL_VIEW_STATE.longitude, this.INITIAL_VIEW_STATE.latitude],
       zoom: this.INITIAL_VIEW_STATE.zoom,
@@ -312,7 +309,7 @@ export class NetworkViewComponent implements AfterViewInit, OnDestroy {
       id: 'icon-layer',
       data: this.allCentreList,
       pickable: true,
-      billboard: false, // false = flat on terrain, true = vertical
+      billboard: true, // false = flat on terrain, true = vertical
       getIcon: d => ({
         url: this.ICON_MAPPING[d.icon],
         width: 64,
@@ -365,41 +362,9 @@ export class NetworkViewComponent implements AfterViewInit, OnDestroy {
       this.map.addLayer(iconLayer);
       this.map.addLayer(textLayer);
       this.showArcs ? this.map.addLayer(arcLayer) : {};
-      //this.map.addControl(nav, 'top-right');
+      /* uncomment to show nav controls */
+      // this.map.addControl(nav, 'top-right');
 
-
-      /* TODO: Hover on map! */
-      /* const popup = new Mapboxgl.Popup({
-        closeButton: false,
-        closeOnClick: false
-      });
-  
-      this.map.on('mouseenter', 'icon-layer', (e) => {
-        // Change the cursor style as a UI indicator.
-        this.map.getCanvas().style.cursor = 'pointer';
-         
-        // Copy coordinates array.
-        const coordinates = e.features[0].properties.coordinates.slice();
-        const description = e.features[0].properties.description;
-        //const coordinates: [number, number] = [this.localCentre.longitude, this.localCentre.latitude];
-        //const description = "This is a Nice PopUp!";
-         
-        // Ensure that if the map is zoomed out such that multiple
-        // copies of the feature are visible, the popup appears
-        // over the copy being pointed to.
-        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-        }
-         
-        // Populate the popup and set its coordinates
-        // based on the feature found.
-        popup.setLngLat(coordinates).setHTML(description).addTo(this.map);
-      });
-         
-      this.map.on('mouseleave', 'icon-layer', () => {
-        this.map.getCanvas().style.cursor = '';
-        popup.remove();
-      }); */
       this.pageRefreshed = false;
       if (this.sub) {
         this.sub.unsubscribe();
@@ -407,7 +372,6 @@ export class NetworkViewComponent implements AfterViewInit, OnDestroy {
     });
 
     this.map.on('resize', () => {
-      /* console.log('A resize event occurred.'); */
     });
     
   }

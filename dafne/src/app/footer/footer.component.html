@@ -3,6 +3,5 @@
 <img id="serco-logo" class="ml-auto" src="assets/images/logo-serco-grey_cut.png" alt="serco logo">
 <img id="alia-logo" src="assets/images/logo_alia_white.png" alt="alia logo">
 <div id="software-version">v: {{softwareVersion}}
-    <!--<span *ngIf="this.authenticationService.currentUser" style="font-size:small;color:var(--windows-title-color)" [innerText]="'[Logged as: ' + (authenticationService.currentUser.role) +']'"></span>-->
     <span *ngIf="this.authenticationService.currentUser" style="font-size:small;color:var(--windows-title-color)" [innerText]="'[' + (authenticationService.currentUser.role) +']'"></span>
 </div>

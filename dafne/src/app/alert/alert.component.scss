@@ -1,5 +1,8 @@
 /* Alert Modal */
 .modal-content {
+  box-shadow: 0 0 2rem 1rem #000;
+}
+.modal-content {
   background-color: var(--title-bg-color);
   color: var(--main-text-color);
 }
@@ -17,4 +20,12 @@
 .fa-exclamation-triangle {
   font-size: 2rem;
   color: tomato;
+}
+
+.modal-backdrop {
+  display: none;
+}
+
+.modal {
+  background: rgba(0, 0, 0, 0.5);
 }

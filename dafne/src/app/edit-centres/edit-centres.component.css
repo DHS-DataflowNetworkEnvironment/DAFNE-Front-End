@@ -75,6 +75,14 @@ input, i {
     margin-left: -0.5rem;
 }
 
+.action {
+    padding: 0 0.75rem;
+    opacity: 100%;
+}
+.action:hover {
+    opacity: 75%;
+}
+
 /* Centre Modals */
 .modal-content {
     background-color: var(--title-bg-color);
@@ -94,12 +102,17 @@ input, i {
 .modal-content label {
     margin-bottom: 0;
 }
+small {
+    position: absolute;
+}
 .form-control.valid {
     border-color: green;
+    border-width: 0;
 }
 
 .form-control.invalid {
     border-color: red;
+    margin-bottom: 50px;
 }
 
 .form-control + small {
@@ -112,18 +125,21 @@ input, i {
 .form-control.invalid + small {
     opacity: 1;
     height: auto;
-    margin-bottom: 20px;
+    margin-top: -40px;
     transition: opacity .4s ease-out;
 }
-#add-color-picker {
+#colorHelp {
+    margin-top: 50px;
+}
+#add_color-picker {
     -webkit-box-shadow:inset 0px 0px 0px 1px #000;
     -moz-box-shadow:inset 0px 0px 0px 1px #000;
     box-shadow:inset 0px 0px 0px 1px #000;
 }
-#add-local {
+#add_local, #edit_local {
     appearance: none;
 }
-#add-local:checked:after {
+#add_local:checked:after, #edit_local:checked:after {
 	content: '\2714';
 	color: var(--checked-color);
     font-size: 2rem;
@@ -131,7 +147,15 @@ input, i {
     bottom: 5px;
     left: 2px;
 }
-
+#add_latitude, #add_longitude, #edit_latitude, #edit_longitude {
+    width: 225px;
+}
+#add_color-picker, #edit_color-picker {
+    width: 35px;
+}
+#add_color, #edit_color {
+    width: 190px;
+}
 /* Hide arrows in lat-lon inputs */
 /* Chrome, Safari, Edge, Opera */
 #addCentreForm input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
@@ -143,8 +167,20 @@ input, i {
   -moz-appearance: textfield;
 }
 
+/* Autofill settings for Firefow and Chrome */
+input:autofill {
+    background: var(--modal-bg-color);
+}
 
-
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    transition: background-color 500s ease-in-out 0s;
+    -webkit-box-shadow: 0 0 0 30px var(--modal-bg-color) inset !important;
+    box-shadow: 0 0 0 30px var(--modal-bg-color) inset !important;
+    -webkit-text-fill-color: var(--main-text-color) !important;
+}
 
 ::ng-deep .color-picker .button-area {
     margin-top: -20px;

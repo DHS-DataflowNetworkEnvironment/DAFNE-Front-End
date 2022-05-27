@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
@@ -12,7 +12,13 @@ export class MessageService {
   private localMessageSource = new BehaviorSubject(false);
   localCurrentMessage = this.localMessageSource.asObservable();
 
+  private spinnerMessageSource = new BehaviorSubject(false);
+  spinnerCurrentMessage = this.spinnerMessageSource.asObservable();
+
+  invokeAutoRefresh = new EventEmitter();
+
   constructor() { }
+
 
   changeMessage(message: string) {
     this.messageSource.next(message)
@@ -20,5 +26,13 @@ export class MessageService {
 
   setLocalPresent(local: boolean) {
     this.localMessageSource.next(local);
+  }
+
+  showSpinner(show: boolean) {
+    this.spinnerMessageSource.next(show);
+  }
+
+  autoRefresh() {
+    this.invokeAutoRefresh.emit();
   }
 }

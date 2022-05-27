@@ -3,7 +3,7 @@ import { Component, Injectable, OnInit } from '@angular/core';
 declare var $: any;
 
 @Injectable({
-    providedIn: 'root'  // <- ADD THIS
+    providedIn: 'root'
 })
 @Component({
   selector: 'app-toast',

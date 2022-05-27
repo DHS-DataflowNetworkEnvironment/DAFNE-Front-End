@@ -61,19 +61,22 @@ th {
 td {
     font-size: 0.8rem;
 }
-table, th, td {
+table, th, td{
     border: 1px solid var(--table-border-color);
     text-align: center;
 }
-input, i {
-    cursor: pointer !important;
+.action {
+    padding: 0 0.75rem;
+    opacity: 100%;
+}
+.action:hover {
+    opacity: 75%;
 }
 
 /* Modals */
 .modal-content {
     background-color: var(--title-bg-color);
     color: var(--main-text-color);
-    /* width: 800px; */
 }
 .modal-header {
     border-bottom: 1px solid var(--table-border-color);
@@ -86,12 +89,18 @@ input, i {
     border-color: var(--title-bg-color);
     color: var(--main-text-color);
     width: 225px;
+    cursor: pointer !important;
 }
-.modal-content i {
-    background-color: var(--title-bg-color);
-    position: absolute;
-    font-size: 2.4rem;
+.modal-content .fa-angle-down, .fa-eye, .fa-eye-slash {
+    font-size: 1.0rem;
+    top: 1.7rem;
     right: 0;
+    border: 0.5rem solid var(--modal-bg-color);
+    background-color: var(--modal-bg-color);
+    color: var(--main-text-color);
+    position: absolute;
+    z-index: 99;
+    cursor: pointer !important;
 }
 .modal-content label {
     margin-bottom: 0;
@@ -102,6 +111,7 @@ small {
 
 .form-control.valid {
     border-color: green;
+    border-width: 0;
 }
 
 .form-control.invalid {
@@ -123,10 +133,23 @@ small {
     transition: opacity .4s ease-out;
 }
 
-/* Delete Modal */
-.fa-exclamation-triangle {
-    font-size: 2rem;
-    color: tomato;
+#add_id, #edit_id, #edit_service_url_backend{
+    color: #505053;
+}
+
+/* Autofill settings for Firefow and Chrome */
+input:autofill {
+    background: var(--modal-bg-color);
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    transition: background-color 500s ease-in-out 0s;
+    -webkit-box-shadow: 0 0 0 30px var(--modal-bg-color) inset !important;
+    box-shadow: 0 0 0 30px var(--modal-bg-color) inset !important;
+    -webkit-text-fill-color: var(--main-text-color) !important;
 }
 
 /* Dropdown menus */
@@ -145,6 +168,11 @@ small {
     text-align: center;
 }
 
+/* Delete Modal */
+.fa-exclamation-triangle {
+    font-size: 2rem;
+    color: tomato;
+}
 
 /* Responsiveness */
 @media screen and (max-width: 767px) {

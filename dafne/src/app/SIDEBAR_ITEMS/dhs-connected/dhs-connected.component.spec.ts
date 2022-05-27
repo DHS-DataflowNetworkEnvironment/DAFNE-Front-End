@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { DhsConnectedComponent } from './dhs-connected.component';
 
 describe('DhsConnectedComponent', () => {

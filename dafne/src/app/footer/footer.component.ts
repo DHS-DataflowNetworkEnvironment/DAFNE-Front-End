@@ -2,7 +2,6 @@ import { Component, OnInit, Inject} from '@angular/core';
 import { AppConfig } from '../services/app.config';
 import { AuthenticationService } from '../services/authentication.service';
 
-
 @Component({
   selector: 'app-footer',
   templateUrl: './footer.component.html',

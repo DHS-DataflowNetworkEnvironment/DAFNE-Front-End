@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { P5chartComponent } from './p5chart.component';
+import { PublicationLatencyComponent } from './publication-latency.component';
 
-describe('P5chartComponent', () => {
-  let component: P5chartComponent;
-  let fixture: ComponentFixture<P5chartComponent>;
+describe('PublicationLatencyComponent', () => {
+  let component: PublicationLatencyComponent;
+  let fixture: ComponentFixture<PublicationLatencyComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ P5chartComponent ]
+      declarations: [ PublicationLatencyComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(P5chartComponent);
+    fixture = TestBed.createComponent(PublicationLatencyComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

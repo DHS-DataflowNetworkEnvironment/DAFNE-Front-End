@@ -8,7 +8,7 @@ import { FooterComponent } from './footer/footer.component';
 import { UniqueNameFilterPipe } from './unique-name-filter.pipe';
 import { MatIconModule } from '@angular/material/icon';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { P5chartComponent } from './MAIN_VIEW_ITEMS/p5chart/p5chart.component';
+import { CompletenessComponent } from './MAIN_VIEW_ITEMS/completeness/completeness.component';
 import { LoginComponent } from './login/login.component';
 import { ArchiveInfoComponent } from './SIDEBAR_ITEMS/archive-info/archive-info.component';
 import { DataSourceInfoComponent } from './SIDEBAR_ITEMS/data-source-info/data-source-info.component';
@@ -30,13 +30,16 @@ import { EditServicesComponent } from './edit-services/edit-services.component';
 import { EditSyncComponent } from './edit-sync/edit-sync.component';
 import { DpDatePickerModule } from 'ng2-date-picker';
 import { AppConfig } from './services/app.config';
+import { PublicationLatencyComponent } from './MAIN_VIEW_ITEMS/publication-latency/publication-latency.component';
+import { PubLatencyComponent } from './SIDEBAR_ITEMS/pub-latency/pub-latency.component';
+import { ServiceAvailabilityComponent } from './MAIN_VIEW_ITEMS/service-availability/service-availability.component';
+import { ServAvailabilityComponent } from './SIDEBAR_ITEMS/serv-availability/serv-availability.component';
 
-export function initializeApp(appConfig: AppConfig,
-  spinner: SpinnerComponent) {
-
+export function initializeApp(
+  appConfig: AppConfig
+) {
     return () => appConfig.load();
-
-  }
+}
 
 
 @NgModule({
@@ -46,7 +49,7 @@ export function initializeApp(appConfig: AppConfig,
     HeaderComponent,
     FooterComponent,
     UniqueNameFilterPipe,
-    P5chartComponent,
+    CompletenessComponent,
     LoginComponent,
     ArchiveInfoComponent,
     DataSourceInfoComponent,
@@ -60,7 +63,11 @@ export function initializeApp(appConfig: AppConfig,
     SpinnerComponent,
     EditCentresComponent,
     EditServicesComponent,
-    EditSyncComponent
+    EditSyncComponent,
+    PubLatencyComponent,
+    PublicationLatencyComponent,
+    ServiceAvailabilityComponent,
+    ServAvailabilityComponent
   ],
   imports: [
     BrowserModule,

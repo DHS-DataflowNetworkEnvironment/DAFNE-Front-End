@@ -1,8 +1,7 @@
-/* tslint:disable:variable-name */
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { catchError, delay, map, tap } from 'rxjs/operators';
+import { BehaviorSubject, throwError } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 import jwt_decode from 'jwt-decode';
 import { User } from '../models/user';
 import { AppConfig } from '../services/app.config';
@@ -34,17 +33,14 @@ export class AuthenticationService {
         return throwError(err);
       }), tap(res => {        
         this.token = res.token;
-        //console.log("TOKEN: " + JSON.stringify(this.token, null, 2));
         this.isAuthenticated = true;
         localStorage.setItem('token', JSON.stringify(this.token));
         this.currentUser = new User();
         this.currentUser.username = this.decodeToken(this.token.access_token).preferred_username;
-        this.currentUser.role = this.decodeToken(this.token.access_token).resource_access.dafne.roles[0]; //ADMIN or USER
+        this.currentUser.role = this.decodeToken(this.token.access_token).resource_access.dafne.roles[0];
         this.currentUser.token = this.token;
         this.currentUser.isAdmin = res.isAdmin;
-        localStorage.setItem('isAdmin', String(this.currentUser.isAdmin));
-        //console.log("IS ADMIN: " + this.currentUser.isAdmin);
-        
+        localStorage.setItem('isAdmin', String(this.currentUser.isAdmin));        
       }));
 
   }
@@ -190,7 +186,7 @@ export class AuthenticationService {
   }
 
   addNewCentre(body: object) {
-    // Update one centre datum
+    // Add one centre
     return this.http.post<any>(
       AppConfig.settings.apiUrl + `/centres`,
       body,
@@ -244,7 +240,7 @@ export class AuthenticationService {
 
 
   getMapDataSourcesInfo(id: number) {
-    // get data sources info from the back-end
+    // get map data info from the back-end
     return this.http.get<any>(AppConfig.settings.apiUrl + `/centres/${id}/map/datasourcesinfo`)
     .pipe(
     catchError(err => {
@@ -256,7 +252,7 @@ export class AuthenticationService {
 
 
   getMapDHSConnected(id: number) {
-    // get data sources info from the back-end
+    // get map dhs info from the back-end
     return this.http.get<any>(AppConfig.settings.apiUrl + `/centres/${id}/map/dhsconnected`)
     .pipe(
     catchError(err => {
@@ -268,8 +264,19 @@ export class AuthenticationService {
 
 
   getSynchronizers() {
-    // get all services from the back-end
+    // get synchronizers from the back-end
     return this.http.get<any>(AppConfig.settings.apiUrl + `/synchronizers`)
+    .pipe(
+    catchError(err => {
+        console.error(err);
+        return throwError(err);
+        }
+    ));
+  }
+
+  getSynchronizersV2() {
+    // get synchronizers v2 from the back-end
+    return this.http.get<any>(AppConfig.settings.apiUrl + `/synchronizers/v2`)
     .pipe(
     catchError(err => {
         console.error(err);
@@ -293,7 +300,7 @@ export class AuthenticationService {
   }
 
   getCompleteness(body: object) {
-    // Update one centre datum
+    // get completeness
     return this.http.post<any>(
       AppConfig.settings.apiUrl + `/products/completeness`,
       body,
@@ -329,6 +336,70 @@ export class AuthenticationService {
       body,
       httpOptions
     )
+    .pipe(
+    catchError(err => {
+        console.error(err);
+        return throwError(err);
+        }
+    ));
+  }
+
+  getServiceAvailability(id: number, body: object) {
+    return this.http.post<any>(
+      AppConfig.settings.apiUrl + `/centres/${id}/service/availability`,
+      body,
+      httpOptions
+    )
+    .pipe(
+    catchError(err => {
+        console.error(err);
+        return throwError(err);
+        }
+    ));
+  }
+
+  getPublicationLatency(id: number, body: object) {
+    return this.http.post<any>(
+      AppConfig.settings.apiUrl + `/centres/${id}/service/latency/daily`,
+      body,
+      httpOptions
+    )
+    .pipe(
+    catchError(err => {
+        console.error(err);
+        return throwError(err);
+        }
+    ));
+  }
+
+  getPublicationLatencyDetail(id: number, body: object) {
+    return this.http.post<any>(
+      AppConfig.settings.apiUrl + `/centres/${id}/service/latency/daily/details`,
+      body,
+      httpOptions
+    )
+    .pipe(
+    catchError(err => {
+        console.error(err);
+        return throwError(err);
+        }
+    ));
+  }
+
+  getLatencyRollingPeriod() {
+    // get latency rolling period in days from the back-end
+    return this.http.get<any>(AppConfig.settings.apiUrl + `/config/latency/rollingPeriodInDays`)
+    .pipe(
+    catchError(err => {
+        console.error(err);
+        return throwError(err);
+        }
+    ));
+  }
+
+  getAvailabilityRollingPeriod() {
+    // get availability rolling period in days from the back-end
+    return this.http.get<any>(AppConfig.settings.apiUrl + `/config/availability/rollingPeriodInDays`)
     .pipe(
     catchError(err => {
         console.error(err);

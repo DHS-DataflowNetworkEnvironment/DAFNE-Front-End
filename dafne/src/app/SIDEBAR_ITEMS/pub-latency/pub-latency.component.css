@@ -1,0 +1,61 @@
+/* Pub Latency Title */
+.row {
+    margin-left: 0;
+    align-items: center;
+    margin-right: 1rem;
+}
+#pub-latency-icon {
+    color: var(--main-buttons-bg-color);
+    font-family: 'Dafne Icon';
+    display: inline-block;
+}
+#pub-latency-title {
+    color: var(--main-text-color);
+    display: inline-block;
+}
+
+/* Button */
+#pub-latency-show-but {
+    background-color: var(--main-buttons-bg-color);
+    color: var(--main-buttons-text-color);
+    border-radius: 5px;
+    border-width: 0;
+    margin-left: auto;
+    margin-right: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+/* Responsiveness */
+@media screen and (max-width: 767px) {
+    #pub-latency-icon {
+        font-size: 1.7rem;
+        padding-left: 0.5rem;
+    }
+    #pub-latency-title {
+        font-size: 1.0rem;
+        padding-left: 1.0rem;
+    }
+    #pub-latency-show-but {
+        font-size: 0.8rem;
+        width: 11rem;
+        height: 1.5rem;
+    }
+}
+@media screen and (min-width: 768px) {
+    #pub-latency-icon {
+        font-size: 2.0rem;
+        padding-left: 0.5rem;
+    }
+    #pub-latency-title {
+        font-size: 1.2rem;
+        padding-left: 1rem;
+    }
+    #pub-latency-show-but {
+        font-size: 1rem;
+        width: 12.5rem;
+        height: 2rem;
+    }
+}

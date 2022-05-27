@@ -1,35 +1,55 @@
-.card-container {
+.modal-dialog {
     justify-content: center;
     align-items: center;
-    height: calc(100vh - 3rem);
+    height: calc(100vh - 7rem)
 }
-.card {
-    width: 20rem;
-    height: 14rem;
+.modal-content {
     background-color: var(--title-bg-color);
     color: var(--main-text-color);
+    width: 25rem;
 }
-.card-header {
+.modal-header {
     border-bottom: 1px solid var(--table-border-color);
 }
-.username {
-    margin-left: auto;
+.modal-title {
+    color: var(--brighter-text-color);
 }
-.password {
-    margin-left: auto;
+.formInput {
+    display: flex;
+    justify-content: flex-end;
+    align-items: baseline;
+    margin: 0.5rem 1rem;
 }
-.buttons {
-    margin-left: auto;
-}
-input {
+.modal-content input {
     background-color: var(--modal-bg-color);
     border-color: var(--title-bg-color);
     color: var(--main-text-color);
+    width: 250px;
+    cursor: pointer !important;
+}
+.modal-content .fa-eye, .fa-eye-slash {
+    font-size: 1.0rem;
+    top: 4.6rem;
+    right: 2.2rem;
+    border: 0.5rem solid var(--modal-bg-color);
+    background-color: var(--modal-bg-color);
+    color: var(--main-text-color);
+    position: absolute;
+    z-index: 99;
+    cursor: pointer !important;
 }
 
 /* Autofill settings for Firefow and Chrome */
-:-webkit-autofill {
-    filter:none;
-    box-shadow: 0 0 0 100px #111f inset;
+input:autofill {
+    background: var(--modal-bg-color);
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    transition: background-color 500s ease-in-out 0s;
+    -webkit-box-shadow: 0 0 0 30px var(--modal-bg-color) inset !important;
+    box-shadow: 0 0 0 30px var(--modal-bg-color) inset !important;
     -webkit-text-fill-color: var(--main-text-color) !important;
 }

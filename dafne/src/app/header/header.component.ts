@@ -19,7 +19,7 @@ export class HeaderComponent implements AfterViewInit {
   ) {  }
 
   ngAfterViewInit(): void {
-    this.elementRef.nativeElement.querySelector('.home-icon').addEventListener("click", this.navHome.bind(this)); 
+    this.elementRef.nativeElement.querySelector('.home-icon').addEventListener("click", this.navHome.bind(this));
   }
   /* Hide menu if not authenticated */
   checkUserAuthenticated() {
@@ -32,7 +32,7 @@ export class HeaderComponent implements AfterViewInit {
 
   navHome(event) {
     if (this.authenticationService.isAuthenticated) {
-      this.router.navigate(['/dafne', { outlets: { centralBodyRouter: ['network-component', 'homeView']}}], { skipLocationChange: true });
+      this.router.navigate(['/gui', { outlets: { centralBodyRouter: ['network-component', 'homeView']}}], { skipLocationChange: true });
     }   
   }
 
