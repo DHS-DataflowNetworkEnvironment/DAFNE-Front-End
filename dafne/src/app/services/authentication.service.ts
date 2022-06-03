@@ -358,9 +358,37 @@ export class AuthenticationService {
     ));
   }
 
+  getServiceAvailabilityWeekly(id: number, body: object) {
+    return this.http.post<any>(
+      AppConfig.settings.apiUrl + `/centres/${id}/service/availability/weekly`,
+      body,
+      httpOptions
+    )
+    .pipe(
+    catchError(err => {
+        console.error(err);
+        return throwError(err);
+        }
+    ));
+  }
+
   getPublicationLatency(id: number, body: object) {
     return this.http.post<any>(
       AppConfig.settings.apiUrl + `/centres/${id}/service/latency/daily`,
+      body,
+      httpOptions
+    )
+    .pipe(
+    catchError(err => {
+        console.error(err);
+        return throwError(err);
+        }
+    ));
+  }
+
+  getPublicationLatencyWeekly(id: number, body: object) {
+    return this.http.post<any>(
+      AppConfig.settings.apiUrl + `/centres/${id}/service/latency/weekly`,
       body,
       httpOptions
     )

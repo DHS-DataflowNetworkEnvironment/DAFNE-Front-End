@@ -4,15 +4,19 @@
     <div id="filters-form-container">
         <form id="filters-form">
             <div id="filters-form-row">
+                <div class="weekly-div">
+                    <label class="form-label">Weekly Aggregation:</label>
+                    <input type="checkbox" class="form-control" id="weekly-checkbox" name="weekly-checkbox" (change)="onWeeklyCheckboxChange()" [checked]="false">
+                </div>
                 <div class="date-picker">
                     <label class="form-label">Start Date:</label>
-                    <dp-date-picker class="" theme="dp-material" id="filter-start-date" name="filter-start-date"
+                    <dp-date-picker class="" theme="dp-material" id="filter-start-date" name="filter-start-date" (click)="onDateClick($event)"
                         [(ngModel)]="startDate" (ngModelChange)="onStartDateChanged($event)" [config]="startDatePickerConfig" placeholder="YYYY-MM-DD">
                     </dp-date-picker>
                 </div>
                 <div class="date-picker">
                     <label class="form-label">Stop Date:</label>
-                    <dp-date-picker class="" theme="dp-material" id="filter-stop-date" name="filter-stop-date"
+                    <dp-date-picker class="" theme="dp-material" id="filter-stop-date" name="filter-stop-date" (click)="onDateClick($event)"
                         [(ngModel)]="stopDate" (ngModelChange)="onStopDateChanged($event)" [config]="stopDatePickerConfig" placeholder="YYYY-MM-DD">
                     </dp-date-picker>
                 </div>
@@ -20,6 +24,7 @@
             </div>
         </form>
     </div>
+
     <div id="main-row-container">
         <!-- Charts -->
         <div id="p5ServiceAvailabilityCanvas-column-div">
@@ -28,9 +33,13 @@
         </div>
         <!-- Selectors -->
         <section id="selectors-container">
+            <!-- Date Title -->
+            <h5 *ngIf="isWeekly == true" class="availability-chart-title">WEEKLY</h5>
+            <h5 *ngIf="isWeekly == false" class="availability-chart-title">DAILY</h5>
+            <!-- Buttons -->
             <h2 id="buttons-title">CHART</h2>
             <button (click)="chartChangeTo('Bar Chart')">Bar Chart</button>
-            <button (click)="chartChangeTo('Calendar Chart')">Calendar Chart</button>
+            <button *ngIf="isWeekly==false" (click)="chartChangeTo('Calendar Chart')">Calendar Chart</button>
 
             <h2 id="legend-title">LEGEND</h2>
             <ng-template ngFor let-color [ngForOf]="availabilityColors" let-i="index">

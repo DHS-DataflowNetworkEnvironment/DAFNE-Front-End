@@ -23,8 +23,11 @@ export class ServiceAvailabilityComponent implements OnInit {
   };
 
   public availabilityDaysNumber: number = 0;
+  public availabilityWeeksNumber: number = 0;
   public requestedDaysNumber: number = 0;
+  public requestedWeeksNumber: number = 0;
   public millisPerDay: number = 86400000;
+  public millisPerWeek:number = this.millisPerDay * 7;
   public maxDays: number = 30;  // set 30 for 31 days of availability.
   public millisPerMaxPeriod = this.millisPerDay * this.maxDays;
   public maxDaysWindow: number;  // this should be retrieved from BE. set 89 for 90 days.
@@ -62,11 +65,15 @@ export class ServiceAvailabilityComponent implements OnInit {
 
   public dayOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   public weekdayShift: number = 0;
+  public weekdayStopShift: number = 0;
   public rowNumber = 5;
 
+  public mouseIsOnList: Array<boolean> = Array.apply(false, Array(30)).map(function () {});
   public availabilityColors;
-
   public averageColor = AppConfig.settings.averageAvailabilityColor;
+
+  public isWeekly: boolean = false;
+  public askForWeekly: boolean = false;
 
   constructor(
     public authenticationService: AuthenticationService,
@@ -116,33 +123,91 @@ export class ServiceAvailabilityComponent implements OnInit {
     );
   }
 
+  onDateClick(event) {
+    event.stopPropagation();
+  }
+
   onStartDateChanged(date) {
-    let tempMillisDate = (Date.parse(date) + this.millisPerMaxPeriod);
-    if (Date.parse(this.stopDate) > tempMillisDate) {
-      this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 31 days");
-      let tempDate = new Date(tempMillisDate);
-      this.stopDate = tempDate.toISOString().slice(0, 10);
-    }
-    if (Date.parse(date) > Date.parse(this.stopDate)) {
-      this.alert.showErrorAlert("Check Date Range", "Start date cannot be later than stop date");
-      this.stopDate = date;
+    let tempMillisDate: number = 0;
+    if (this.askForWeekly == true) {
+      tempMillisDate = (Date.parse(date) + this.millisPerMaxWindow);
+      if (Date.parse(this.stopDate) > tempMillisDate) { 
+        this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 90 days");
+        let tempDate = new Date(tempMillisDate);
+        this.stopDate = tempDate.toISOString().slice(0, 10);
+      }
+      if (Date.parse(date) > Date.parse(this.stopDate)) {
+        this.alert.showErrorAlert("Check Date Range", "Start date cannot be later than stop date");
+        this.stopDate = date;
+      }
+    } else {
+      tempMillisDate = (Date.parse(date) + this.millisPerMaxPeriod);
+      if (Date.parse(this.stopDate) > tempMillisDate) {
+        this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 31 days");
+        let tempDate = new Date(tempMillisDate);
+        this.stopDate = tempDate.toISOString().slice(0, 10);
+      }
+      if (Date.parse(date) > Date.parse(this.stopDate)) {
+        this.alert.showErrorAlert("Check Date Range", "Start date cannot be later than stop date");
+        this.stopDate = date;
+      }
     }
   }
 
   onStopDateChanged(date) {
-    let tempMillisDate = (Date.parse(date) - this.millisPerMaxPeriod);
-    if (Date.parse(this.startDate) < tempMillisDate) {
-      this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 31 days");
-      let tempDate = new Date(tempMillisDate);
-      this.startDate = tempDate.toISOString().slice(0, 10);
+    if (this.askForWeekly == true) {
+      let tempMillisDate = (Date.parse(date) - this.millisPerMaxWindow);
+      if (Date.parse(this.startDate) < tempMillisDate) {
+        this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 90 days");
+        let tempDate = new Date(tempMillisDate);
+        this.startDate = tempDate.toISOString().slice(0, 10);
+      }
+      if (Date.parse(date) < Date.parse(this.startDate)) {
+        this.alert.showErrorAlert("Check Date Range", "Stop date cannot be earlier than start date");
+        this.startDate = date;
+      }
+    } else {
+      let tempMillisDate = (Date.parse(date) - this.millisPerMaxPeriod);
+      if (Date.parse(this.startDate) < tempMillisDate) {
+        this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 31 days");
+        let tempDate = new Date(tempMillisDate);
+        this.startDate = tempDate.toISOString().slice(0, 10);
+      }
+      if (Date.parse(date) < Date.parse(this.startDate)) {
+        this.alert.showErrorAlert("Check Date Range", "Stop date cannot be earlier than start date");
+        this.startDate = date;
+      }
     }
-    if (Date.parse(date) < Date.parse(this.startDate)) {
-      this.alert.showErrorAlert("Check Date Range", "Stop date cannot be earlier than start date");
-      this.startDate = date;
+  }
+
+  onWeeklyCheckboxChange() {
+    var chkBox = <HTMLInputElement>document.getElementById('weekly-checkbox');
+    if (chkBox.checked == true) {
+      this.askForWeekly = true;
+      let tempMillisDate = (Date.parse(this.stopDate) - this.millisPerMaxWindow);
+      if (tempMillisDate < (Date.parse(this.todayDate) - this.millisPerMaxWindow)) {
+        tempMillisDate = Date.parse(this.todayDate) - this.millisPerMaxWindow;
+      }
+      this.startDate = new Date(tempMillisDate).toISOString().slice(0, 10);
+    } else {
+      this.askForWeekly = false;
+      let tempMillisDate = (Date.parse(this.stopDate) - this.millisPerMaxPeriod);
+      if (tempMillisDate < (Date.parse(this.todayDate) - this.millisPerMaxWindow)) {
+        tempMillisDate = Date.parse(this.todayDate) - this.millisPerMaxWindow;
+      }
+      this.startDate = new Date(tempMillisDate).toISOString().slice(0, 10);
     }
   }
 
   onFilterSubmit(): void {
+    if (this.localCentre.id == -1) {
+      this.alert.showErrorAlert("No Local Centre Found", "Please check if a local centre has been configured");
+      return;
+    }
+    this.availabilityDaysNumber = 0;
+    this.availabilityWeeksNumber = 0;
+    this.requestedDaysNumber = 0;
+    this.requestedWeeksNumber = 0;
     let tempStopDate = new Date(this.stopDate);
     let tempStartDate = new Date(this.startDate);
     let tempTimeDifference = tempStopDate.getTime() - tempStartDate.getTime();
@@ -151,51 +216,92 @@ export class ServiceAvailabilityComponent implements OnInit {
       "startDate": this.startDate.concat("T00:00:00"),
       "stopDate": this.stopDate.concat("T23:59:59")
     }
-    if (this.localCentre.id == -1) {
-      this.alert.showErrorAlert("No Local Centre Found", "Please check if a local centre has been configured");
-      return;
-    }
-    this.authenticationService.getServiceAvailability(this.localCentre.id, body).subscribe(
-      (res) => {
-        if (res.centreId == this.localCentre.id) {
-          this.availabilityDaysNumber = res.values.length;
-          this.requestedDaysNumber = tempTimeDifference / (1000 * 3600 * 24) + 1;
-          this.requestedServiceAvailabilityList = [];
-          if (this.availabilityDaysNumber > 0) {
-            this.averageServiceAvailability = res.values[0].average;
-          } else {
-            this.averageServiceAvailability = -1;
-          }
-          
-          for (var i = 0; i < this.requestedDaysNumber; i++) {
-            this.requestedServiceAvailabilityList[i] = {
-              date: new Date(Date.parse(this.startDate) + (i * this.millisPerDay)).toISOString().slice(0,10),
-              successResponses: -1,
-              totalRequests: -1,
-              percentage: -1
+
+    let weeklyCheckbox: HTMLInputElement = <HTMLInputElement>document.getElementById("weekly-checkbox");
+    if (weeklyCheckbox.checked == true) {
+      /* Weekly */
+      this.isWeekly = true;
+      this.chartChangeTo('Bar Chart');
+      this.authenticationService.getServiceAvailabilityWeekly(this.localCentre.id, body).subscribe(
+        (res) => {
+          if (res.centreId == this.localCentre.id) {
+            this.availabilityWeeksNumber = res.values.length;
+            this.weekdayShift = (tempStartDate.getDay() == 0 ? 6 : (tempStartDate.getDay() - 1));
+            this.weekdayStopShift = (tempStopDate.getDay() == 0 ? 0 : (7 - tempStopDate.getDay()));
+            this.requestedWeeksNumber = Math.ceil((((tempTimeDifference + (this.weekdayShift + this.weekdayStopShift) * this.millisPerDay ) / this.millisPerDay) + 1) / 7);
+            this.requestedServiceAvailabilityList = [];
+            if (this.availabilityWeeksNumber > 0) {
+              this.averageServiceAvailability = res.values[0].average;
+            } else {
+              this.averageServiceAvailability = -1;
             }
-          }
-          this.serviceAvailabilityList = res.values;
-
-          /* Calculate week-day shift */
-          this.weekdayShift = (tempStartDate.getDay() == 0 ? 6 : tempStartDate.getDay() - 1);
-          if (this.weekdayShift == 6 && this.requestedDaysNumber == 30) {
-            this.rowNumber = 6;
-          } else {
-            this.rowNumber = 5;
-          }          
-
-          for (var i = 0; i < this.requestedDaysNumber; i++) {
-            for (var k = 0; k < this.availabilityDaysNumber; k++) {
-              if (this.serviceAvailabilityList[k].date == this.requestedServiceAvailabilityList[i].date) {
-                this.requestedServiceAvailabilityList[i] = this.serviceAvailabilityList[k];
+            for (var i = 0; i < this.requestedWeeksNumber; i++) {
+              this.requestedServiceAvailabilityList[i] = {
+                date: new Date(Date.parse(this.startDate) - (this.weekdayShift * this.millisPerDay) + (i * this.millisPerWeek)).toISOString().slice(0,10),
+                successResponses: -1,
+                totalRequests: -1,
+                percentage: -1
               }
             }
+            this.serviceAvailabilityList = res.values;
+            for (var i = 0; i < this.requestedWeeksNumber; i++) {
+              for (var k = 0; k < this.availabilityWeeksNumber; k++) {
+                if (this.serviceAvailabilityList[k].date == this.requestedServiceAvailabilityList[i].date) {
+                  this.requestedServiceAvailabilityList[i] = this.serviceAvailabilityList[k];
+                }
+              }
+            }
+            this.p5Chart.setClickTimeoutId(undefined);
+            this.p5Chart.windowResized();
           }
-          this.p5Chart.windowResized();
         }
-      }
-    );
+      );
+    } else {
+      /* Daily */
+      this.isWeekly = false;
+      this.authenticationService.getServiceAvailability(this.localCentre.id, body).subscribe(
+        (res) => {
+          if (res.centreId == this.localCentre.id) {
+            this.availabilityDaysNumber = res.values.length;
+            this.requestedDaysNumber = tempTimeDifference / (1000 * 3600 * 24) + 1;
+            this.requestedServiceAvailabilityList = [];
+            if (this.availabilityDaysNumber > 0) {
+              this.averageServiceAvailability = res.values[0].average;
+            } else {
+              this.averageServiceAvailability = -1;
+            }
+            
+            for (var i = 0; i < this.requestedDaysNumber; i++) {
+              this.requestedServiceAvailabilityList[i] = {
+                date: new Date(Date.parse(this.startDate) + (i * this.millisPerDay)).toISOString().slice(0,10),
+                successResponses: -1,
+                totalRequests: -1,
+                percentage: -1
+              }
+            }
+            this.serviceAvailabilityList = res.values;
+  
+            /* Calculate week-day shift */
+            this.weekdayShift = (tempStartDate.getDay() == 0 ? 6 : tempStartDate.getDay() - 1);
+            if (this.weekdayShift == 6 && this.requestedDaysNumber == 30) {
+              this.rowNumber = 6;
+            } else {
+              this.rowNumber = 5;
+            }          
+  
+            for (var i = 0; i < this.requestedDaysNumber; i++) {
+              for (var k = 0; k < this.availabilityDaysNumber; k++) {
+                if (this.serviceAvailabilityList[k].date == this.requestedServiceAvailabilityList[i].date) {
+                  this.requestedServiceAvailabilityList[i] = this.serviceAvailabilityList[k];
+                }
+              }
+            }
+            this.p5Chart.setClickTimeoutId(undefined);
+            this.p5Chart.windowResized();
+          }
+        }
+      );
+    }    
   }
 
   toggleTable() {
@@ -218,25 +324,50 @@ export class ServiceAvailabilityComponent implements OnInit {
   }
 
   saveAsCSV() {
-    if (this.requestedServiceAvailabilityList.length > 0) {
-      var csvContent: string = '';
-      var table = document.getElementById('data-table');
-      for (var r = 0; r < table.childElementCount; r++) {
-        for (var c = 0; c < table.children[r].childElementCount; c++) {
-          csvContent += table.children[r].children[c].innerHTML;
-          if (!(c == (table.children[r].childElementCount - 1) && r == (table.childElementCount - 1))) csvContent += ',';
+    if (this.isWeekly == true) {
+      /* Export Weekly Availability */
+      if (this.requestedServiceAvailabilityList.length > 0) {
+        var csvContent: string = '';
+        var table = document.getElementById('data-table');
+        for (var r = 0; r < table.childElementCount; r++) {
+          for (var c = 0; c < table.children[r].childElementCount; c++) {
+            csvContent += table.children[r].children[c].innerHTML;
+            if (!(c == (table.children[r].childElementCount - 1) && r == (table.childElementCount - 1))) csvContent += ',';
+          }
+          r < (table.childElementCount - 1) ? csvContent += '\n' : null;
         }
-        r < (table.childElementCount - 1) ? csvContent += '\n' : null;
+        this.csvService.exportToCsv(
+          'DAFNE-Service_Weekly_Availability('
+          + this.localCentre.name
+          + ')_From('
+          + table.children[0].children[1].innerHTML
+          + ')_To('
+          + table.children[0].children[table.children[0].childElementCount - 1].innerHTML
+          + ').csv', csvContent
+        );
       }
-      this.csvService.exportToCsv(
-        'DAFNE-Service-Availability_Centre('
-        + this.localCentre.name
-        + ')_From('
-        + table.children[0].children[1].innerHTML
-        + ')_To('
-        + table.children[0].children[table.children[0].childElementCount - 1].innerHTML
-        + ').csv', csvContent
-      );
+    } else {
+      /* Export Daily Availability */
+      if (this.requestedServiceAvailabilityList.length > 0) {
+        var csvContent: string = '';
+        var table = document.getElementById('data-table');
+        for (var r = 0; r < table.childElementCount; r++) {
+          for (var c = 0; c < table.children[r].childElementCount; c++) {
+            csvContent += table.children[r].children[c].innerHTML;
+            if (!(c == (table.children[r].childElementCount - 1) && r == (table.childElementCount - 1))) csvContent += ',';
+          }
+          r < (table.childElementCount - 1) ? csvContent += '\n' : null;
+        }
+        this.csvService.exportToCsv(
+          'DAFNE-Service_Daily_Availability('
+          + this.localCentre.name
+          + ')_From('
+          + table.children[0].children[1].innerHTML
+          + ')_To('
+          + table.children[0].children[table.children[0].childElementCount - 1].innerHTML
+          + ').csv', csvContent
+        );
+      }
     }
   }
 
@@ -279,6 +410,8 @@ export class ServiceAvailabilityComponent implements OnInit {
       let tx = 0;
       let ty = 0;
 
+      let clickTimerId;
+
       p.setup = () => {
         canvasSpace = p.createCanvas(canvasWidth, canvasHeight).parent('p5ServiceAvailabilityCanvas');
         p.pixelDensity(1.0);
@@ -294,6 +427,7 @@ export class ServiceAvailabilityComponent implements OnInit {
         p.windowResized();
         p.translate(tx, ty);
 
+        this.mouseIsOnList = Array.apply(false, Array(31)).map(function () {});
         if (this.chartType == this.selectorText[0]) {
           p.fillBarChart();
         } else if (this.chartType == this.selectorText[1]) {
@@ -311,6 +445,43 @@ export class ServiceAvailabilityComponent implements OnInit {
           this.doResetZoom = false;
           resetZoom();
         }
+      }
+
+      p.doubleClicked = () => {
+        if (clickTimerId) {
+          clearTimeout(clickTimerId);
+          clickTimerId = undefined;
+        }
+        resetZoom();
+      }
+
+      p.mouseClicked = () => {
+        if (p.mouseX > xCenter - chartXDim2 + tx && p.mouseX < xCenter + chartXDim2 + tx
+          && p.mouseY > yCenter - chartYDim2 + ty && p.mouseY < yCenter + chartYDim2 + ty) {
+          if (!clickTimerId) {
+            clickTimerId = setTimeout(() => {
+              if (this.isWeekly == true) {
+                for (var i = 0; i < this.requestedWeeksNumber; i++) {
+                  if (this.mouseIsOnList[i] == true) {
+                    this.startDate = this.requestedServiceAvailabilityList[i].date;
+                    let tempStopDateToCalendar = Date.parse(this.requestedServiceAvailabilityList[i].date) + 6*this.millisPerDay;
+                    if (tempStopDateToCalendar < Date.parse(this.stopDate)) {
+                      this.stopDate = new Date(Date.parse(this.requestedServiceAvailabilityList[i].date) + 6*this.millisPerDay).toISOString().slice(0, 10);
+                    }
+                    let weeklyCheckbox: HTMLInputElement = <HTMLInputElement>document.getElementById("weekly-checkbox");
+                    weeklyCheckbox.checked = false;
+                    this.askForWeekly = false;
+                    this.onFilterSubmit();
+                  }
+                }
+              }
+            }, 500)
+          }      
+        }  
+      }
+
+      p.setClickTimeoutId = (id) => {
+        clickTimerId = id;    
       }
 
       function applyScale(s) {
@@ -353,141 +524,243 @@ export class ServiceAvailabilityComponent implements OnInit {
       };
 
       p.fillBarChart = () => {
-        for (var i = 0; i < this.requestedDaysNumber; i++) {
-          let sectionXCenter = xCenter - chartXDim2 + chartXDim / (2 * this.requestedDaysNumber) + i * chartXDim / this.requestedDaysNumber;
-          let sectionXFilledDim = (chartXDim / this.requestedDaysNumber) / sectionScaleSingle;
-          let sectionXFilledDim2 = sectionXFilledDim / 2;
-          let barGap = sectionXFilledDim / barGapScale;
+        if (this.isWeekly == true) {
+          /* Weekly */
+          for (var i = 0; i < this.requestedWeeksNumber; i++) {
+            let sectionXCenter = xCenter - chartXDim2 + chartXDim / (2 * this.requestedWeeksNumber) + i * chartXDim / this.requestedWeeksNumber;
+            let sectionXFilledDim = (chartXDim / this.requestedWeeksNumber) / sectionScaleSingle;
+            let sectionXFilledDim2 = sectionXFilledDim / 2;
+            let barGap = sectionXFilledDim / barGapScale;
 
-          /* xAxis Text */
-          p.textAlign(p.CENTER, p.CENTER);
-          p.fill(lineColor);
-          p.noStroke();
-          p.textSize(dateFontSize);
+            /* xAxis Text */
+            p.textAlign(p.CENTER, p.CENTER);
+            p.fill(lineColor);
+            p.noStroke();
+            p.textSize(dateFontSize);
 
-          /* Rotate Dates */          
-          let tempText
-          tempText = this.requestedServiceAvailabilityList[i].date;          
-          let tempRadium = (sectionXFilledDim - (2 * barGap) - dateFontSize);
-          let angle = 0;
-          if (tempRadium > p.textWidth(tempText)) tempRadium = p.textWidth(tempText);
-          if (tempRadium > 0) angle = p.acos(tempRadium / p.textWidth(tempText));
-          else angle = p.PI/2;
-          let sinOfAngleTemp = p.sin(angle);
-          if (sinOfAngleTemp < 0.001) {
-            sinOfAngleTemp = 0.001;
-          }
-          let sinOfAngle = sinOfAngleTemp * (p.textWidth(tempText) / 2);
-          p.push();
-          p.translate(sectionXCenter, yCenter + chartYDim2 + sinOfAngle + dateFontSize);
-          if (angle > p.PI / 2) angle = p.PI / 2;
-          if (angle < 0) angle = 0;
-          p.rotate(-angle);
-          p.text(tempText, 0, 0);
-          p.pop();
+            /* Rotate Dates */          
+            let tempText;
+            let preText = "Week from";
+            tempText = preText + "\n" + this.requestedServiceAvailabilityList[i].date;          
+            let tempRadium = (sectionXFilledDim - (2 * barGap) - dateFontSize);
+            let angle = 0;
+            if (tempRadium > p.textWidth(preText)) tempRadium = p.textWidth(preText);
+            if (tempRadium > 0) angle = p.acos(tempRadium / p.textWidth(preText));
+            else angle = p.PI/2;
+            let sinOfAngleTemp = p.sin(angle);
+            if (sinOfAngleTemp < 0.001) {
+              sinOfAngleTemp = 0.001;
+            }
+            let sinOfAngle = sinOfAngleTemp * (p.textWidth(preText) / 2);
+            p.push();
+            p.translate(sectionXCenter, yCenter + chartYDim2 + sinOfAngle + 3 * dateFontSize);
+            if (angle > p.PI / 2) angle = p.PI / 2;
+            if (angle < 0) angle = 0;
+            p.rotate(-angle);
+            tempText = tempText + "\n";
+            p.text(tempText, 0, 0);
+            p.pop();
+
+            p.noFill();
+            p.stroke(lineColor);
+            p.line(xCenter - chartXDim2 + (i + 1) * chartXDim / this.requestedWeeksNumber, yCenter + chartYDim2 + 5, xCenter - chartXDim2 + (i + 1) * chartXDim / this.requestedWeeksNumber, yCenter + chartYDim2);
+
+            /* Bars */
+            p.rectMode(p.CORNER);
+            if (this.requestedServiceAvailabilityList[i].percentage == 0) {
+              p.stroke(this.getAvailabilityIntsColorFromPerc(this.requestedServiceAvailabilityList[i].percentage));
+              p.line(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2, sectionXCenter + sectionXFilledDim2, yCenter + chartYDim2);
+            } else if (this.requestedServiceAvailabilityList[i].percentage > 0) {
+              p.fill(this.getAvailabilityIntsColorFromPerc(this.requestedServiceAvailabilityList[i].percentage));
+              p.noStroke();
+              p.rect(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2, sectionXFilledDim, -((this.requestedServiceAvailabilityList[i].percentage < 0 ? 0 : this.requestedServiceAvailabilityList[i].percentage) * chartYDim / maxValue));
+            }
+
+            /* Selector box */
+            if (p.mouseX > sectionXCenter - (chartXDim / this.requestedWeeksNumber)/2 + tx && p.mouseX < sectionXCenter + (chartXDim / this.requestedWeeksNumber)/2 + tx
+                && p.mouseY > yCenter - chartYDim2 + ty && p.mouseY < yCenter + chartYDim2 + sinOfAngle + 4 * dateFontSize + ty) {
+              p.stroke(230);
+              p.fill(255, 30);
+              p.rect(sectionXCenter - sectionXFilledDim2, yCenter - chartYDim2, sectionXFilledDim, chartYDim + sinOfAngle + 4 * dateFontSize);
+              this.mouseIsOnList[i] = true;
+            }
+          } 
+          /* Scheme */
+          p.rectMode(p.CENTER);
+          p.textAlign(p.RIGHT, p.CENTER);
           p.noFill();
           p.stroke(lineColor);
-          p.line(xCenter - chartXDim2 + (i + 1) * chartXDim / this.requestedDaysNumber, yCenter + chartYDim2 + 5, xCenter - chartXDim2 + (i + 1) * chartXDim / this.requestedDaysNumber, yCenter + chartYDim2);
-
-          /* Bars */
-          p.rectMode(p.CORNER);
-          if (this.requestedServiceAvailabilityList[i].percentage == 0) {
-            p.stroke(this.getAvailabilityIntsColorFromPerc(this.requestedServiceAvailabilityList[i].percentage));
-            p.line(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2, sectionXCenter + sectionXFilledDim2, yCenter + chartYDim2);
-          } else if (this.requestedServiceAvailabilityList[i].percentage > 0) {
-            p.fill(this.getAvailabilityIntsColorFromPerc(this.requestedServiceAvailabilityList[i].percentage));
-            p.noStroke();
-            p.rect(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2, sectionXFilledDim, -((this.requestedServiceAvailabilityList[i].percentage < 0 ? 0 : this.requestedServiceAvailabilityList[i].percentage) * chartYDim / maxValue));
+          p.line(xCenter - chartXDim2, yCenter + chartYDim2, xCenter - chartXDim2, yCenter - chartYDim2);
+          p.line(xCenter - chartXDim2, yCenter + chartYDim2, xCenter + chartXDim2, yCenter + chartYDim2);
+          /* Average Line */
+          if (this.averageServiceAvailability >= 0) {
+            p.stroke(averageLineColor);
+            p.drawingContext.setLineDash(lineDashSequence);
+            p.line(xCenter - chartXDim2, yCenter + chartYDim2 - this.averageServiceAvailability * chartYDim / maxValue, xCenter + chartXDim2, yCenter + chartYDim2 - this.averageServiceAvailability * chartYDim / maxValue);
+            p.drawingContext.setLineDash([]);
+            p.textSize(textFontSize);
+            p.textAlign(p.RIGHT, p.CENTER);
           }
-        } 
-        /* Scheme */
-        p.rectMode(p.CENTER);
-        p.textAlign(p.RIGHT, p.CENTER);
-        p.noFill();
-        p.stroke(lineColor);
-        p.line(xCenter - chartXDim2, yCenter + chartYDim2, xCenter - chartXDim2, yCenter - chartYDim2);
-        p.line(xCenter - chartXDim2, yCenter + chartYDim2, xCenter + chartXDim2, yCenter + chartYDim2);
-        /* Average Line */
-        if (this.averageServiceAvailability >= 0) {
-          p.stroke(averageLineColor);
-          p.drawingContext.setLineDash(lineDashSequence);
-          p.line(xCenter - chartXDim2, yCenter + chartYDim2 - this.averageServiceAvailability * chartYDim / maxValue, xCenter + chartXDim2, yCenter + chartYDim2 - this.averageServiceAvailability * chartYDim / maxValue);
-          p.drawingContext.setLineDash([]);
-          p.textSize(textFontSize);
-          p.textAlign(p.RIGHT, p.CENTER);
-        }
-          /* Zero text */
-        p.fill(lineColor);
-        p.noStroke();
-        p.text("0%", xCenter - chartXDim2 - 10, yCenter + chartYDim2);
-        p.stroke(lineColor);
-        p.line(xCenter - chartXDim2 - 5, yCenter + chartYDim2, xCenter - chartXDim2, yCenter + chartYDim2);
-        p.line(xCenter - chartXDim2, yCenter + chartYDim2 + 5, xCenter - chartXDim2, yCenter + chartYDim2);
-        /* yAxis text */
-        for (var i = 0; i < nLines; i++) {
+            /* Zero text */
           p.fill(lineColor);
           p.noStroke();
-          p.text(p.int(maxValue / (nLines / (i + 1))) + "%", xCenter - chartXDim2 - 15, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines + 1);
+          p.text("0%", xCenter - chartXDim2 - 10, yCenter + chartYDim2);
           p.stroke(lineColor);
-          p.line(xCenter - chartXDim2 - 5, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines, xCenter - chartXDim2, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines)
-        }
-        /* Draw threshold lines */
-        for (var i = 1; i < this.availabilityColors.length; i++) {
-          p.stroke(this.getAvailabilityIntsColorFromPerc(this.availabilityColors[i].threshold));
-          p.line(xCenter - chartXDim2, yCenter + chartYDim2 - (this.availabilityColors[i].threshold * chartYDim / 100), xCenter + chartXDim2, yCenter + chartYDim2 - (this.availabilityColors[i].threshold * chartYDim / 100));
+          p.line(xCenter - chartXDim2 - 5, yCenter + chartYDim2, xCenter - chartXDim2, yCenter + chartYDim2);
+          p.line(xCenter - chartXDim2, yCenter + chartYDim2 + 5, xCenter - chartXDim2, yCenter + chartYDim2);
+          /* yAxis text */
+          for (var i = 0; i < nLines; i++) {
+            p.fill(lineColor);
+            p.noStroke();
+            p.text(p.int(maxValue / (nLines / (i + 1))) + "%", xCenter - chartXDim2 - 15, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines + 1);
+            p.stroke(lineColor);
+            p.line(xCenter - chartXDim2 - 5, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines, xCenter - chartXDim2, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines)
+          }
+          /* Draw threshold lines */
+          for (var i = 1; i < this.availabilityColors.length; i++) {
+            p.stroke(this.getAvailabilityIntsColorFromPerc(this.availabilityColors[i].threshold));
+            p.line(xCenter - chartXDim2, yCenter + chartYDim2 - (this.availabilityColors[i].threshold * chartYDim / 100), xCenter + chartXDim2, yCenter + chartYDim2 - (this.availabilityColors[i].threshold * chartYDim / 100));
+          }
+        } else {
+          /* Daily */
+          for (var i = 0; i < this.requestedDaysNumber; i++) {
+            let sectionXCenter = xCenter - chartXDim2 + chartXDim / (2 * this.requestedDaysNumber) + i * chartXDim / this.requestedDaysNumber;
+            let sectionXFilledDim = (chartXDim / this.requestedDaysNumber) / sectionScaleSingle;
+            let sectionXFilledDim2 = sectionXFilledDim / 2;
+            let barGap = sectionXFilledDim / barGapScale;
+
+            /* xAxis Text */
+            p.textAlign(p.CENTER, p.CENTER);
+            p.fill(lineColor);
+            p.noStroke();
+            p.textSize(dateFontSize);
+
+            /* Rotate Dates */          
+            let tempText
+            tempText = this.requestedServiceAvailabilityList[i].date;          
+            let tempRadium = (sectionXFilledDim - (2 * barGap) - dateFontSize);
+            let angle = 0;
+            if (tempRadium > p.textWidth(tempText)) tempRadium = p.textWidth(tempText);
+            if (tempRadium > 0) angle = p.acos(tempRadium / p.textWidth(tempText));
+            else angle = p.PI/2;
+            let sinOfAngleTemp = p.sin(angle);
+            if (sinOfAngleTemp < 0.001) {
+              sinOfAngleTemp = 0.001;
+            }
+            let sinOfAngle = sinOfAngleTemp * (p.textWidth(tempText) / 2);
+            p.push();
+            p.translate(sectionXCenter, yCenter + chartYDim2 + sinOfAngle + 2 * dateFontSize);
+            if (angle > p.PI / 2) angle = p.PI / 2;
+            if (angle < 0) angle = 0;
+            p.rotate(-angle);
+            p.text(tempText, 0, 0);
+            p.pop();
+            p.noFill();
+            p.stroke(lineColor);
+            p.line(xCenter - chartXDim2 + (i + 1) * chartXDim / this.requestedDaysNumber, yCenter + chartYDim2 + 5, xCenter - chartXDim2 + (i + 1) * chartXDim / this.requestedDaysNumber, yCenter + chartYDim2);
+
+            /* Bars */
+            p.rectMode(p.CORNER);
+            if (this.requestedServiceAvailabilityList[i].percentage == 0) {
+              p.stroke(this.getAvailabilityIntsColorFromPerc(this.requestedServiceAvailabilityList[i].percentage));
+              p.line(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2, sectionXCenter + sectionXFilledDim2, yCenter + chartYDim2);
+            } else if (this.requestedServiceAvailabilityList[i].percentage > 0) {
+              p.fill(this.getAvailabilityIntsColorFromPerc(this.requestedServiceAvailabilityList[i].percentage));
+              p.noStroke();
+              p.rect(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2, sectionXFilledDim, -((this.requestedServiceAvailabilityList[i].percentage < 0 ? 0 : this.requestedServiceAvailabilityList[i].percentage) * chartYDim / maxValue));
+            }
+          } 
+          /* Scheme */
+          p.rectMode(p.CENTER);
+          p.textAlign(p.RIGHT, p.CENTER);
+          p.noFill();
+          p.stroke(lineColor);
+          p.line(xCenter - chartXDim2, yCenter + chartYDim2, xCenter - chartXDim2, yCenter - chartYDim2);
+          p.line(xCenter - chartXDim2, yCenter + chartYDim2, xCenter + chartXDim2, yCenter + chartYDim2);
+          /* Average Line */
+          if (this.averageServiceAvailability >= 0) {
+            p.stroke(averageLineColor);
+            p.drawingContext.setLineDash(lineDashSequence);
+            p.line(xCenter - chartXDim2, yCenter + chartYDim2 - this.averageServiceAvailability * chartYDim / maxValue, xCenter + chartXDim2, yCenter + chartYDim2 - this.averageServiceAvailability * chartYDim / maxValue);
+            p.drawingContext.setLineDash([]);
+            p.textSize(textFontSize);
+            p.textAlign(p.RIGHT, p.CENTER);
+          }
+            /* Zero text */
+          p.fill(lineColor);
+          p.noStroke();
+          p.text("0%", xCenter - chartXDim2 - 10, yCenter + chartYDim2);
+          p.stroke(lineColor);
+          p.line(xCenter - chartXDim2 - 5, yCenter + chartYDim2, xCenter - chartXDim2, yCenter + chartYDim2);
+          p.line(xCenter - chartXDim2, yCenter + chartYDim2 + 5, xCenter - chartXDim2, yCenter + chartYDim2);
+          /* yAxis text */
+          for (var i = 0; i < nLines; i++) {
+            p.fill(lineColor);
+            p.noStroke();
+            p.text(p.int(maxValue / (nLines / (i + 1))) + "%", xCenter - chartXDim2 - 15, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines + 1);
+            p.stroke(lineColor);
+            p.line(xCenter - chartXDim2 - 5, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines, xCenter - chartXDim2, yCenter + chartYDim2 - (i + 1) * chartYDim / nLines)
+          }
+          /* Draw threshold lines */
+          for (var i = 1; i < this.availabilityColors.length; i++) {
+            p.stroke(this.getAvailabilityIntsColorFromPerc(this.availabilityColors[i].threshold));
+            p.line(xCenter - chartXDim2, yCenter + chartYDim2 - (this.availabilityColors[i].threshold * chartYDim / 100), xCenter + chartXDim2, yCenter + chartYDim2 - (this.availabilityColors[i].threshold * chartYDim / 100));
+          }
         }
       }
 
       p.fillCalendarChart = () => {        
         p.rectMode(p.CENTER);
         p.textAlign(p.CENTER, p.CENTER);
-        
-        for (var i = 0; i < 7; i++) {
-          p.fill(200);
-          p.noStroke();
-          p.textSize(dateFontSize);
-          p.text(this.dayOfWeek[i], xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2*dayYDim - dayYDim/1.5);
-          for (var k = 0; k < this.rowNumber; k++) {
-            if ((i+k*7) < this.weekdayShift || (i+k*7) >= (this.weekdayShift + this.requestedDaysNumber)) {
-              p.stroke(70);
-              p.fill(20);
-              p.rect(xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2*dayYDim + k * dayYDim, dayXDim, dayYDim);
-            } else {
-              if (this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].percentage == -1) {
+        if (this.isWeekly == true) {
+        } else {        
+          for (var i = 0; i < 7; i++) {
+            p.fill(200);
+            p.noStroke();
+            p.textSize(dateFontSize);
+            p.text(this.dayOfWeek[i], xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2*dayYDim - dayYDim/1.5);
+            for (var k = 0; k < this.rowNumber; k++) {
+              if ((i+k*7) < this.weekdayShift || (i+k*7) >= (this.weekdayShift + this.requestedDaysNumber)) {
                 p.stroke(70);
                 p.fill(20);
                 p.rect(xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2*dayYDim + k * dayYDim, dayXDim, dayYDim);
-                p.noStroke();
-                p.fill(0,150);
-                p.rect(xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2*dayYDim + k * dayYDim - dayYDim/4.0, dayXDim / 1.2, dayYDim / 4, 5);
-                p.fill(200);
-                p.noStroke();
-                p.textSize(dateFontSize);
-                p.text(this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].date, xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2 * dayYDim + k * dayYDim + 1 - dayYDim/4.0);
-                p.fill(100);
-                p.textSize(valueFontSize);
-                p.text("NaN", xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2 * dayYDim + k * dayYDim + 1 + dayYDim/5.5);
+              } else {
+                if (this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].percentage == -1) {
+                  p.stroke(70);
+                  p.fill(20);
+                  p.rect(xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2*dayYDim + k * dayYDim, dayXDim, dayYDim);
+                  p.noStroke();
+                  p.fill(0,150);
+                  p.rect(xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2*dayYDim + k * dayYDim - dayYDim/4.0, dayXDim / 1.2, dayYDim / 4, 5);
+                  p.fill(200);
+                  p.noStroke();
+                  p.textSize(dateFontSize);
+                  p.text(this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].date, xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2 * dayYDim + k * dayYDim + 1 - dayYDim/4.0);
+                  p.fill(100);
+                  p.textSize(valueFontSize);
+                  p.text("NaN", xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2 * dayYDim + k * dayYDim + 1 + dayYDim/5.5);
+                }
               }
             }
           }
-        }
-        for (var i = 0; i < 7; i++) {
-          for (var k = 0; k < this.rowNumber; k++) {
-            if ((i+k*7) >= this.weekdayShift && (i+k*7) < (this.weekdayShift + this.requestedDaysNumber)) {
-              if (this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].percentage >= 0 ) {
-                p.stroke(255);
-                p.fill(this.getAvailabilityIntsColorFromPerc(this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].percentage));
-                p.rect(xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2*dayYDim + k * dayYDim, dayXDim, dayYDim);
-                p.noStroke();
-                p.fill(0,150);
-                p.rect(xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2*dayYDim + k * dayYDim - dayYDim/4.0, dayXDim / 1.2, dayYDim / 4, 5);
-                p.fill(200);
-                p.noStroke();
-                p.textSize(dateFontSize);
-                p.text(this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].date, xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2 * dayYDim + k * dayYDim + 1 - dayYDim/4.0);
-                p.textSize(valueFontSize);
-                p.fill(30);
-                p.text(this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].percentage.toFixed(2)+"%", xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2 * dayYDim + k * dayYDim + 1 + dayYDim/5.5);
+          for (var i = 0; i < 7; i++) {
+            for (var k = 0; k < this.rowNumber; k++) {
+              if ((i+k*7) >= this.weekdayShift && (i+k*7) < (this.weekdayShift + this.requestedDaysNumber)) {
+                if (this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].percentage >= 0 ) {
+                  p.stroke(255);
+                  p.fill(this.getAvailabilityIntsColorFromPerc(this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].percentage));
+                  p.rect(xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2*dayYDim + k * dayYDim, dayXDim, dayYDim);
+                  p.noStroke();
+                  p.fill(0,150);
+                  p.rect(xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2*dayYDim + k * dayYDim - dayYDim/4.0, dayXDim / 1.2, dayYDim / 4, 5);
+                  p.fill(200);
+                  p.noStroke();
+                  p.textSize(dateFontSize);
+                  p.text(this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].date, xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2 * dayYDim + k * dayYDim + 1 - dayYDim/4.0);
+                  p.textSize(valueFontSize);
+                  p.fill(30);
+                  p.text(this.requestedServiceAvailabilityList[i+k*7 - this.weekdayShift].percentage.toFixed(2)+"%", xCenter - 3*dayXDim + i * dayXDim, yCenter - (this.rowNumber-1)/2 * dayYDim + k * dayYDim + 1 + dayYDim/5.5);
+                }
               }
             }
           }
