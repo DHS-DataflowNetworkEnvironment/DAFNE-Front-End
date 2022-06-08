@@ -13,6 +13,7 @@
     background-color: var(--main-bg-color);
     color: var(--main-text-color);
     width: 100%;
+    min-width: 980px;
 }
 
 /* Filters view */
@@ -35,38 +36,86 @@
     flex-wrap: nowrap;
     justify-content: center;
 }
-#filters-form #mission-select, #product-type-select, #platform-number-select {
-    font-size: 0.75rem;
-    height: 2rem;
+#filters-form .use-filter-div {
+    display: flex;
+    align-items: center;
+    margin-left: 0;
 }
-#filters-form label {
+#filters-form .filter-string-div{
+    display: flex;
+    align-items: center;
+    margin-left: 0;
+}
+#use-filter-checkbox {
+    -webkit-appearance: none;
+	background-color: var(--modal-bg-color);
+    border-color: var(--title-bg-color);
+    color: var(--checked-color);
+	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05);
+    font-size: 2rem;
+    width: 2rem;
+    cursor: pointer !important;
+}
+#use-filter-checkbox:checked:after {
+	content: '\2714';
+    position: absolute;
+    left: 1px;
+    top: -10px;
+}
+label {
     color: var(--main-text-color);
     font-size: 0.75rem;
     text-align: right;
     margin-right: 0.5rem;
-
     margin-left: 1rem;
 }
-#filters-form select {
+select {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
     background-color: var(--modal-bg-color);
     border-color: var(--title-bg-color);
     color: var(--main-text-color);
     font-size: 0.75rem;
+    max-width: 6rem;
+    height: 2rem;
 }
+input {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    background-color: var(--modal-bg-color);
+    border-width: 2px;
+    border-color: var(--title-bg-color);
+    border-style: inset;
+    padding: 9px;
+	border-radius: 1px;
+    bottom: 5px;
+    height: 2rem;
+    max-width: 6rem;
+    position: relative;
+}
+#filter-string {
+    color: var(--main-text-color);
+    font-size: 0.75rem;
+}
+
 #filter-submit-button {
     font-size: 1.0rem;
     height: 2rem;
     text-align: center;
     line-height: 1rem;
-    margin-left: 4rem;
+    margin-left: 1rem;
     padding-left: 2rem;
     padding-right: 4rem;
 }
 ::ng-deep dp-date-picker.dp-material .dp-picker-input {
     background-color: var(--modal-bg-color) !important;
     color: var(--main-text-color) !important ;
-    border-width: 0;
-    border-radius: 5px;
+    border-width: 2px;
+    border-color: var(--title-bg-color);
+    border-style: inset;
+    height: 2rem !important;
     font-size: 0.75rem;
     width: 80px !important;
     text-align: center;
@@ -258,9 +307,6 @@ th {
     #main-column-container {
         height: calc(100vh - 9rem - 11.5rem);
     }
-    #filters-form label {
-        display: none;
-    }
 }
 
 @media screen and (min-width: 768px) {
@@ -271,9 +317,6 @@ th {
     }
     #main-column-container {
         height: calc(100vh - 9rem - 12rem);
-    }
-    #filters-form label {
-        display: inline;
     }
 }
 

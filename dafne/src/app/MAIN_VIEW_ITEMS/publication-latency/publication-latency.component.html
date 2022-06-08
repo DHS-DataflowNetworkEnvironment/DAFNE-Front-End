@@ -9,19 +9,18 @@
                     <input type="checkbox" class="form-control" id="weekly-checkbox" name="weekly-checkbox" (change)="onWeeklyCheckboxChange()" [checked]="false">
                 </div>
                 <div>
-                    <label class="form-label">Synchronizer:</label>
+                    <label class="form-label">Synch:</label>
                     <select id="synchronizer-select" class="form-select" (change)="onFilterSyncChange($event)">
                         <option [value]="sync.Label" *ngFor="let sync of syncList">{{sync.Label}}</option>
                     </select>
                 </div>
                 <div class="date-picker">
-                    <label class="form-label">Start Date:</label>
+                    <label class="form-label">Start/Stop Date:</label>
                     <dp-date-picker class="" theme="dp-material" id="filter-start-date" name="filter-start-date" (click)="onDateClick($event)"
                         [(ngModel)]="startDate" (ngModelChange)="onStartDateChanged($event)" [config]="startDatePickerConfig" placeholder="YYYY-MM-DD">
                     </dp-date-picker>
                 </div>
                 <div class="date-picker">
-                    <label class="form-label">Stop Date:</label>
                     <dp-date-picker class="" theme="dp-material" id="filter-stop-date" name="filter-stop-date" (click)="onDateClick($event)"
                         [(ngModel)]="stopDate" (ngModelChange)="onStopDateChanged($event)" [config]="stopDatePickerConfig" placeholder="YYYY-MM-DD">
                     </dp-date-picker>

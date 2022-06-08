@@ -274,6 +274,17 @@ export class AuthenticationService {
     ));
   }
 
+  getFESynchronizers() {
+    // get FE synchronizers v2 from the back-end
+    return this.http.get<any>(AppConfig.settings.apiUrl + `/synchronizers/fe`)
+    .pipe(
+    catchError(err => {
+        console.error(err);
+        return throwError(err);
+        }
+    ));
+  }
+
   getSynchronizersV2() {
     // get synchronizers v2 from the back-end
     return this.http.get<any>(AppConfig.settings.apiUrl + `/synchronizers/v2`)
@@ -284,7 +295,6 @@ export class AuthenticationService {
         }
     ));
   }
-
 
   deleteSynchronizer(id: number, body: object) {
     // delete one sync
@@ -303,6 +313,21 @@ export class AuthenticationService {
     // get completeness
     return this.http.post<any>(
       AppConfig.settings.apiUrl + `/products/completeness`,
+      body,
+      httpOptions
+    )
+    .pipe(
+    catchError(err => {
+        console.error(err);
+        return throwError(err);
+        }
+    ));
+  }
+
+  getFilterCompleteness(body: object) {
+    // get completeness
+    return this.http.post<any>(
+      AppConfig.settings.apiUrl + `/products/filter-completeness`,
       body,
       httpOptions
     )

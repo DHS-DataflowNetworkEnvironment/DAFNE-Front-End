@@ -661,6 +661,7 @@ export class PublicationLatencyComponent implements OnInit {
         p.resizeCanvas(canvasWidth, canvasHeight);
         canvasWidth = canvas.clientWidth * sf;
         canvasHeight = canvas.clientHeight * sf;
+        if (canvasHeight < 240) canvasHeight = 240;
         xCenter = canvasWidth / 2;
         yCenter = canvasHeight / 2;
         chartXDim = (canvasWidth - blankXDim);

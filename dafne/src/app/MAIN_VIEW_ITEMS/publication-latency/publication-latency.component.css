@@ -13,6 +13,7 @@
     background-color: var(--main-bg-color);
     color: var(--main-text-color);
     width: 100%;
+    min-width: 730px;
 }
 
 /* Filters view */
@@ -38,6 +39,7 @@
 #filters-form #synchronizer-select {
     font-size: 0.75rem;
     height: 2rem;
+    width: 6rem;
 }
 #filters-form .date-picker {
     margin-left: 0;
@@ -49,12 +51,18 @@
 }
 #weekly-checkbox {
     -webkit-appearance: none;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
 	background-color: var(--modal-bg-color);
 	border: 1px solid var(--title-bg-color);
     color: var(--checked-color);
 	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05);
 	padding: 9px;
 	border-radius: 3px;
+    border-width: 2px;
+    border-color: var(--title-bg-color);
+    border-style: inset;
     font-size: 2rem;
     width: 2rem;
     height: 2rem;
@@ -65,8 +73,8 @@
 #weekly-checkbox:checked:after {
 	content: '\2714';
     position: absolute;
-    left: 3px;
-    top: -8px;
+    left: 1px;
+    top: -10px;
 }
 #filters-form label {
     flex: none;
@@ -94,8 +102,10 @@
 ::ng-deep dp-date-picker.dp-material .dp-picker-input {
     background-color: var(--modal-bg-color) !important;
     color: var(--main-text-color) !important ;
-    border-width: 0;
-    border-radius: 5px;
+    border-width: 2px;
+    border-color: var(--title-bg-color);
+    border-style: inset;
+    height: 2rem !important;
     font-size: 0.75rem;
     width: 80px !important;
     text-align: center;
@@ -313,9 +323,6 @@ th {
     #main-column-container {
         height: calc(100vh - 9rem - 11.5rem);
     }
-    #filters-form label {
-        display: none;
-    }
 }
 
 @media screen and (min-width: 768px) {
@@ -326,9 +333,6 @@ th {
     }
     #main-column-container {
         height: calc(100vh - 9rem - 12rem);
-    }
-    #filters-form label {
-        display: inline;
     }
 }
 

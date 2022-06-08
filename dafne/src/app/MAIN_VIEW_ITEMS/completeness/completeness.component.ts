@@ -47,7 +47,24 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
   public platformNumberList = this.missionFiltered.platform[0];
   public platformNumber: string = this.platformNumberList[0];
   public platformNumberFiltered: string = this.platformNumber;
+  public filter: string;
+  public syncList = [];
+  public syncBackendLength: number;
+  public syncBackendLengthArray = [];
+  public serviceUrlBackendList = [];
+  public intelligentSyncSupported = [];
   public bodyMission: string;
+
+  public beSynchronizers = []
+  public feSynchronizers = []
+  public serviceTypeList = [
+    "All",
+    "Back-End and Single Instance",
+    "Front-End"
+  ]
+  public serviceType: string;
+  public showBESync: boolean = false;
+  public showFESync: boolean = false;
 
   public today = new Date();
   public todayDate: string = this.today.toISOString().slice(0, 10);
@@ -84,6 +101,9 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
   public chartType: string = this.selectorText[2];
   public doResetZoom: boolean = false;
   public centreNumber: number = 0;
+
+  public useSyncFilter: boolean = false;
+  public useSyncFilterForTable: boolean = null;
 
   constructor(
     private el: ElementRef,
@@ -125,7 +145,6 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
       (res: any) => {
         /* Filter services with service_type != Back-End */
         this.serviceList = res.filter(a => a.service_type != 3);
-        
         for (var i = 0; i < this.serviceList.length; i++) {
             this.getServiceType(i, this.serviceList[i].service_type);
         }
@@ -190,11 +209,83 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
             longitude: '0.0'
           };
         }
-        
-        // uncomment to get completeness on page load:
-        //this.onFilterSubmit();
+
+        this.getSynchronizers();
       }
     );
+  }
+
+  getSynchronizers() {
+    this.authenticationService.getSynchronizers().subscribe(
+      (res: any) => {
+        for (var i = 0; i < Object.keys(res).length; i++) {
+          for (var k = 0; k < res[i].synchronizers.length; k++) {
+            res[i].synchronizers[k].serviceUrl = res[i].serviceUrl;
+            this.beSynchronizers.push(res[i].synchronizers[k]);
+          }
+        }
+        this.authenticationService.getFESynchronizers().subscribe(
+          (res: any) => {        
+            for (var i = 0; i < Object.keys(res).length; i++) {
+              for (var k = 0; k < res[i].synchronizers.length; k++) {
+                res[i].synchronizers[k].serviceUrl = res[i].serviceUrl;
+                this.feSynchronizers.push(res[i].synchronizers[k])
+              }
+            }
+          }
+        );
+      }
+    );
+  }
+
+  onUseFilterCheckboxChange() {
+    var chkBox = <HTMLInputElement>document.getElementById('use-filter-checkbox');
+    this.useSyncFilter = chkBox.checked;
+    if (this.useSyncFilter) {
+      /* Set initial status for sync filters */
+      this.showBESync = true;
+      this.showFESync = true;
+      this.filter = this.beSynchronizers[0].FilterParam
+    } else {
+      /* Set initial status for manual filters */
+      this.missionFiltered = this.totalMissionList[0];
+      this.productTypeFiltered = this.missionFiltered.productType[0];
+      this.missionName = this.missionFiltered.name;
+      this.productType = this.productTypeFiltered;
+      this.platformNumberList = this.missionFiltered.platform[0];
+      this.platformNumber = this.platformNumberList[0];
+      this.platformNumberFiltered = this.platformNumber;
+    }
+  }
+
+  onServiceTypeChange(serviceType) {
+    if (serviceType.target.value == "All") {
+      this.showBESync = true;
+      this.showFESync = true;
+      if (this.beSynchronizers[0]) this.filter = this.beSynchronizers[0].FilterParam
+    } else if (serviceType.target.value == "Front-End") {
+      this.showBESync = false;
+      this.showFESync = true;
+      if (this.feSynchronizers[0]) this.filter = this.feSynchronizers[0].FilterParam
+    } else {
+      this.showBESync = true;
+      this.showFESync = false;
+      if (this.beSynchronizers[0]) this.filter = this.beSynchronizers[0].FilterParam
+    }
+  }
+
+  onSyncChange(sync) {
+    let tempFilter;
+    tempFilter = this.beSynchronizers.filter(a => a.Label == sync.target.value)[0];
+    if (tempFilter !== undefined) {
+      this.filter = tempFilter.FilterParam;
+      return;
+    }
+    tempFilter = this.feSynchronizers.filter(a => a.Label == sync.target.value)[0];
+    if (tempFilter !== undefined) {
+      this.filter = tempFilter.FilterParam;
+      return;
+    }
   }
 
   onMissionChange(mission) {
@@ -214,55 +305,88 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  onFilterSubmit(): void {    
-    /* Get values from filters: */
-    this.missionName = this.missionFiltered.name;
-    this.productType = this.productTypeFiltered;
-    if (this.platformNumberFiltered == '---') {
-      this.platformNumber = '';
-    } else {
-      this.platformNumber = this.platformNumberFiltered;
-    }
-    this.bodyMission = this.missionFiltered.acronym + this.platformNumber;
-    let tempStopDate = new Date(this.stopDate);
-    let tempStartDate = new Date(this.startDate);
-    let tempTimeDifference = tempStopDate.getTime() - tempStartDate.getTime();
-    this.tempDaysNumber = tempTimeDifference / (1000 * 3600 * 24) + 1;
-  
-    for (var i = 0; i < this.tempDaysNumber; i++) {
-      let tempFilteredDate = new Date(tempStartDate.getTime() + i*(1000*3600*24));
-      let tempFilteredDateString: string = tempFilteredDate.toISOString().slice(0, 10);
+  onFilterSubmit(): void {
+    if (this.useSyncFilter == true) {
+      let tempStopDate = new Date(this.stopDate);
+      let tempStartDate = new Date(this.startDate);
+      let tempTimeDifference = tempStopDate.getTime() - tempStartDate.getTime();
+      this.tempDaysNumber = tempTimeDifference / (1000 * 3600 * 24) + 1;
+      for (var i = 0; i < this.tempDaysNumber; i++) {
+        let tempFilteredDate = new Date(tempStartDate.getTime() + i*(1000*3600*24));
+        let tempFilteredDateString: string = tempFilteredDate.toISOString().slice(0, 10);
 
-      let body: object = {
-        "mission":this.bodyMission,
-        "productType":this.productType,
-        "startDate":tempFilteredDateString,
-        "stopDate":tempFilteredDateString
-      };
-      this.completenessDailyGetDone[i] = false;   
-      this.getDailyCompleteness(body, i);
+        let body: object = {
+          "filter":this.filter,
+          "startDate":tempFilteredDateString,
+          "stopDate":tempFilteredDateString
+        };
+        this.completenessDailyGetDone[i] = false;   
+        this.getDailyCompleteness(body, i);
+      }
+    } else {
+      /* Get values from filters: */
+      this.missionName = this.missionFiltered.name;
+      this.productType = this.productTypeFiltered;
+      if (this.platformNumberFiltered == '---') {
+        this.platformNumber = '';
+      } else {
+        this.platformNumber = this.platformNumberFiltered;
+      }
+      this.bodyMission = this.missionFiltered.acronym + this.platformNumber;
+      let tempStopDate = new Date(this.stopDate);
+      let tempStartDate = new Date(this.startDate);
+      let tempTimeDifference = tempStopDate.getTime() - tempStartDate.getTime();
+      this.tempDaysNumber = tempTimeDifference / (1000 * 3600 * 24) + 1;
+    
+      for (var i = 0; i < this.tempDaysNumber; i++) {
+        let tempFilteredDate = new Date(tempStartDate.getTime() + i*(1000*3600*24));
+        let tempFilteredDateString: string = tempFilteredDate.toISOString().slice(0, 10);
+
+        let body: object = {
+          "mission":this.bodyMission,
+          "productType":this.productType,
+          "startDate":tempFilteredDateString,
+          "stopDate":tempFilteredDateString
+        };
+        this.completenessDailyGetDone[i] = false;   
+        this.getDailyCompleteness(body, i);
+      }
     }
   }
 
   getDailyCompleteness(body, index) {
-    this.authenticationService.getCompleteness(body).subscribe(
-      (res: object) => {
-        if (res) {
-          this.completenessDailyDataList[index] = res;
-          this.completenessDailyGetDone[index] = true;
-          this.sumDailyCompleteness();
-        } else {
-          this.completenessDailyDataList[index] = [];
+    if (this.useSyncFilter == true) {
+      this.authenticationService.getFilterCompleteness(body).subscribe(
+        (res: object) => {
+          if (res) {
+            this.completenessDailyDataList[index] = res;
+            this.completenessDailyGetDone[index] = true;
+            this.sumDailyCompleteness();
+          } else {
+            this.completenessDailyDataList[index] = [];
+          }
+          this.useSyncFilterForTable = this.useSyncFilter
         }
-      }
-    );
+      );
+    } else {
+      this.authenticationService.getCompleteness(body).subscribe(
+        (res: object) => {
+          if (res) {
+            this.completenessDailyDataList[index] = res;
+            this.completenessDailyGetDone[index] = true;
+            this.sumDailyCompleteness();
+          } else {
+            this.completenessDailyDataList[index] = [];
+          }
+          this.useSyncFilterForTable = this.useSyncFilter
+        }
+      );
+    }
   }
 
   sumDailyCompleteness() {
-    let tempGetReady = true;
     for (var i = 0; i < this.tempDaysNumber; i++) {
       if (this.completenessDailyGetDone[i] == false) {
-        tempGetReady = false;
         return;
       }
     }
@@ -348,18 +472,25 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
       var table = document.getElementById('data-table');
       for (var r = 0; r < table.childElementCount; r++) {
         for (var c = 0; c < table.children[r].childElementCount; c++) {
-          csvContent += table.children[r].children[c].innerHTML;
+          if (table.children[r].children[c].innerHTML.includes(',')) {
+            csvContent += '"'+table.children[r].children[c].innerHTML+'"'
+          } else {
+            csvContent += table.children[r].children[c].innerHTML;
+          }
           if (!(c == (table.children[r].childElementCount - 1) && r == (table.childElementCount - 1))) csvContent += ',';
         }
         r < (table.childElementCount - 1) ? csvContent += '\n' : null;
       }
-      let tempCompleteCsvMissionName = this.missionFiltered.acronym + this.platformNumber;
+      let tempCompleteCsvMissionName
+      if (this.useSyncFilter) {
+        tempCompleteCsvMissionName = 'Filter(' + this.filter + ')';
+      } else {
+        tempCompleteCsvMissionName = 'Mission(' + this.missionFiltered.acronym + this.platformNumber + ')_Product(' + this.productType + ')';
+      }
       this.csvService.exportToCsv(
-        'DAFNE-Mission('
-        + tempCompleteCsvMissionName
-        + ')_Product('
-        + this.productType 
-        + ')_From('
+        'DAFNE-Completeness_'
+        + tempCompleteCsvMissionName 
+        + '_From('
         + table.children[0].children[1].innerHTML
         + ')_To('
         + table.children[0].children[table.children[0].childElementCount - 1].innerHTML
@@ -502,6 +633,7 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
         p.resizeCanvas(canvasWidth, canvasHeight);
         canvasWidth = canvas.clientWidth * sf;
         canvasHeight = canvas.clientHeight * sf;
+        if (canvasHeight < 240) canvasHeight = 240;
         xCenter = canvasWidth / 2;
         yCenter = canvasHeight / 2;
         pieExtDiameter = (canvasWidth > canvasHeight) ? canvasHeight - blankYDim : canvasWidth - blankXDim;
