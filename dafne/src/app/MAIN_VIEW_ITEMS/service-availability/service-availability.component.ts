@@ -399,6 +399,8 @@ export class ServiceAvailabilityComponent implements OnInit {
       let valueFontSize = 20;
       let dateFontSize = 10;
       let textFontSize = 10;
+      let percentageFontSize = 14;
+
 
       let barGapScale = 30.0;
       let sectionScaleSingle = 1.4;
@@ -577,13 +579,22 @@ export class ServiceAvailabilityComponent implements OnInit {
               p.rect(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2, sectionXFilledDim, -((this.requestedServiceAvailabilityList[i].percentage < 0 ? 0 : this.requestedServiceAvailabilityList[i].percentage) * chartYDim / maxValue));
             }
 
-            /* Selector box */
+            /* If mouse is on bar */
             if (p.mouseX > sectionXCenter - (chartXDim / this.requestedWeeksNumber)/2 + tx && p.mouseX < sectionXCenter + (chartXDim / this.requestedWeeksNumber)/2 + tx
                 && p.mouseY > yCenter - chartYDim2 + ty && p.mouseY < yCenter + chartYDim2 + sinOfAngle + 4 * dateFontSize + ty) {
+              
+              /* Selector box */
               p.stroke(230);
               p.fill(255, 30);
-              p.rect(sectionXCenter - sectionXFilledDim2, yCenter - chartYDim2, sectionXFilledDim, chartYDim + sinOfAngle + 4 * dateFontSize);
+              p.rect(sectionXCenter - sectionXFilledDim2, yCenter - chartYDim2, sectionXFilledDim, chartYDim + 2 * sinOfAngle + 4 * dateFontSize);
               this.mouseIsOnList[i] = true;
+
+              /* Tooltip */
+              p.textSize(percentageFontSize);
+              p.noStroke();
+              p.fill(lineColor);
+              p.text((this.requestedServiceAvailabilityList[i].percentage == null || this.requestedServiceAvailabilityList[i].percentage < 0) ? "NaN" : this.requestedServiceAvailabilityList[i].percentage == 100 ? "100.00%": p.nf(this.requestedServiceAvailabilityList[i].percentage, 2, 2)+"%", 
+                      sectionXCenter, yCenter - chartYDim2 - 2 * dateFontSize);
             }
           } 
           /* Scheme */
@@ -669,6 +680,24 @@ export class ServiceAvailabilityComponent implements OnInit {
               p.fill(this.getAvailabilityIntsColorFromPerc(this.requestedServiceAvailabilityList[i].percentage));
               p.noStroke();
               p.rect(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2, sectionXFilledDim, -((this.requestedServiceAvailabilityList[i].percentage < 0 ? 0 : this.requestedServiceAvailabilityList[i].percentage) * chartYDim / maxValue));
+            }
+
+            /* If mouse is on bar */
+            if (p.mouseX > sectionXCenter - (chartXDim / this.requestedDaysNumber)/2 + tx && p.mouseX < sectionXCenter + (chartXDim / this.requestedDaysNumber)/2 + tx
+                && p.mouseY > yCenter - chartYDim2 + ty && p.mouseY < yCenter + chartYDim2 + sinOfAngle + 4 * dateFontSize + ty) {
+              
+              /* Selector box */
+              p.stroke(230);
+              p.fill(255, 30);
+              p.rect(sectionXCenter - sectionXFilledDim2, yCenter - chartYDim2, sectionXFilledDim, chartYDim + 2 * sinOfAngle + 3 * dateFontSize);
+              this.mouseIsOnList[i] = true;
+
+              /* Tooltip */
+              p.textSize(percentageFontSize);
+              p.noStroke();
+              p.fill(lineColor);
+              p.text((this.requestedServiceAvailabilityList[i].percentage == null || this.requestedServiceAvailabilityList[i].percentage < 0) ? "NaN" : this.requestedServiceAvailabilityList[i].percentage == 100 ? "100.00%": p.nf(this.requestedServiceAvailabilityList[i].percentage, 2, 2)+"%", 
+                      sectionXCenter, yCenter - chartYDim2 - 2 * dateFontSize);
             }
           } 
           /* Scheme */

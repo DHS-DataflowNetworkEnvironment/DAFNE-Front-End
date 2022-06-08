@@ -533,7 +533,7 @@ export class PublicationLatencyComponent implements OnInit {
       let lineColor = p.color('#aaaaaa');
       let valuesColor = p.color(200);
       let dateFontSize = 10;
-      let valueFontSize = 10;
+      let valueFontSize = 14;
 
       let barGapScale = 30.0;
       let sectionScaleSingle = 1.4;
@@ -716,7 +716,7 @@ export class PublicationLatencyComponent implements OnInit {
             if (sinOfAngleTemp < 0.001) {
               sinOfAngleTemp = 0.001;
             }
-            let sinOfAngle = sinOfAngleTemp * (p.textWidth(preText) / 2);
+            let sinOfAngle = sinOfAngleTemp * (p.textWidth(preText) / 2);            
             p.push();
             p.translate(sectionXCenter, yCenter + chartYDim2 + sinOfAngle + 3 * dateFontSize);
             if (angle > p.PI / 2) angle = p.PI / 2;
@@ -752,13 +752,21 @@ export class PublicationLatencyComponent implements OnInit {
             p.noStroke();
             p.rect(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2, sectionXFilledDim, -((this.requestedPublicationLatencyList[i].average_latency < 0 ? 0 : this.requestedPublicationLatencyList[i].average_latency * chartYDim / maxValue)));
   
-            /* Selector box */
+            /* If mouse on bars */
             if (p.mouseX > sectionXCenter - (chartXDim / this.requestedWeeksNumber)/2 + tx && p.mouseX < sectionXCenter + (chartXDim / this.requestedWeeksNumber)/2 + tx
                 && p.mouseY > yCenter - chartYDim2 + ty && p.mouseY < yCenter + chartYDim2 + sinOfAngle + 4 * dateFontSize + ty) {
+              /* Selector box */
               p.stroke(230);
               p.fill(255, 30);
-              p.rect(sectionXCenter - sectionXFilledDim2, yCenter - chartYDim2, sectionXFilledDim, chartYDim + sinOfAngle + 4 * dateFontSize);
+              p.rect(sectionXCenter - sectionXFilledDim2, yCenter - chartYDim2, sectionXFilledDim, chartYDim + 2 * sinOfAngle + 4 * dateFontSize);
               this.mouseIsOnList[i] = true;
+
+              /* Tooltip */
+              p.textSize(valueFontSize);
+              p.noStroke();
+              p.fill(lineColor);
+              p.text(this.requestedPublicationLatencyList[i].average_latency == null ? "NaN" : this.millisToHHMMSS(this.requestedPublicationLatencyList[i].average_latency), 
+                      sectionXCenter, yCenter - chartYDim2 - 2 * dateFontSize);
             }
           } 
           /* Scheme */
@@ -771,6 +779,7 @@ export class PublicationLatencyComponent implements OnInit {
           /* Zero text */
           p.fill(lineColor);
           p.noStroke();
+          p.textSize(dateFontSize);
           p.text("0s", xCenter - chartXDim2 - 10, yCenter + chartYDim2);
           p.stroke(lineColor);
           p.line(xCenter - chartXDim2 - 5, yCenter + chartYDim2, xCenter - chartXDim2, yCenter + chartYDim2);
@@ -845,6 +854,7 @@ export class PublicationLatencyComponent implements OnInit {
             p.noFill();
             p.stroke(lineColor);
             p.line(xCenter - chartXDim2 + (i + 1) * chartXDim / this.requestedDaysNumber, yCenter + chartYDim2 + 5, xCenter - chartXDim2 + (i + 1) * chartXDim / this.requestedDaysNumber, yCenter + chartYDim2);
+            
             /* Bars */
             p.rectMode(p.CORNER);
             if (this.requestedPublicationLatencyList[i].average_latency > this.latencyColors[0].threshold) {
@@ -860,15 +870,23 @@ export class PublicationLatencyComponent implements OnInit {
             }
             
             p.noStroke();
-            p.rect(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2, sectionXFilledDim, -((this.requestedPublicationLatencyList[i].average_latency < 0 ? 0 : this.requestedPublicationLatencyList[i].average_latency * chartYDim / maxValue)));
+            p.rect(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2, sectionXFilledDim, -(this.requestedPublicationLatencyList[i].average_latency < 0 ? 0 : this.requestedPublicationLatencyList[i].average_latency * chartYDim / maxValue));
 
-            /* Selector box */
+            /* if mouse is on bar */
             if (p.mouseX > sectionXCenter - (chartXDim / this.requestedDaysNumber)/2 + tx && p.mouseX < sectionXCenter + (chartXDim / this.requestedDaysNumber)/2 + tx
                 && p.mouseY > yCenter - chartYDim2 + ty && p.mouseY < yCenter + chartYDim2 + sinOfAngle + 2 * dateFontSize + ty) {
+              /* Selector box */
               p.stroke(230);
               p.fill(255, 30);
-              p.rect(sectionXCenter - sectionXFilledDim2, yCenter - chartYDim2, sectionXFilledDim, chartYDim + sinOfAngle + 2 * dateFontSize);
+              p.rect(sectionXCenter - sectionXFilledDim2, yCenter - chartYDim2, sectionXFilledDim, chartYDim + 2 * sinOfAngle + 3 * dateFontSize);
               this.mouseIsOnList[i] = true;
+
+              /* Tooltip */
+              p.textSize(valueFontSize);
+              p.noStroke();
+              p.fill(lineColor);
+              p.text(this.requestedPublicationLatencyList[i].average_latency == null ? "NaN" : this.millisToHHMMSS(this.requestedPublicationLatencyList[i].average_latency), 
+                      sectionXCenter, yCenter - chartYDim2 - 2 * dateFontSize);
             }
           } 
           /* Scheme */
@@ -881,6 +899,7 @@ export class PublicationLatencyComponent implements OnInit {
           /* Zero text */
           p.fill(lineColor);
           p.noStroke();
+          p.textSize(dateFontSize);
           p.text("0s", xCenter - chartXDim2 - 10, yCenter + chartYDim2);
           p.stroke(lineColor);
           p.line(xCenter - chartXDim2 - 5, yCenter + chartYDim2, xCenter - chartXDim2, yCenter + chartYDim2);
@@ -941,6 +960,13 @@ export class PublicationLatencyComponent implements OnInit {
 
           for (var i = 0; i < this.requestedWeeksNumber; i++) {
             let sectionXCenter = xCenter - chartXDim2 + chartXDim / (2 * this.requestedWeeksNumber) + i * chartXDim / this.requestedWeeksNumber;
+            
+            /* xAxis Text */
+            p.textAlign(p.CENTER, p.CENTER);
+            p.fill(lineColor);
+            p.noStroke();
+            p.textSize(dateFontSize);
+
             /* Rotate Dates */
             let tempText;
             let preText = "Week from";
@@ -956,14 +982,10 @@ export class PublicationLatencyComponent implements OnInit {
             }
             let sinOfAngle = sinOfAngleTemp * (p.textWidth(preText) / 2);
             p.push();
-            p.translate(sectionXCenter, yCenter + chartYDim2 + sinOfAngle + 4 * dateFontSize);
+            p.translate(sectionXCenter, yCenter + chartYDim2 + sinOfAngle + 3 * dateFontSize);
             if (angle > p.PI / 2) angle = p.PI / 2;
             if (angle < 0) angle = 0;
             p.rotate(-angle);
-            p.textAlign(p.CENTER, p.CENTER);
-            p.fill(lineColor);
-            p.noStroke();
-            p.textSize(dateFontSize);
             if (this.requestedPublicationLatencyList[i].source == "BE") {
               tempText = tempText + "\n( BE )";
             } else if (this.requestedPublicationLatencyList[i].source == "FE+BE") {
@@ -974,13 +996,22 @@ export class PublicationLatencyComponent implements OnInit {
             p.text(tempText, 0, 0);
             p.pop();
 
-            /* Selector box */
+            /* If mouse on bars */
             if (p.mouseX > sectionXCenter - (chartXDim / this.requestedWeeksNumber)/2 + tx && p.mouseX < sectionXCenter + (chartXDim / this.requestedWeeksNumber)/2 + tx
                 && p.mouseY > yCenter - chartYDim2 + ty && p.mouseY < yCenter + chartYDim2 + sinOfAngle + 4 * dateFontSize + ty) {
+              /* Selector box */
               p.stroke(230);
               p.fill(255, 30);
-              p.rect(sectionXCenter - sectionXFilledDim2, yCenter - chartYDim2, sectionXFilledDim, chartYDim + sinOfAngle + 4 * dateFontSize);
+              //p.rect(sectionXCenter - sectionXFilledDim2, yCenter - chartYDim2, sectionXFilledDim, chartYDim + 2 * sinOfAngle + 4 * dateFontSize);
+              p.line(sectionXCenter, yCenter - chartYDim2, sectionXCenter, yCenter + chartYDim2);
               this.mouseIsOnList[i] = true;
+
+              /* Tooltip */
+              p.textSize(valueFontSize);
+              p.noStroke();
+              p.fill(lineColor);
+              p.text(this.requestedPublicationLatencyList[i].average_latency == null ? "NaN" : this.millisToHHMMSS(this.requestedPublicationLatencyList[i].average_latency), 
+                      sectionXCenter, yCenter - chartYDim2 - 2 * dateFontSize);
             }
 
             /* xAxis Lines */
@@ -998,6 +1029,7 @@ export class PublicationLatencyComponent implements OnInit {
           /* Zero text */
           p.fill(lineColor);
           p.noStroke();
+          p.textSize(dateFontSize);
           p.text("0s", xCenter - chartXDim2 - 10, yCenter + chartYDim2);
           p.stroke(lineColor);
           p.line(xCenter - chartXDim2 - 5, yCenter + chartYDim2, xCenter - chartXDim2, yCenter + chartYDim2);
@@ -1053,6 +1085,13 @@ export class PublicationLatencyComponent implements OnInit {
 
           for (var i = 0; i < this.requestedDaysNumber; i++) {
             let sectionXCenter = xCenter - chartXDim2 + chartXDim / (2 * this.requestedDaysNumber) + i * chartXDim / this.requestedDaysNumber;
+            
+            /* xAxis Text */
+            p.textAlign(p.CENTER, p.CENTER);
+            p.fill(lineColor);
+            p.noStroke();
+            p.textSize(dateFontSize);
+
             /* Rotate Dates */
             let tempText = this.requestedPublicationLatencyList[i].day;
             let tempRadium = (sectionXFilledDim - (2 * barGap) - dateFontSize);
@@ -1066,14 +1105,10 @@ export class PublicationLatencyComponent implements OnInit {
             }
             let sinOfAngle = sinOfAngleTemp * (p.textWidth(tempText) / 2);
             p.push();
-            p.translate(sectionXCenter, yCenter + chartYDim2 + sinOfAngle + dateFontSize*2);
+            p.translate(sectionXCenter, yCenter + chartYDim2 + sinOfAngle + 2 * dateFontSize);
             if (angle > p.PI / 2) angle = p.PI / 2;
             if (angle < 0) angle = 0;
             p.rotate(-angle);
-            p.textAlign(p.CENTER, p.CENTER);
-            p.fill(lineColor);
-            p.noStroke();
-            p.textSize(dateFontSize);
             if (this.requestedPublicationLatencyList[i].source == "BE") {
               tempText = tempText + "\n( BE )";
             } else if (this.requestedPublicationLatencyList[i].source == "FE+BE") {
@@ -1089,8 +1124,16 @@ export class PublicationLatencyComponent implements OnInit {
                 && p.mouseY > yCenter - chartYDim2 + ty && p.mouseY < yCenter + chartYDim2 + sinOfAngle + 2*dateFontSize + ty) {
               p.stroke(230);
               p.fill(255, 30);
-              p.rect(sectionXCenter - sectionXFilledDim2, yCenter - chartYDim2, sectionXFilledDim, chartYDim + sinOfAngle + 2*dateFontSize);
+              //p.rect(sectionXCenter - sectionXFilledDim2, yCenter - chartYDim2, sectionXFilledDim, chartYDim + 2 * sinOfAngle + 3 * dateFontSize);
+              p.line(sectionXCenter, yCenter - chartYDim2, sectionXCenter, yCenter + chartYDim2);
               this.mouseIsOnList[i] = true;
+
+              /* Tooltip */
+              p.textSize(valueFontSize);
+              p.noStroke();
+              p.fill(lineColor);
+              p.text(this.requestedPublicationLatencyList[i].average_latency == null ? "NaN" : this.millisToHHMMSS(this.requestedPublicationLatencyList[i].average_latency), 
+                      sectionXCenter, yCenter - chartYDim2 - 2 * dateFontSize);
             }
 
             /* xAxis Lines */
@@ -1108,6 +1151,7 @@ export class PublicationLatencyComponent implements OnInit {
           /* Zero text */
           p.fill(lineColor);
           p.noStroke();
+          p.textSize(dateFontSize);
           p.text("0s", xCenter - chartXDim2 - 10, yCenter + chartYDim2);
           p.stroke(lineColor);
           p.line(xCenter - chartXDim2 - 5, yCenter + chartYDim2, xCenter - chartXDim2, yCenter + chartYDim2);
@@ -1201,6 +1245,23 @@ export class PublicationLatencyComponent implements OnInit {
           }
           p.noStroke();
           p.rect(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2, sectionXFilledDim, -((this.publicationDetailLatencyList[i].latency_be < 0 ? 0 : this.publicationDetailLatencyList[i].latency_be) * chartYDim / maxValue));
+
+          /* if mouse is on bar */
+          if (p.mouseX > sectionXCenter - (chartXDim / this.latencyDetailNumber)/2 + tx && p.mouseX < sectionXCenter + (chartXDim / this.latencyDetailNumber)/2 + tx
+                && p.mouseY > yCenter - chartYDim2 + ty && p.mouseY < yCenter + chartYDim2 + 2 * dateFontSize + ty) {
+
+            /* Selector box */
+            p.stroke(230);
+            p.fill(255, 30);
+            p.rect(sectionXCenter - sectionXFilledDim2, yCenter - chartYDim2, sectionXFilledDim, chartYDim + 3 * dateFontSize);
+
+            /* Tooltip */
+            p.textSize(valueFontSize);
+            p.noStroke();
+            p.fill(lineColor);
+            p.text(this.publicationDetailLatencyList[i].latency_be == null ? "NaN" : this.millisToHHMMSS(this.publicationDetailLatencyList[i].latency_be), 
+                    sectionXCenter, yCenter - chartYDim2 - 2 * dateFontSize);
+          }
         } 
 
         /* Scheme */
@@ -1213,6 +1274,7 @@ export class PublicationLatencyComponent implements OnInit {
         /* Zero text */
         p.fill(lineColor);
         p.noStroke();
+        p.textSize(dateFontSize);
         p.text("0s", xCenter - chartXDim2 - 10, yCenter + chartYDim2);
         p.stroke(lineColor);
         p.line(xCenter - chartXDim2 - 5, yCenter + chartYDim2, xCenter - chartXDim2, yCenter + chartYDim2);
@@ -1295,11 +1357,10 @@ export class PublicationLatencyComponent implements OnInit {
           }
           let sinOfAngle = sinOfAngleTemp * (p.textWidth(tempText) / 2);
           p.push();
-          p.translate(sectionXCenter, yCenter + chartYDim2 + sinOfAngle + dateFontSize*2);
+          p.translate(sectionXCenter, yCenter + chartYDim2 + sinOfAngle + 2 * dateFontSize);
           if (angle > p.PI / 2) angle = p.PI / 2;
           if (angle < 0) angle = 0;
           p.rotate(-angle);
-          p.textAlign(p.CENTER, p.CENTER);
           p.fill(lineColor);
           p.noStroke();
           p.textSize(dateFontSize);
@@ -1310,6 +1371,23 @@ export class PublicationLatencyComponent implements OnInit {
           }
           p.text(tempText, 0, 0);
           p.pop();
+
+          /* if mouse is on bar */
+          if (p.mouseX > sectionXCenter - (chartXDim / this.latencyDetailNumber)/2 + tx && p.mouseX < sectionXCenter + (chartXDim / this.latencyDetailNumber)/2 + tx
+                && p.mouseY > yCenter - chartYDim2 + ty && p.mouseY < yCenter + chartYDim2 + 2 * dateFontSize + ty) {
+
+            /* Tooltip line */
+            p.stroke(230);
+            p.line(sectionXCenter, yCenter - chartYDim2, sectionXCenter, yCenter + chartYDim2);
+
+            /* Tooltip */
+            p.textSize(valueFontSize);
+            p.noStroke();
+            p.fill(lineColor);
+            p.textAlign(p.CENTER, p.CENTER);
+            p.text(this.publicationDetailLatencyList[i].latency_be == null ? "NaN" : this.millisToHHMMSS(this.publicationDetailLatencyList[i].latency_be), 
+                    sectionXCenter, yCenter - chartYDim2 - 2 * dateFontSize);
+          }
         }
 
         /* Scheme */
@@ -1321,6 +1399,7 @@ export class PublicationLatencyComponent implements OnInit {
         /* Zero text */
         p.fill(lineColor);
         p.noStroke();
+        p.textSize(dateFontSize);
         p.text("0s", xCenter - chartXDim2 - 10, yCenter + chartYDim2);
         p.stroke(lineColor);
         p.line(xCenter - chartXDim2 - 5, yCenter + chartYDim2, xCenter - chartXDim2, yCenter + chartYDim2);
