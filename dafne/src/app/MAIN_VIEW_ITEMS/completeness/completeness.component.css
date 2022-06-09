@@ -4,6 +4,7 @@
     color: var(--main-text-color);
     align-items: center;
     padding-left: 0.5rem;
+    min-width: 980px;
 }
 
 /* Main Column Container */

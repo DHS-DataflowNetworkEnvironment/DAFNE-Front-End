@@ -4,6 +4,7 @@
     color: var(--main-text-color);
     align-items: center;
     padding-left: 0.5rem;
+    min-width: 980px;
 }
 
 /* Main Column Container */
@@ -13,7 +14,7 @@
     background-color: var(--main-bg-color);
     color: var(--main-text-color);
     width: 100%;
-    min-width: 580px;
+    min-width: 980px;
 }
 
 /* Filters view */

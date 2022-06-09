@@ -19,6 +19,7 @@
     background-color: var(--main-bg-color);
     color: var(--main-text-color);
     align-items: center;
+    min-width: 980px;
 }
 
 /* Responsiveness */
