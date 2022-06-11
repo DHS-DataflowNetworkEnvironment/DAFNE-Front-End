@@ -48,6 +48,7 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
   public platformNumber: string = this.platformNumberList[0];
   public platformNumberFiltered: string = this.platformNumber;
   public filter: string;
+  public tempFilter: string;
   public syncList = [];
   public syncBackendLength: number;
   public syncBackendLengthArray = [];
@@ -55,16 +56,18 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
   public intelligentSyncSupported = [];
   public bodyMission: string;
 
-  public beSynchronizers = []
+  public siSynchronizers = []
   public feSynchronizers = []
+  public beSynchronizers = []
   public serviceTypeList = [
-    "All",
-    "Back-End and Single Instance",
-    "Front-End"
+    "Single Instance",
+    "Front-End",
+    "Back-End"
   ]
   public serviceType: string;
-  public showBESync: boolean = false;
-  public showFESync: boolean = false;
+  public serviceTypeChoosen: number = 1;
+  public choosenSync: string;
+  public canSubmit: boolean = true;
 
   public today = new Date();
   public todayDate: string = this.today.toISOString().slice(0, 10);
@@ -216,24 +219,34 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getSynchronizers() {
-    this.authenticationService.getSynchronizers().subscribe(
+    this.authenticationService.getSISynchronizers().subscribe(
       (res: any) => {
         for (var i = 0; i < Object.keys(res).length; i++) {
           for (var k = 0; k < res[i].synchronizers.length; k++) {
             res[i].synchronizers[k].serviceUrl = res[i].serviceUrl;
-            this.beSynchronizers.push(res[i].synchronizers[k]);
+            this.siSynchronizers.push(res[i].synchronizers[k]);
           }
         }
-        this.authenticationService.getFESynchronizers().subscribe(
-          (res: any) => {        
-            for (var i = 0; i < Object.keys(res).length; i++) {
-              for (var k = 0; k < res[i].synchronizers.length; k++) {
-                res[i].synchronizers[k].serviceUrl = res[i].serviceUrl;
-                this.feSynchronizers.push(res[i].synchronizers[k])
-              }
-            }
+      }
+    );
+    this.authenticationService.getFESynchronizers().subscribe(
+      (res: any) => {        
+        for (var i = 0; i < Object.keys(res).length; i++) {
+          for (var k = 0; k < res[i].synchronizers.length; k++) {
+            res[i].synchronizers[k].serviceUrl = res[i].serviceUrl;
+            this.feSynchronizers.push(res[i].synchronizers[k])
           }
-        );
+        }
+      }
+    );
+    this.authenticationService.getBESynchronizers().subscribe(
+      (res: any) => {        
+        for (var i = 0; i < Object.keys(res).length; i++) {
+          for (var k = 0; k < res[i].synchronizers.length; k++) {
+            res[i].synchronizers[k].serviceUrl = res[i].serviceUrl;
+            this.beSynchronizers.push(res[i].synchronizers[k])
+          }
+        }
       }
     );
   }
@@ -243,9 +256,14 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
     this.useSyncFilter = chkBox.checked;
     if (this.useSyncFilter) {
       /* Set initial status for sync filters */
-      this.showBESync = true;
-      this.showFESync = true;
-      this.filter = this.beSynchronizers[0].FilterParam
+      this.serviceTypeChoosen = 1;
+      if (this.siSynchronizers[0]) {
+        this.tempFilter = this.siSynchronizers[0].FilterParam
+        this.canSubmit = true
+      } else {
+        this.tempFilter = "NaN"
+        this.canSubmit = false
+      }
     } else {
       /* Set initial status for manual filters */
       this.missionFiltered = this.totalMissionList[0];
@@ -255,35 +273,61 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
       this.platformNumberList = this.missionFiltered.platform[0];
       this.platformNumber = this.platformNumberList[0];
       this.platformNumberFiltered = this.platformNumber;
+
+      this.canSubmit = true
     }
   }
 
   onServiceTypeChange(serviceType) {
-    if (serviceType.target.value == "All") {
-      this.showBESync = true;
-      this.showFESync = true;
-      if (this.beSynchronizers[0]) this.filter = this.beSynchronizers[0].FilterParam
+    if (serviceType.target.value == "Single Instance") {
+      this.serviceTypeChoosen = 1;
+      if (this.siSynchronizers[0]) {
+        this.choosenSync = this.siSynchronizers[0].Label
+        this.tempFilter = this.siSynchronizers[0].FilterParam
+        this.canSubmit = true
+      } else {
+        this.tempFilter = "NaN"
+        this.canSubmit = false
+      }
     } else if (serviceType.target.value == "Front-End") {
-      this.showBESync = false;
-      this.showFESync = true;
-      if (this.feSynchronizers[0]) this.filter = this.feSynchronizers[0].FilterParam
-    } else {
-      this.showBESync = true;
-      this.showFESync = false;
-      if (this.beSynchronizers[0]) this.filter = this.beSynchronizers[0].FilterParam
+      this.serviceTypeChoosen = 2;
+      if (this.feSynchronizers[0]) {
+        this.choosenSync = this.feSynchronizers[0].Label
+        this.tempFilter = this.feSynchronizers[0].FilterParam
+        this.canSubmit = true
+      } else {
+        this.tempFilter = "NaN"
+        this.canSubmit = false
+      }
+    } else {  // Back-end..
+      this.serviceTypeChoosen = 3;
+      if (this.beSynchronizers[0]) {
+        this.choosenSync = this.beSynchronizers[0].Label
+        this.tempFilter = this.beSynchronizers[0].FilterParam
+        this.canSubmit = true
+      } else {
+        this.tempFilter = "NaN"
+        this.canSubmit = false
+      }
     }
   }
 
   onSyncChange(sync) {
-    let tempFilter;
-    tempFilter = this.beSynchronizers.filter(a => a.Label == sync.target.value)[0];
-    if (tempFilter !== undefined) {
-      this.filter = tempFilter.FilterParam;
+    this.choosenSync = sync.target.value;
+    let tempF;
+    tempF = this.siSynchronizers.filter(a => a.Label == sync.target.value)[0];
+    if (tempF !== undefined) {
+      this.tempFilter = tempF.FilterParam;
       return;
     }
-    tempFilter = this.feSynchronizers.filter(a => a.Label == sync.target.value)[0];
-    if (tempFilter !== undefined) {
-      this.filter = tempFilter.FilterParam;
+    tempF = this.feSynchronizers.filter(a => a.Label == sync.target.value)[0];
+    if (tempF !== undefined) {
+      this.tempFilter = tempF.FilterParam;
+      return;
+    }
+    tempF = this.beSynchronizers.filter(a => a.Label == sync.target.value)[0];
+    if (tempF !== undefined) {
+      this.tempFilter = tempF.FilterParam;
       return;
     }
   }
@@ -305,6 +349,10 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  checkCanSubmit() {
+    return !this.canSubmit
+  }
+
   onFilterSubmit(): void {
     if (this.useSyncFilter == true) {
       let tempStopDate = new Date(this.stopDate);
@@ -316,7 +364,7 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
         let tempFilteredDateString: string = tempFilteredDate.toISOString().slice(0, 10);
 
         let body: object = {
-          "filter":this.filter,
+          "filter":this.tempFilter,
           "startDate":tempFilteredDateString,
           "stopDate":tempFilteredDateString
         };
@@ -366,6 +414,7 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
             this.completenessDailyDataList[index] = [];
           }
           this.useSyncFilterForTable = this.useSyncFilter
+          this.filter = this.tempFilter;
         }
       );
     } else {
@@ -483,7 +532,7 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       let tempCompleteCsvMissionName
       if (this.useSyncFilter) {
-        tempCompleteCsvMissionName = 'Filter(' + this.filter + ')';
+        tempCompleteCsvMissionName = 'Sync(' + this.choosenSync + ')';
       } else {
         tempCompleteCsvMissionName = 'Mission(' + this.missionFiltered.acronym + this.platformNumber + ')_Product(' + this.productType + ')';
       }

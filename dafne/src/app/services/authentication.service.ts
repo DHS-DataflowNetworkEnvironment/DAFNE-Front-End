@@ -275,8 +275,30 @@ export class AuthenticationService {
   }
 
   getFESynchronizers() {
-    // get FE synchronizers v2 from the back-end
+    // get FE synchronizers from the back-end
     return this.http.get<any>(AppConfig.settings.apiUrl + `/synchronizers/fe`)
+    .pipe(
+    catchError(err => {
+        console.error(err);
+        return throwError(err);
+        }
+    ));
+  }
+
+  getBESynchronizers() {
+    // get BE synchronizers from the back-end
+    return this.http.get<any>(AppConfig.settings.apiUrl + `/synchronizers/be`)
+    .pipe(
+    catchError(err => {
+        console.error(err);
+        return throwError(err);
+        }
+    ));
+  }
+
+  getSISynchronizers() {
+    // get SI synchronizers from the back-end
+    return this.http.get<any>(AppConfig.settings.apiUrl + `/synchronizers/si`)
     .pipe(
     catchError(err => {
         console.error(err);
