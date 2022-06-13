@@ -354,51 +354,55 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onFilterSubmit(): void {
-    if (this.useSyncFilter == true) {
-      let tempStopDate = new Date(this.stopDate);
-      let tempStartDate = new Date(this.startDate);
-      let tempTimeDifference = tempStopDate.getTime() - tempStartDate.getTime();
-      this.tempDaysNumber = tempTimeDifference / (1000 * 3600 * 24) + 1;
-      for (var i = 0; i < this.tempDaysNumber; i++) {
-        let tempFilteredDate = new Date(tempStartDate.getTime() + i*(1000*3600*24));
-        let tempFilteredDateString: string = tempFilteredDate.toISOString().slice(0, 10);
+    if (this.canSubmit) {
+      if (this.useSyncFilter == true) {
+        let tempStopDate = new Date(this.stopDate);
+        let tempStartDate = new Date(this.startDate);
+        let tempTimeDifference = tempStopDate.getTime() - tempStartDate.getTime();
+        this.tempDaysNumber = tempTimeDifference / (1000 * 3600 * 24) + 1;
+        for (var i = 0; i < this.tempDaysNumber; i++) {
+          let tempFilteredDate = new Date(tempStartDate.getTime() + i*(1000*3600*24));
+          let tempFilteredDateString: string = tempFilteredDate.toISOString().slice(0, 10);
 
-        let body: object = {
-          "filter":this.tempFilter,
-          "startDate":tempFilteredDateString,
-          "stopDate":tempFilteredDateString
-        };
-        this.completenessDailyGetDone[i] = false;   
-        this.getDailyCompleteness(body, i);
+          let body: object = {
+            "filter":this.tempFilter,
+            "startDate":tempFilteredDateString,
+            "stopDate":tempFilteredDateString
+          };
+          this.completenessDailyGetDone[i] = false;   
+          this.getDailyCompleteness(body, i);
+        }
+      } else {
+        /* Get values from filters: */
+        this.missionName = this.missionFiltered.name;
+        this.productType = this.productTypeFiltered;
+        if (this.platformNumberFiltered == '---') {
+          this.platformNumber = '';
+        } else {
+          this.platformNumber = this.platformNumberFiltered;
+        }
+        this.bodyMission = this.missionFiltered.acronym + this.platformNumber;
+        let tempStopDate = new Date(this.stopDate);
+        let tempStartDate = new Date(this.startDate);
+        let tempTimeDifference = tempStopDate.getTime() - tempStartDate.getTime();
+        this.tempDaysNumber = tempTimeDifference / (1000 * 3600 * 24) + 1;
+      
+        for (var i = 0; i < this.tempDaysNumber; i++) {
+          let tempFilteredDate = new Date(tempStartDate.getTime() + i*(1000*3600*24));
+          let tempFilteredDateString: string = tempFilteredDate.toISOString().slice(0, 10);
+
+          let body: object = {
+            "mission":this.bodyMission,
+            "productType":this.productType,
+            "startDate":tempFilteredDateString,
+            "stopDate":tempFilteredDateString
+          };
+          this.completenessDailyGetDone[i] = false;   
+          this.getDailyCompleteness(body, i);
+        }
       }
     } else {
-      /* Get values from filters: */
-      this.missionName = this.missionFiltered.name;
-      this.productType = this.productTypeFiltered;
-      if (this.platformNumberFiltered == '---') {
-        this.platformNumber = '';
-      } else {
-        this.platformNumber = this.platformNumberFiltered;
-      }
-      this.bodyMission = this.missionFiltered.acronym + this.platformNumber;
-      let tempStopDate = new Date(this.stopDate);
-      let tempStartDate = new Date(this.startDate);
-      let tempTimeDifference = tempStopDate.getTime() - tempStartDate.getTime();
-      this.tempDaysNumber = tempTimeDifference / (1000 * 3600 * 24) + 1;
-    
-      for (var i = 0; i < this.tempDaysNumber; i++) {
-        let tempFilteredDate = new Date(tempStartDate.getTime() + i*(1000*3600*24));
-        let tempFilteredDateString: string = tempFilteredDate.toISOString().slice(0, 10);
-
-        let body: object = {
-          "mission":this.bodyMission,
-          "productType":this.productType,
-          "startDate":tempFilteredDateString,
-          "stopDate":tempFilteredDateString
-        };
-        this.completenessDailyGetDone[i] = false;   
-        this.getDailyCompleteness(body, i);
-      }
+      this.alert.showErrorAlert("No synchronizers configured for the selected service type", "Please select another service type");
     }
   }
 

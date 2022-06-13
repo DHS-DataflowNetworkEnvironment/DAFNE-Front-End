@@ -70,7 +70,7 @@
                         [(ngModel)]="stopDate" (ngModelChange)="onStopDateChanged($event)" [config]="stopDatePickerConfig" placeholder="YYYY-MM-DD">
                     </dp-date-picker>
                 </div>
-                <button type="submit" class="btn btn-primary col-1" id="filter-submit-button" (click)="onFilterSubmit()" [disabled]="!canSubmit">Filter</button>
+                <button type="submit" class="btn btn-primary col-1" id="filter-submit-button" (click)="onFilterSubmit()">Filter</button>
             </div>
         </form>
     </div>
