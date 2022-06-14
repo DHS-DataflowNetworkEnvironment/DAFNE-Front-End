@@ -727,7 +727,8 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
 
       p.fillSunburstSingleChart = () => {
         let centreAngle = (this.sectionRadians / this.centreNumber);
-        /* Mouse Angle */
+
+        /* Mouse angle and distance calc */
         let mouseAngle = p.PI - (p.atan2((p.mouseX - tx) - xCenter, (p.mouseY - ty) - yCenter) + p.HALF_PI);
         let mouseDist = p.dist(xCenter, yCenter, (p.mouseX - tx), (p.mouseY - ty));
         let pieRadiusHover = [];
@@ -803,6 +804,7 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
               p.noStroke();
               p.text(0, xCenter, yCenter - zeroRadius + 1);
 
+              /* Draw values */
               p.rectMode(p.CENTER);
               let xTextPos = p.mouseX - tx;
               let yTextPos = p.mouseY - ty - 25;
@@ -832,7 +834,7 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
       };
 
       p.fillSunburstStackedChart = () => {
-        /* Mouse Angle */
+        /* Mouse angle and distance calc */
         let mouseAngle = p.PI - (p.atan2((p.mouseX - tx) - xCenter, (p.mouseY - ty) - yCenter) + p.HALF_PI);
         let mouseDist = p.dist(xCenter, yCenter, (p.mouseX - tx), (p.mouseY - ty));
         let pieRadiusHover = [];
@@ -851,7 +853,7 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
           p.noStroke();
           p.textSize(dateFontSize);
           p.arcText(this.completenessDataList[i].date, xCenter, yCenter, this.sectionRadians * i + this.sectionRadians / 2, -(pieExtRadius + zeroRadius + 10));
-          /* Coloured arcs */
+          /* Coloured arcs calcs */
           pieRadiusHover.push([]);
           pieBeginHover.push([]);
           for (var k = 0; k < this.centreNumber; k++) {         
@@ -882,7 +884,7 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
             p.stroke(pieStrokeColor);
             p.arc(xCenter, yCenter, pieRadiusHover[i][k], pieRadiusHover[i][k], pieBeginHover[i][k], pieBeginHover[i][k] + this.sectionRadians, p.PIE);
 
-            /* Draw Hover */
+            /* Draw Hovered Arc */
             if (hover) {             
               isHovering = true;
               hoveringText = this.completenessDataList[i].values[k].value;
@@ -922,6 +924,8 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
         p.fill(lineColor);
         p.noStroke();
         p.text(0, xCenter, yCenter - zeroRadius + 1);
+        
+        /* Draw value */
         if (isHovering) {
           p.rectMode(p.CENTER);
           let xTextPos = p.mouseX - tx;
