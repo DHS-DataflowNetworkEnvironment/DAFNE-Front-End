@@ -590,8 +590,8 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
       let labelBackgroundColor = p.color('#12222fcc')
       let lineColor = p.color('#aaaaaa');
       let pieStrokeColor = p.color(200);
-      let blankRadiusX = 20;
-      let blankRadiusY = 9;
+      let blankRadiusX = 25;
+      let blankRadiusY = 10;
       let blankRadius2X = 2 * blankRadiusX;
       let blankRadius2Y = 2 * blankRadiusY;
       let tempSum = 0;
@@ -601,8 +601,9 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
       let tempSumPeriod = 0;
       let zeroDiameter = 80;
       let zeroRadius = zeroDiameter / 2;
+      let pieTextRadiusGap = pieExtRadius/4;
 
-      let dateFontSize = 10;
+      let dateFontSize = 12;
       let valueFontSize = 10;
 
       let barGapScale = 30.0;
@@ -695,6 +696,7 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
         chartYDim = (canvasHeight - blankYDim);
         chartXDim2 = chartXDim / 2;
         chartYDim2 = chartYDim / 2;
+        pieTextRadiusGap = pieExtRadius/4;
       };
 
       p.calcMaxSumVal = () => {
@@ -725,6 +727,13 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
 
       p.fillSunburstSingleChart = () => {
         let centreAngle = (this.sectionRadians / this.centreNumber);
+        /* Mouse Angle */
+        let mouseAngle = p.PI - (p.atan2((p.mouseX - tx) - xCenter, (p.mouseY - ty) - yCenter) + p.HALF_PI);
+        let mouseDist = p.dist(xCenter, yCenter, (p.mouseX - tx), (p.mouseY - ty));
+        let pieRadiusHover = [];
+        let pieBeginHover = [];
+        let isHovering = false;
+
         /* Draw Pie Slices*/
         for (var i = 0; i < this.daysNumber; i++) {
           /* Radial lines */
@@ -736,12 +745,17 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
           p.noStroke();
           p.textSize(dateFontSize);
           p.arcText(this.completenessDataList[i].date, xCenter, yCenter, this.sectionRadians * i + this.sectionRadians / 2, -(pieExtRadius + zeroRadius + 10));
+          pieRadiusHover.push([]);
+          pieBeginHover.push([]);
+
           /* Coloured arcs */
           for (var k = 0; k < this.centreNumber; k++) {
             var pieRadius = (this.completenessDataList[i].values[k].value < 0 ? 0 : this.completenessDataList[i].values[k].value);
-            pieRadius = pieExtDiameter * pieRadius / maxSumValue;
+            pieRadius = pieRadius * pieExtDiameter / maxSumValue;
             pieRadius += zeroDiameter;
+            pieRadiusHover[i].push(pieRadius);
             var pieBegin = this.sectionRadians * i + centreAngle * k - p.HALF_PI;
+            pieBeginHover[i].push(pieBegin);
             p.fill(this.serviceAllCentreList[k].color);
             p.stroke(pieStrokeColor);
             p.arc(xCenter, yCenter, pieRadius, pieRadius, pieBegin, pieBegin + centreAngle, p.PIE);
@@ -766,21 +780,66 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
           p.noStroke();
           p.text(p.int(maxSumValue / (nLines / (i + 1))), xCenter, yCenter - pieExtRadius / (nLines / (i + 1)) - zeroRadius + 1);
         }
-        /* Zero Circle */
-        p.stroke(pieStrokeColor);
-        p.fill(backgroundColor)
-        p.circle(xCenter, yCenter, zeroDiameter);
-        /* Zero Label */
-        p.stroke(lineColor);
-        p.fill(labelBackgroundColor);
-        p.rect(xCenter, yCenter - zeroRadius, blankRadius2X, blankRadius2Y, 5);
-        /* Zero text */
-        p.fill(lineColor);
-        p.noStroke();
-        p.text(0, xCenter, yCenter - zeroRadius + 1);
+
+        for (var i = 0; i < this.daysNumber; i++) {
+          for (var k = 0; k < this.centreNumber; k++) {
+            /* Check hover */
+            let hover = mouseDist < pieRadiusHover[i][k]/2 && mouseDist > zeroRadius && mouseAngle >= pieBeginHover[i][k] && mouseAngle < pieBeginHover[i][k] + centreAngle;
+            if (hover) {
+              isHovering = true;
+              p.fill(0, 0, 0, 127);
+              p.stroke(lineColor);
+              p.arc(xCenter, yCenter, pieRadiusHover[i][k], pieRadiusHover[i][k], pieBeginHover[i][k], pieBeginHover[i][k] + centreAngle);
+              /* Zero Circle */
+              p.stroke(pieStrokeColor);
+              p.fill(backgroundColor)
+              p.circle(xCenter, yCenter, zeroDiameter);
+              /* Zero Label */
+              p.stroke(lineColor);
+              p.fill(labelBackgroundColor);
+              p.rect(xCenter, yCenter - zeroRadius, blankRadius2X, blankRadius2Y, 5);
+              /* Zero text */
+              p.fill(lineColor);
+              p.noStroke();
+              p.text(0, xCenter, yCenter - zeroRadius + 1);
+
+              p.rectMode(p.CENTER);
+              let xTextPos = p.mouseX - tx;
+              let yTextPos = p.mouseY - ty - 25;
+              p.fill(0, 0, 0, 127);
+              p.stroke(255,255,255);
+              p.rect(xTextPos, yTextPos, blankRadius2X + 10, blankRadius2Y + 10, 5);
+              p.fill(255,255,255);
+              p.noStroke();
+              p.text(this.completenessDataList[i].values[k].value, xTextPos, yTextPos + 1);
+            }
+          }
+        }
+        if (!isHovering) {
+          /* Zero Circle */
+          p.stroke(pieStrokeColor);
+          p.fill(backgroundColor)
+          p.circle(xCenter, yCenter, zeroDiameter);
+          /* Zero Label */
+          p.stroke(lineColor);
+          p.fill(labelBackgroundColor);
+          p.rect(xCenter, yCenter - zeroRadius, blankRadius2X, blankRadius2Y, 5);
+          /* Zero text */
+          p.fill(lineColor);
+          p.noStroke();
+          p.text(0, xCenter, yCenter - zeroRadius + 1);
+        }
       };
 
       p.fillSunburstStackedChart = () => {
+        /* Mouse Angle */
+        let mouseAngle = p.PI - (p.atan2((p.mouseX - tx) - xCenter, (p.mouseY - ty) - yCenter) + p.HALF_PI);
+        let mouseDist = p.dist(xCenter, yCenter, (p.mouseX - tx), (p.mouseY - ty));
+        let pieRadiusHover = [];
+        let pieBeginHover = [];
+        let isHovering = false;
+        let hoveringText;
+
         /* Draw Pie Slices*/
         for (var i = 0; i < this.daysNumber; i++) {
           /* Radial lines */
@@ -793,17 +852,43 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
           p.textSize(dateFontSize);
           p.arcText(this.completenessDataList[i].date, xCenter, yCenter, this.sectionRadians * i + this.sectionRadians / 2, -(pieExtRadius + zeroRadius + 10));
           /* Coloured arcs */
-          for (var k = 0; k < this.centreNumber; k++) {
+          pieRadiusHover.push([]);
+          pieBeginHover.push([]);
+          for (var k = 0; k < this.centreNumber; k++) {         
             var pieRadius = (this.completenessDataList[i].values[k].value < 0 ? 0 : this.completenessDataList[i].values[k].value);
             for (var j = k + 1; j < this.centreNumber; j++) {
               if (this.completenessDataList[i].values[j].value > 0) pieRadius += this.completenessDataList[i].values[j].value;
             }
-            pieRadius = pieExtDiameter * pieRadius / maxSumValue;
+            pieRadius = pieRadius * pieExtDiameter / maxSumValue;
             pieRadius += zeroDiameter;
+            pieRadiusHover[i].push(pieRadius);
             var pieBegin = this.sectionRadians * i - p.HALF_PI;
+            pieBeginHover[i].push(pieBegin);
+          }
+        }
+
+        for (var i = 0; i < this.daysNumber; i++) {
+          for (var k = 0; k < this.centreNumber; k++) {
+            /* Check hover */
+            let hover = false;
+            if (k == this.centreNumber - 1) {
+              hover = mouseDist <= pieRadiusHover[i][k]/2 && mouseDist > zeroDiameter/2 && mouseAngle >= pieBeginHover[i][k] && mouseAngle < pieBeginHover[i][k] + this.sectionRadians;
+            } else {              
+              hover = mouseDist <= pieRadiusHover[i][k]/2 && mouseDist > pieRadiusHover[i][k+1]/2 && mouseAngle >= pieBeginHover[i][k] && mouseAngle < pieBeginHover[i][k] + this.sectionRadians;
+            }
+
+            /* Draw Arcs */
             p.fill(this.serviceAllCentreList[k].color);
             p.stroke(pieStrokeColor);
-            p.arc(xCenter, yCenter, pieRadius, pieRadius, pieBegin, pieBegin + this.sectionRadians, p.PIE);
+            p.arc(xCenter, yCenter, pieRadiusHover[i][k], pieRadiusHover[i][k], pieBeginHover[i][k], pieBeginHover[i][k] + this.sectionRadians, p.PIE);
+
+            /* Draw Hover */
+            if (hover) {             
+              isHovering = true;
+              hoveringText = this.completenessDataList[i].values[k].value;
+              p.fill(0, 0, 0, 127);
+              p.arc(xCenter, yCenter, pieRadiusHover[i][k], pieRadiusHover[i][k], pieBeginHover[i][k], pieBeginHover[i][k] + this.sectionRadians, p.PIE);
+            }
           }
         }
 
@@ -837,6 +922,17 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
         p.fill(lineColor);
         p.noStroke();
         p.text(0, xCenter, yCenter - zeroRadius + 1);
+        if (isHovering) {
+          p.rectMode(p.CENTER);
+          let xTextPos = p.mouseX - tx;
+          let yTextPos = p.mouseY - ty - 25;
+          p.fill(0, 0, 0, 127);
+          p.stroke(255,255,255);
+          p.rect(xTextPos, yTextPos, blankRadius2X + 10, blankRadius2Y + 10, 5);
+          p.fill(255,255,255);
+          p.noStroke();
+          p.text(hoveringText, xTextPos, yTextPos + 1);
+        }
       };
 
       p.fillSingleBarChart = () => {
