@@ -62,7 +62,8 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
   public serviceTypeList = [
     "Single Instance",
     "Front-End",
-    "Back-End"
+    "Back-End",
+    "All"
   ]
   public serviceType: string;
   public serviceTypeChoosen: number = 1;
@@ -299,9 +300,27 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
         this.tempFilter = "NaN"
         this.canSubmit = false
       }
-    } else {  // Back-end..
+    } else if (serviceType.target.value == "Back-End") {
       this.serviceTypeChoosen = 3;
       if (this.beSynchronizers[0]) {
+        this.choosenSync = this.beSynchronizers[0].Label
+        this.tempFilter = this.beSynchronizers[0].FilterParam
+        this.canSubmit = true
+      } else {
+        this.tempFilter = "NaN"
+        this.canSubmit = false
+      }
+    } else if (serviceType.target.value == "All") {  // All..
+      this.serviceTypeChoosen = 4;
+      if (this.siSynchronizers[0]) {
+        this.choosenSync = this.siSynchronizers[0].Label
+        this.tempFilter = this.siSynchronizers[0].FilterParam
+        this.canSubmit = true
+      } else if (this.feSynchronizers[0]) {
+        this.choosenSync = this.feSynchronizers[0].Label
+        this.tempFilter = this.feSynchronizers[0].FilterParam
+        this.canSubmit = true
+      } else if (this.beSynchronizers[0]) {
         this.choosenSync = this.beSynchronizers[0].Label
         this.tempFilter = this.beSynchronizers[0].FilterParam
         this.canSubmit = true

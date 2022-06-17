@@ -39,7 +39,7 @@
                 </div>
                 <div *ngIf="useSyncFilter == true" class="select-sync-div">
                     <label class="form-label">Synch:</label>
-                    <select id="sync-select" class="form-select" (change)="onSyncChange($event)">
+                    <select *ngIf="serviceTypeChoosen < 4" id="sync-select" class="form-select" (change)="onSyncChange($event)">
                         <optgroup *ngIf="serviceTypeChoosen == 1" label="Single Instance">
                             <option [value]="sync.Label" *ngFor="let sync of siSynchronizers" title="URL: {{sync.serviceUrl}}">{{sync.Label}}</option>
                         </optgroup>
@@ -47,6 +47,18 @@
                             <option [value]="sync.Label" *ngFor="let sync of feSynchronizers" title="URL: {{sync.serviceUrl}}">{{sync.Label}}</option>
                         </optgroup>
                         <optgroup *ngIf="serviceTypeChoosen == 3" label="Back-End">
+                            <option [value]="sync.Label" *ngFor="let sync of beSynchronizers" title="URL: {{sync.serviceUrl}}">{{sync.Label}}</option>
+                        </optgroup>
+                        <option *ngIf="canSubmit == false">NaN</option>
+                    </select>
+                    <select *ngIf="serviceTypeChoosen == 4" id="sync-select" class="form-select" (change)="onSyncChange($event)">
+                        <optgroup label="Single Instance">
+                            <option [value]="sync.Label" *ngFor="let sync of siSynchronizers" title="URL: {{sync.serviceUrl}}">{{sync.Label}}</option>
+                        </optgroup>
+                        <optgroup label="Front-End">
+                            <option [value]="sync.Label" *ngFor="let sync of feSynchronizers" title="URL: {{sync.serviceUrl}}">{{sync.Label}}</option>
+                        </optgroup>
+                        <optgroup label="Back-End">
                             <option [value]="sync.Label" *ngFor="let sync of beSynchronizers" title="URL: {{sync.serviceUrl}}">{{sync.Label}}</option>
                         </optgroup>
                         <option *ngIf="canSubmit == false">NaN</option>
