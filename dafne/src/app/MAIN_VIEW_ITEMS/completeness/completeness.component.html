@@ -34,7 +34,7 @@
                 <div *ngIf="useSyncFilter == true">
                     <label class="form-label">Service Type:</label>
                     <select id="service-type-select" class="form-select" (change)="onServiceTypeChange($event)">
-                        <option [value]="serviceType" *ngFor="let serviceType of serviceTypeList">{{serviceType}}</option>
+                        <option [value]="serviceType.service_type" *ngFor="let serviceType of serviceTypeList">{{serviceType.service_type}}</option>
                     </select>
                 </div>
                 <div *ngIf="useSyncFilter == true" class="select-sync-div">

@@ -59,12 +59,13 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
   public siSynchronizers = []
   public feSynchronizers = []
   public beSynchronizers = []
-  public serviceTypeList = [
+  public serviceTypeList = []
+  /* public serviceTypeList = [
     "Single Instance",
     "Front-End",
     "Back-End",
     "All"
-  ]
+  ] */
   public serviceType: string;
   public serviceTypeChoosen: number = 1;
   public choosenSync: string;
@@ -124,6 +125,17 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
         this.getServices();
       }
     });
+    this.authenticationService.getAllServiceTypes().subscribe(
+      (res: any) => {
+        this.serviceTypeList = res.filter(a => a.id < 4).sort(this.getSortOrder("id"));
+        this.serviceTypeList.push({
+          "id": 99,
+          "service_type": "All",
+          "createdAt": "",
+          "updatedAt": ""
+        });
+      }
+    )
   }
 
   ngOnInit(): void {
@@ -280,7 +292,7 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onServiceTypeChange(serviceType) {
-    if (serviceType.target.value == "Single Instance") {
+    if (serviceType.target.value == this.serviceTypeList[0].service_type) {  //Single Instance
       this.serviceTypeChoosen = 1;
       if (this.siSynchronizers[0]) {
         this.choosenSync = this.siSynchronizers[0].Label
@@ -290,7 +302,7 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
         this.tempFilter = "NaN"
         this.canSubmit = false
       }
-    } else if (serviceType.target.value == "Front-End") {
+    } else if (serviceType.target.value == this.serviceTypeList[1].service_type) { // Front-End
       this.serviceTypeChoosen = 2;
       if (this.feSynchronizers[0]) {
         this.choosenSync = this.feSynchronizers[0].Label
@@ -300,7 +312,7 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
         this.tempFilter = "NaN"
         this.canSubmit = false
       }
-    } else if (serviceType.target.value == "Back-End") {
+    } else if (serviceType.target.value == this.serviceTypeList[2].service_type) { // Back-End
       this.serviceTypeChoosen = 3;
       if (this.beSynchronizers[0]) {
         this.choosenSync = this.beSynchronizers[0].Label
@@ -310,7 +322,7 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
         this.tempFilter = "NaN"
         this.canSubmit = false
       }
-    } else if (serviceType.target.value == "All") {  // All..
+    } else if (serviceType.target.value == this.serviceTypeList[3].service_type) {  // All..
       this.serviceTypeChoosen = 4;
       if (this.siSynchronizers[0]) {
         this.choosenSync = this.siSynchronizers[0].Label
