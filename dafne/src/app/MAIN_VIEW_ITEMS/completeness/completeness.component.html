@@ -95,8 +95,12 @@
                 <li id="target-id-remote-title" class="mt-2" style="color: white">Remotes:</li>
             </ul>
             <ul *ngFor="let item of serviceRemoteCentreList | uniqueCentreFilter; let i = index;" id="target-id-list">
-                <li [ngStyle]='{color: item.color}'>
-                    {{item.name}}
+                <li *ngIf="useSyncFilterForTable == true">
+                    <span *ngIf="item.isCSC == true" style='color: var(--windows-title-color)'>{{item.name}} - (N/A)</span>
+                    <span *ngIf="item.isCSC == false" [ngStyle]='{color: item.color}'>{{item.name}}</span>
+                </li>
+                <li *ngIf="useSyncFilterForTable == false || useSyncFilterForTable == null">
+                    <span [ngStyle]='{color: item.color}'>{{item.name}}</span>
                 </li>
             </ul>
         </section>
@@ -133,8 +137,16 @@
                 <th *ngFor="let column of completenessDataList" style="padding: 0 0.5rem;">{{column.date}}</th>
             </thead>
             <tr *ngFor="let centre of serviceAllCentreList; let i=index">
-                <td [ngStyle]="{'color': centre.color }">{{centre.name}}</td>
-                <td [ngStyle]="{'color': centre.color }" *ngFor="let data of completenessDataList">{{(data.values[i].value < 0 ? "NaN" : data.values[i].value)}}</td>
+                <td *ngIf="useSyncFilterForTable == false || (useSyncFilterForTable == true && centre.isCSC == false)" >
+                    <div [ngStyle]="{'color': centre.color }">{{centre.name}}</div>
+                </td>
+                <td *ngIf="useSyncFilterForTable == true && centre.isCSC == true" >
+                    <div style='color: var(--windows-title-color)'>{{centre.name}} - (N/A)</div>
+                </td>
+                <td *ngFor="let data of completenessDataList">
+                    <div *ngIf="useSyncFilterForTable == false || (useSyncFilterForTable == true && centre.isCSC == false)" [ngStyle]="{'color': centre.color }">{{(data.values[i].value < 0 ? "NaN" : data.values[i].value)}}</div>
+                    <div *ngIf="useSyncFilterForTable == true && centre.isCSC == true" style='color: var(--windows-title-color)'>(N/A)</div>
+                </td>
             </tr>
         </table>
     </div>

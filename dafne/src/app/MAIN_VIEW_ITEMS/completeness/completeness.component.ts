@@ -8,6 +8,7 @@ import { Centre } from '../../models/centre';
 import { AlertComponent } from '../../alert/alert.component';
 import { MessageService } from '../../services/message.service';
 import { NavigationEnd, Router } from '@angular/router';
+import { stringify } from 'querystring';
 
 declare var $: any;
 
@@ -35,9 +36,9 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
   public sectionRadians: number = 0;
   public allCentreList;
   public remoteCentreList;
-  public serviceLocalCentre: Centre = new Centre;
-  public serviceRemoteCentreList: Centre[] = [];
-  public serviceAllCentreList: Centre[] = [];
+  public serviceLocalCentre = new Centre;
+  public serviceRemoteCentreList = [];
+  public serviceAllCentreList = [];
   public localCentre: Centre = new Centre;
   public totalMissionList = AppConfig.settings.satelliteList;
   public missionFiltered = this.totalMissionList[0];
@@ -161,8 +162,10 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
       (res: any) => {
         /* Filter services with service_type != Back-End */
         this.serviceList = res.filter(a => a.service_type != 3);
+        
         for (var i = 0; i < this.serviceList.length; i++) {
-            this.getServiceType(i, this.serviceList[i].service_type);
+          this.serviceList[i].service_type_id = this.serviceList[i].service_type
+          this.getServiceType(i, this.serviceList[i].service_type);
         }
         this.getCentresData();
       }
@@ -193,6 +196,12 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
           /* Copy service centres one by one into tempServiceCentre */
           let tempServiceCentre = this.allCentreList.filter(a => a.name == this.serviceList[i].centre)[0];
 
+          /* Add "is-CSC-flag" for every centre */
+          tempServiceCentre.isCSC = false;
+          if (tempServiceCentre.name == this.serviceList[i].centre && this.serviceList[i].service_type_id > 3) {      
+            tempServiceCentre.isCSC = true;
+          }
+
           /* Copy tempServiceCentre first into a complete list... */
           this.serviceAllCentreList.push(tempServiceCentre);
     
@@ -203,8 +212,14 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
         this.serviceAllCentreList.sort(this.getSortOrder("id"));
         this.setLocalFirst(this.serviceAllCentreList);
         
+        /* Sort All Centres to put CSC at the end */
+        this.serviceAllCentreList.sort(this.getSortOrder("isCSC"));
+        
         /* Sort serviceRemoteCentreList[] by ID */
         this.serviceRemoteCentreList.sort(this.getSortOrder("id"));
+
+        /* Sort Remote Centres to put CSC at the end */
+        this.serviceRemoteCentreList.sort(this.getSortOrder("isCSC"));
         
         /* Get complete Centre List (also those without a service..) and copy into 'remoteCentreList[]' */
         this.remoteCentreList = Object.values(res).filter((x) => x.local === null);
@@ -380,10 +395,6 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  checkCanSubmit() {
-    return !this.canSubmit
-  }
-
   onFilterSubmit(): void {
     if (this.canSubmit) {
       if (this.useSyncFilter == true) {
@@ -441,7 +452,7 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.useSyncFilter == true) {
       this.authenticationService.getFilterCompleteness(body).subscribe(
         (res: object) => {
-          if (res) {
+          if (res) {            
             this.completenessDailyDataList[index] = res;
             this.completenessDailyGetDone[index] = true;
             this.sumDailyCompleteness();
@@ -474,6 +485,7 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
         return;
       }
     }
+    
     let tempJsonCompleteness:object[] = [];
     for (var i = 0; i < this.tempDaysNumber; i++) {
       tempJsonCompleteness.push(this.completenessDailyDataList[i][0]);
@@ -486,7 +498,11 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.daysNumber = this.tempDaysNumber;
     this.sectionRadians = (2 * Math.PI) / this.daysNumber;
-    this.centreNumber = this.serviceAllCentreList.length;
+    if (this.useSyncFilter) {
+      this.centreNumber = this.completenessDataList[0].values.length;
+    } else {
+      this.centreNumber = this.serviceAllCentreList.length;
+    }
   }
 
   onStartDateChanged(date) {
