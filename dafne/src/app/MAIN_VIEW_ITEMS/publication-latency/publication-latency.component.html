@@ -69,8 +69,20 @@
     </div>
     <div id="table-div">
         <table id="data-table">
+            <!-- Weekly Latency -->
+            <thead *ngIf="isWeekly == true">
+                <th style="color: white">{{localCentre.name}}</th>
+                <th *ngFor="let latency of requestedPublicationLatencyList; let i = index" style="padding: 0 0.5rem;">Week <div>from: {{latency.day}}</div><div>to: {{getWeekEndDateText(latency.day)}}</div>
+                    <div *ngIf="latency.source == 'FE'" style="color: var(--main-bg-color); font-size: 0.6rem;"><br></div>
+                    <div *ngIf="latency.source == 'BE'" style="color: lightsalmon; font-size: 0.6rem;">( BE )</div>
+                    <div *ngIf="latency.source == 'FE+BE'" style="color: lightgoldenrodyellow; font-size: 0.6rem;">( FE+BE )</div>
+                    <div *ngIf="latency.source == 'null'" style="color: grey; font-size: 0.6rem;"><br></div>
+                    <div *ngIf="latency.source == ''" style="color: grey; font-size: 0.6rem;"><br></div>
+                </th>
+            </thead>
+
             <!-- Daily Latency -->
-            <thead *ngIf="showDetailLatency == false">
+            <thead *ngIf="showDetailLatency == false && isWeekly == false">
                 <th style="color: white">{{localCentre.name}}</th>
                 <th *ngFor="let latency of requestedPublicationLatencyList; let i = index" style="padding: 0 0.5rem;">{{latency.day}}
                     <div *ngIf="latency.source == 'FE'" style="color: var(--main-bg-color); font-size: 0.6rem;"><br></div>
@@ -80,6 +92,8 @@
                     <div *ngIf="latency.source == ''" style="color: grey; font-size: 0.6rem;"><br></div>
                 </th>
             </thead>
+
+            <!-- Weekly and Daily Data -->
             <tr *ngIf="showDetailLatency == false">
                 <td style="color: #ffffff">Latency {{selectedFilterSyncLabel}}</td>
                 <td *ngFor="let latency of requestedPublicationLatencyList">
@@ -90,7 +104,7 @@
             </tr>
             
             <!-- Detail Latency -->
-            <thead *ngIf="showDetailLatency == true">
+            <thead *ngIf="showDetailLatency == true && isWeekly == false">
                 <th style="color: white">{{localCentre.name}}</th>
                 <th *ngFor="let latency of publicationDetailLatencyList; let i = index" style="padding: 0 0.5rem;">{{latency.timezone.slice(11, 16)}}
                     <div *ngIf="latency.source == 'FE'" style="color: var(--main-bg-color); font-size: 0.6rem;"><br></div>
@@ -98,7 +112,7 @@
                     <div *ngIf="latency.source == 'null'" style="color: grey; font-size: 0.6rem;"><br></div>
                 </th>
             </thead>
-            <tr *ngIf="showDetailLatency == true">
+            <tr *ngIf="showDetailLatency == true && isWeekly == false">
                 <td style="color: #ffffff; white-space:nowrap;">{{latencyDetailDate}} Latency {{selectedFilterSyncLabel}}</td>
                 <td *ngFor="let latency of publicationDetailLatencyList">
                     <div *ngIf="latency.latency_fe != null" [ngStyle]="{'background-color': getLatencyHexColorFromSeconds(latency.latency_fe)}"><span style="padding: 0 0.5rem; color: var(--main-bg-color)">{{millisToHHMMSS(latency.latency_fe)}}</span></div>

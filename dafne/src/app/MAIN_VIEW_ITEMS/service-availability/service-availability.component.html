@@ -61,12 +61,23 @@
     </div>
     <div id="table-div">
         <table id="data-table">
-            <thead>
+            <!-- Weekly Availability -->
+            <thead *ngIf="isWeekly == true">
+                <th style="color: white">{{localCentre.name}}</th>
+                <ng-template ngFor let-availability [ngForOf]="requestedServiceAvailabilityList" let-i="index">
+                    <th style="padding: 0 0.5rem;">Week <div>from: {{availability.date}}</div><div>to: {{getWeekEndDateText(availability.date)}}</div></th>
+                </ng-template>
+            </thead>
+
+            <!-- Daily Availability -->
+            <thead *ngIf="isWeekly == false">
                 <th style="color: white">{{localCentre.name}}</th>
                 <ng-template ngFor let-availability [ngForOf]="requestedServiceAvailabilityList" let-i="index">
                     <th style="padding: 0 0.5rem;">{{availability.date}}</th>
                 </ng-template>
             </thead>
+
+            <!-- Data -->
             <tr>
                 <td style="color: var(--main-text-color)">TotalRequests</td>
                 <ng-template ngFor let-availability [ngForOf]="requestedServiceAvailabilityList" let-i="index">

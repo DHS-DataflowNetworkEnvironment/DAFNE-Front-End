@@ -705,18 +705,20 @@ export class PublicationLatencyComponent implements OnInit {
 
             /* Rotate Dates */
             let tempText;
-            let preText = "Week from";
-            tempText = preText + "\n" + this.requestedPublicationLatencyList[i].day;
+            let preText = "Week\n";
+            let weekStartText = "from: " + this.requestedPublicationLatencyList[i].day + "\nto: ";
+            let weekEndText = this.getWeekEndDateText(this.requestedPublicationLatencyList[i].day);
+            tempText = preText + weekStartText + weekEndText;
             let tempRadium = (sectionXFilledDim - (2 * barGap) - dateFontSize);
             let angle = 0;
-            if (tempRadium > p.textWidth(preText)) tempRadium = p.textWidth(preText);
-            if (tempRadium > 0) angle = p.acos(tempRadium / p.textWidth(preText));
+            if (tempRadium > p.textWidth(weekEndText)) tempRadium = p.textWidth(weekEndText);
+            if (tempRadium > 0) angle = p.acos(tempRadium / p.textWidth(weekEndText));
             else angle = p.PI/2;
             let sinOfAngleTemp = p.sin(angle);
             if (sinOfAngleTemp < 0.001) {
               sinOfAngleTemp = 0.001;
             }
-            let sinOfAngle = sinOfAngleTemp * (p.textWidth(preText) / 2);            
+            let sinOfAngle = sinOfAngleTemp * (p.textWidth(weekEndText) / 2);            
             p.push();
             p.translate(sectionXCenter, yCenter + chartYDim2 + sinOfAngle + 3 * dateFontSize);
             if (angle > p.PI / 2) angle = p.PI / 2;
@@ -969,18 +971,20 @@ export class PublicationLatencyComponent implements OnInit {
 
             /* Rotate Dates */
             let tempText;
-            let preText = "Week from";
-            tempText = preText + "\n" + this.requestedPublicationLatencyList[i].day;
+            let preText = "Week\n";
+            let weekStartText = "from: " + this.requestedPublicationLatencyList[i].day + "\nto: ";
+            let weekEndText = this.getWeekEndDateText(this.requestedPublicationLatencyList[i].day);
+            tempText = preText + weekStartText + weekEndText;
             let tempRadium = (sectionXFilledDim - (2 * barGap) - dateFontSize);
             let angle = 0;
-            if (tempRadium > p.textWidth(preText)) tempRadium = p.textWidth(preText);
-            if (tempRadium > 0) angle = p.acos(tempRadium / p.textWidth(preText));
+            if (tempRadium > p.textWidth(weekEndText)) tempRadium = p.textWidth(weekEndText);
+            if (tempRadium > 0) angle = p.acos(tempRadium / p.textWidth(weekEndText));
             else angle = p.PI/2;
             let sinOfAngleTemp = p.sin(angle);
             if (sinOfAngleTemp < 0.001) {
               sinOfAngleTemp = 0.001;
             }
-            let sinOfAngle = sinOfAngleTemp * (p.textWidth(preText) / 2);
+            let sinOfAngle = sinOfAngleTemp * (p.textWidth(weekEndText) / 2);  
             p.push();
             p.translate(sectionXCenter, yCenter + chartYDim2 + sinOfAngle + 3 * dateFontSize);
             if (angle > p.PI / 2) angle = p.PI / 2;
@@ -1483,5 +1487,9 @@ export class PublicationLatencyComponent implements OnInit {
     var seconds = Math.floor(sec_num) - (hours * 3600) - (minutes * 60);
     var timeStr = hours.toString(10).padStart(2, '0') + "h:" + minutes.toString(10).padStart(2, '0') + "m:" + seconds.toString(10).padStart(2, '0') + "s";
     return timeStr;
+  }
+
+  getWeekEndDateText(weekStartText) {
+    return new Date(Date.parse(weekStartText) + (this.millisPerDay * 6)).toISOString().slice(0, 10)
   }
 }
