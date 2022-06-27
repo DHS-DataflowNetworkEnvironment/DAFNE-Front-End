@@ -4,32 +4,80 @@
     <div id="filters-form-container">
         <form id="filters-form">
             <div id="filters-form-row">
-                <div>
-                    <label class="form-label">Mission:</label>
+                <!-- Use sync filter checkbox -->
+                <div class="use-filter-div">
+                    <label class="form-label" for="use-filter-checkbox">Use sync filter:</label>
+                    <input type="checkbox" class="form-control" id="use-filter-checkbox" (change)="onUseFilterCheckboxChange()" [checked]="false">
+                </div>
+
+                <!-- FALSE -->
+                <div *ngIf="useSyncFilter == false">
+                    <label class="form-label" for="mission-select">Mission:</label>
                     <select id="mission-select" class="form-select" (change)="onMissionChange($event)">
                         <option [value]="mission.name" *ngFor="let mission of totalMissionList">{{mission.name}}</option>
                     </select>
                 </div>
-                <div>
+                <div *ngIf="useSyncFilter == false">
                     <label class="form-label">Product Type:</label>
                     <select id="product-type-select" class="form-select" (change)="onProductTypeChange($event)">
                         <option [value]="productType" *ngFor="let productType of missionFiltered.productType">{{productType}}</option>
                     </select>
                 </div>
-                <div>
+                <div *ngIf="useSyncFilter == false">
                     <label class="form-label">Platform N.:</label>
                     <select id="platform-number-select" class="form-select" (change)="onPlatformNumberChange($event)">
                         <option [value]="platformNumber" *ngFor="let platformNumber of missionFiltered.platform">{{platformNumber}}</option>
                     </select>
                 </div>
+
+                <!-- TRUE -->
+                <div *ngIf="useSyncFilter == true">
+                    <label class="form-label">Service Type:</label>
+                    <select id="service-type-select" class="form-select" (change)="onServiceTypeChange($event)">
+                        <option [value]="serviceType.service_type" *ngFor="let serviceType of serviceTypeList">{{serviceType.service_type}}</option>
+                    </select>
+                </div>
+                <div *ngIf="useSyncFilter == true" class="select-sync-div">
+                    <label class="form-label">Synch:</label>
+                    <select *ngIf="serviceTypeChoosen < 4" id="sync-select" class="form-select" (change)="onSyncChange($event)">
+                        <optgroup *ngIf="serviceTypeChoosen == 1" label="Single Instance">
+                            <option [value]="sync.Label" *ngFor="let sync of siSynchronizers" title="URL: {{sync.serviceUrl}}">{{sync.Label}}</option>
+                        </optgroup>
+                        <optgroup *ngIf="serviceTypeChoosen == 2" label="Front-End">
+                            <option [value]="sync.Label" *ngFor="let sync of feSynchronizers" title="URL: {{sync.serviceUrl}}">{{sync.Label}}</option>
+                        </optgroup>
+                        <optgroup *ngIf="serviceTypeChoosen == 3" label="Back-End">
+                            <option [value]="sync.Label" *ngFor="let sync of beSynchronizers" title="URL: {{sync.serviceUrl}}">{{sync.Label}}</option>
+                        </optgroup>
+                        <option *ngIf="canSubmit == false">NaN</option>
+                    </select>
+                    <select *ngIf="serviceTypeChoosen == 4" id="sync-select" class="form-select" (change)="onSyncChange($event)">
+                        <optgroup label="Single Instance">
+                            <option [value]="sync.Label" *ngFor="let sync of siSynchronizers" title="URL: {{sync.serviceUrl}}">{{sync.Label}}</option>
+                        </optgroup>
+                        <optgroup label="Front-End">
+                            <option [value]="sync.Label" *ngFor="let sync of feSynchronizers" title="URL: {{sync.serviceUrl}}">{{sync.Label}}</option>
+                        </optgroup>
+                        <optgroup label="Back-End">
+                            <option [value]="sync.Label" *ngFor="let sync of beSynchronizers" title="URL: {{sync.serviceUrl}}">{{sync.Label}}</option>
+                        </optgroup>
+                        <option *ngIf="canSubmit == false">NaN</option>
+                    </select>
+                </div>
+                <div *ngIf="useSyncFilter == true" class="filter-string-div">
+                    <label class="form-label">Filter:</label>
+                    <input type="text" class="form-control" id="filter-string" [value]="tempFilter" placeholder="All product types" title="{{tempFilter}}">
+                </div>
+
+                <!-- DATES -->
                 <div class="date-picker">
-                    <label class="form-label">Start Date:</label>
+                    <label class="form-label">Start/Stop Date:</label>
                     <dp-date-picker class="" theme="dp-material" id="filter-start-date" name="filter-start-date"
                         [(ngModel)]="startDate" (ngModelChange)="onStartDateChanged($event)" [config]="startDatePickerConfig" placeholder="YYYY-MM-DD">
                     </dp-date-picker>
                 </div>
                 <div>
-                    <label class="form-label">Stop Date:</label>
+                    <!-- <label class="form-label">Stop Date:</label> -->
                     <dp-date-picker class="" theme="dp-material" id="filter-stop-date" name="filter-stop-date"
                         [(ngModel)]="stopDate" (ngModelChange)="onStopDateChanged($event)" [config]="stopDatePickerConfig" placeholder="YYYY-MM-DD">
                     </dp-date-picker>
@@ -47,8 +95,12 @@
                 <li id="target-id-remote-title" class="mt-2" style="color: white">Remotes:</li>
             </ul>
             <ul *ngFor="let item of serviceRemoteCentreList | uniqueCentreFilter; let i = index;" id="target-id-list">
-                <li [ngStyle]='{color: item.color}'>
-                    {{item.name}}
+                <li *ngIf="useSyncFilterForTable == true">
+                    <span *ngIf="item.isCSC == true" style='color: var(--windows-title-color)'>{{item.name}} - (N/A)</span>
+                    <span *ngIf="item.isCSC == false" [ngStyle]='{color: item.color}'>{{item.name}}</span>
+                </li>
+                <li *ngIf="useSyncFilterForTable == false || useSyncFilterForTable == null">
+                    <span [ngStyle]='{color: item.color}'>{{item.name}}</span>
                 </li>
             </ul>
         </section>
@@ -78,12 +130,23 @@
     <div id="table-div">
         <table id="data-table">
             <thead>
-                <th style="color: white">{{missionName}} {{platformNumber}} ({{productType}})</th>
+                <th *ngIf="useSyncFilterForTable == null" style="color: white">Filter:</th>
+                <th *ngIf="useSyncFilterForTable == true && filter != null" style="color: white">Filter: {{filter}}</th>
+                <th *ngIf="useSyncFilterForTable == true && filter == null" style="color: white">Filter: All product types</th>
+                <th *ngIf="useSyncFilterForTable == false" style="color: white">Filter: {{missionName}} {{platformNumber}} ({{productType}})</th>
                 <th *ngFor="let column of completenessDataList" style="padding: 0 0.5rem;">{{column.date}}</th>
             </thead>
             <tr *ngFor="let centre of serviceAllCentreList; let i=index">
-                <td [ngStyle]="{'color': centre.color }">{{centre.name}}</td>
-                <td [ngStyle]="{'color': centre.color }" *ngFor="let data of completenessDataList">{{(data.values[i].value < 0 ? "NaN" : data.values[i].value)}}</td>
+                <td *ngIf="useSyncFilterForTable == false || (useSyncFilterForTable == true && centre.isCSC == false)" >
+                    <div [ngStyle]="{'color': centre.color }">{{centre.name}}</div>
+                </td>
+                <td *ngIf="useSyncFilterForTable == true && centre.isCSC == true" >
+                    <div style='color: var(--windows-title-color)'>{{centre.name}} - (N/A)</div>
+                </td>
+                <td *ngFor="let data of completenessDataList">
+                    <div *ngIf="useSyncFilterForTable == false || (useSyncFilterForTable == true && centre.isCSC == false)" [ngStyle]="{'color': centre.color }">{{(data.values[i].value < 0 ? "NaN" : data.values[i].value)}}</div>
+                    <div *ngIf="useSyncFilterForTable == true && centre.isCSC == true" style='color: var(--windows-title-color)'>(N/A)</div>
+                </td>
             </tr>
         </table>
     </div>

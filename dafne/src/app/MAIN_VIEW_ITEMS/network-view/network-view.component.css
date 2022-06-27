@@ -4,10 +4,12 @@
     color: var(--main-text-color);
     align-items: center;
     padding-left: 0.5rem;
+    min-width: 980px;
 }
 #map-content {
     background-color: var(--main-bg-color);
     color: var(--main-text-color);
+    min-width: 980px;
 }
 
 /* Centres List */

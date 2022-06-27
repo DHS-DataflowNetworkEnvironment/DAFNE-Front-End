@@ -4,21 +4,24 @@
     <div id="filters-form-container">
         <form id="filters-form">
             <div id="filters-form-row">
+                <div class="weekly-div">
+                    <label class="form-label">Weekly Aggregation:</label>
+                    <input type="checkbox" class="form-control" id="weekly-checkbox" name="weekly-checkbox" (change)="onWeeklyCheckboxChange()" [checked]="false">
+                </div>
                 <div>
-                    <label class="form-label">Synchronizer:</label>
+                    <label class="form-label">Synch:</label>
                     <select id="synchronizer-select" class="form-select" (change)="onFilterSyncChange($event)">
                         <option [value]="sync.Label" *ngFor="let sync of syncList">{{sync.Label}}</option>
                     </select>
                 </div>
                 <div class="date-picker">
-                    <label class="form-label">Start Date:</label>
-                    <dp-date-picker class="" theme="dp-material" id="filter-start-date" name="filter-start-date"
+                    <label class="form-label">Start/Stop Date:</label>
+                    <dp-date-picker class="" theme="dp-material" id="filter-start-date" name="filter-start-date" (click)="onDateClick($event)"
                         [(ngModel)]="startDate" (ngModelChange)="onStartDateChanged($event)" [config]="startDatePickerConfig" placeholder="YYYY-MM-DD">
                     </dp-date-picker>
                 </div>
                 <div class="date-picker">
-                    <label class="form-label">Stop Date:</label>
-                    <dp-date-picker class="" theme="dp-material" id="filter-stop-date" name="filter-stop-date"
+                    <dp-date-picker class="" theme="dp-material" id="filter-stop-date" name="filter-stop-date" (click)="onDateClick($event)"
                         [(ngModel)]="stopDate" (ngModelChange)="onStopDateChanged($event)" [config]="stopDatePickerConfig" placeholder="YYYY-MM-DD">
                     </dp-date-picker>
                 </div>
@@ -27,8 +30,6 @@
         </form>
     </div>
     <div id="main-row-container">
-        <!-- Date Title -->
-        <h5 *ngIf="showDetailLatency == true" id="detail-day-title">{{latencyDetailDate}} Latency</h5>
         <!-- Charts -->
         <div id="p5PublicationLatencyCanvas-column-div">
             <div id="p5PublicationLatencyCanvas"></div>
@@ -36,7 +37,12 @@
         </div>
         <!-- Selectors -->
         <section id="selectors-container">
-            <h2>CHART</h2>
+            <!-- Date Title -->
+            <h5 *ngIf="showDetailLatency == false && isWeekly == true" class="latency-chart-title">WEEKLY</h5>
+            <h5 *ngIf="showDetailLatency == false && isWeekly == false" class="latency-chart-title">DAILY</h5>
+            <h5 *ngIf="showDetailLatency == true" class="latency-chart-title">{{latencyDetailDate}} DETAIL</h5>
+            <!-- Buttons -->
+            <h2 id="buttons-title">CHART</h2>
             <button (click)="chartChangeTo('Bar Chart')">Bar Chart</button>
             <button (click)="chartChangeTo('Line Chart')">Line Chart</button>
             
@@ -63,8 +69,20 @@
     </div>
     <div id="table-div">
         <table id="data-table">
+            <!-- Weekly Latency -->
+            <thead *ngIf="isWeekly == true">
+                <th style="color: white">{{localCentre.name}}</th>
+                <th *ngFor="let latency of requestedPublicationLatencyList; let i = index" style="padding: 0 0.5rem;">Week <div>from: {{latency.day}}</div><div>to: {{getWeekEndDateText(latency.day)}}</div>
+                    <div *ngIf="latency.source == 'FE'" style="color: var(--main-bg-color); font-size: 0.6rem;"><br></div>
+                    <div *ngIf="latency.source == 'BE'" style="color: lightsalmon; font-size: 0.6rem;">( BE )</div>
+                    <div *ngIf="latency.source == 'FE+BE'" style="color: lightgoldenrodyellow; font-size: 0.6rem;">( FE+BE )</div>
+                    <div *ngIf="latency.source == 'null'" style="color: grey; font-size: 0.6rem;"><br></div>
+                    <div *ngIf="latency.source == ''" style="color: grey; font-size: 0.6rem;"><br></div>
+                </th>
+            </thead>
+
             <!-- Daily Latency -->
-            <thead *ngIf="showDetailLatency == false">
+            <thead *ngIf="showDetailLatency == false && isWeekly == false">
                 <th style="color: white">{{localCentre.name}}</th>
                 <th *ngFor="let latency of requestedPublicationLatencyList; let i = index" style="padding: 0 0.5rem;">{{latency.day}}
                     <div *ngIf="latency.source == 'FE'" style="color: var(--main-bg-color); font-size: 0.6rem;"><br></div>
@@ -74,6 +92,8 @@
                     <div *ngIf="latency.source == ''" style="color: grey; font-size: 0.6rem;"><br></div>
                 </th>
             </thead>
+
+            <!-- Weekly and Daily Data -->
             <tr *ngIf="showDetailLatency == false">
                 <td style="color: #ffffff">Latency {{selectedFilterSyncLabel}}</td>
                 <td *ngFor="let latency of requestedPublicationLatencyList">
@@ -84,7 +104,7 @@
             </tr>
             
             <!-- Detail Latency -->
-            <thead *ngIf="showDetailLatency == true">
+            <thead *ngIf="showDetailLatency == true && isWeekly == false">
                 <th style="color: white">{{localCentre.name}}</th>
                 <th *ngFor="let latency of publicationDetailLatencyList; let i = index" style="padding: 0 0.5rem;">{{latency.timezone.slice(11, 16)}}
                     <div *ngIf="latency.source == 'FE'" style="color: var(--main-bg-color); font-size: 0.6rem;"><br></div>
@@ -92,7 +112,7 @@
                     <div *ngIf="latency.source == 'null'" style="color: grey; font-size: 0.6rem;"><br></div>
                 </th>
             </thead>
-            <tr *ngIf="showDetailLatency == true">
+            <tr *ngIf="showDetailLatency == true && isWeekly == false">
                 <td style="color: #ffffff; white-space:nowrap;">{{latencyDetailDate}} Latency {{selectedFilterSyncLabel}}</td>
                 <td *ngFor="let latency of publicationDetailLatencyList">
                     <div *ngIf="latency.latency_fe != null" [ngStyle]="{'background-color': getLatencyHexColorFromSeconds(latency.latency_fe)}"><span style="padding: 0 0.5rem; color: var(--main-bg-color)">{{millisToHHMMSS(latency.latency_fe)}}</span></div>
