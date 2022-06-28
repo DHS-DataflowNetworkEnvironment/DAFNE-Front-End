@@ -328,21 +328,26 @@ export class ServiceAvailabilityComponent implements OnInit {
       /* Export Weekly Availability */
       if (this.requestedServiceAvailabilityList.length > 0) {
         var csvContent: string = '';
-        var table = document.getElementById('data-table');
-        for (var r = 0; r < table.childElementCount; r++) {
-          for (var c = 0; c < table.children[r].childElementCount; c++) {
-            csvContent += table.children[r].children[c].innerHTML;
-            if (!(c == (table.children[r].childElementCount - 1) && r == (table.childElementCount - 1))) csvContent += ',';
+        var table = <HTMLTableElement>document.getElementById('data-table');
+        for (var h = 0; h < table.tHead.childElementCount; h++) {
+          csvContent += table.tHead.children[h].textContent;
+          if (h != table.tHead.childElementCount - 1) csvContent += ',';
+        }
+        csvContent += '\n';
+        for (var r = 0; r < table.rows.length; r++) {
+          for (var c = 0; c < table.rows[r].cells.length; c++) {
+            csvContent += table.rows[r].cells[c].innerText;
+            if (!(c == (table.rows[r].childElementCount - 1) && r == (table.childElementCount - 1))) csvContent += ',';
           }
           r < (table.childElementCount - 1) ? csvContent += '\n' : null;
-        }
+        }  
         this.csvService.exportToCsv(
           'DAFNE-Service_Weekly_Availability('
           + this.localCentre.name
           + ')_From('
-          + table.children[0].children[1].innerHTML
+          + this.startDate
           + ')_To('
-          + table.children[0].children[table.children[0].childElementCount - 1].innerHTML
+          + this.stopDate
           + ').csv', csvContent
         );
       }
@@ -350,21 +355,26 @@ export class ServiceAvailabilityComponent implements OnInit {
       /* Export Daily Availability */
       if (this.requestedServiceAvailabilityList.length > 0) {
         var csvContent: string = '';
-        var table = document.getElementById('data-table');
-        for (var r = 0; r < table.childElementCount; r++) {
-          for (var c = 0; c < table.children[r].childElementCount; c++) {
-            csvContent += table.children[r].children[c].innerHTML;
-            if (!(c == (table.children[r].childElementCount - 1) && r == (table.childElementCount - 1))) csvContent += ',';
+        var table = <HTMLTableElement>document.getElementById('data-table');
+          for (var h = 0; h < table.tHead.childElementCount; h++) {
+            csvContent += table.tHead.children[h].textContent;
+            if (h != table.tHead.childElementCount - 1) csvContent += ',';
           }
-          r < (table.childElementCount - 1) ? csvContent += '\n' : null;
-        }
+          csvContent += '\n';
+          for (var r = 0; r < table.rows.length; r++) {
+            for (var c = 0; c < table.rows[r].cells.length; c++) {
+              csvContent += table.rows[r].cells[c].innerText;
+              if (!(c == (table.rows[r].childElementCount - 1) && r == (table.childElementCount - 1))) csvContent += ',';
+            }
+            r < (table.childElementCount - 1) ? csvContent += '\n' : null;
+          }      
         this.csvService.exportToCsv(
           'DAFNE-Service_Daily_Availability('
           + this.localCentre.name
           + ')_From('
-          + table.children[0].children[1].innerHTML
+          + this.startDate
           + ')_To('
-          + table.children[0].children[table.children[0].childElementCount - 1].innerHTML
+          + this.stopDate
           + ').csv', csvContent
         );
       }

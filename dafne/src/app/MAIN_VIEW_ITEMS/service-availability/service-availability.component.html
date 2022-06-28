@@ -65,7 +65,7 @@
             <thead *ngIf="isWeekly == true">
                 <th style="color: white">{{localCentre.name}}</th>
                 <ng-template ngFor let-availability [ngForOf]="requestedServiceAvailabilityList" let-i="index">
-                    <th style="padding: 0 0.5rem;">Week <div>from: {{availability.date}}</div><div>to: {{getWeekEndDateText(availability.date)}}</div></th>
+                    <th style="padding: 0 0.5rem; white-space: pre;">Week <div>from: {{availability.date}} </div><div>to: {{getWeekEndDateText(availability.date)}}</div></th>
                 </ng-template>
             </thead>
 

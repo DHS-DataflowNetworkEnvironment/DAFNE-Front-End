@@ -311,7 +311,6 @@ table, th, td {
 }
 th {
     background-color: var(--table-header-bg-color);
-    white-space:nowrap;
 }
 
 /* Responsiveness */

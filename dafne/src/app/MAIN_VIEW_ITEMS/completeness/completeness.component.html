@@ -131,8 +131,8 @@
         <table id="data-table">
             <thead>
                 <th *ngIf="useSyncFilterForTable == null" style="color: white">Filter:</th>
-                <th *ngIf="useSyncFilterForTable == true && filter != null" style="color: white">Filter: {{filter}}</th>
-                <th *ngIf="useSyncFilterForTable == true && filter == null" style="color: white">Filter: All product types</th>
+                <th *ngIf="useSyncFilterForTable == true && filter != null" style="color: white">Sync: {{choosenSync}} - Filter: {{filter}}</th>
+                <th *ngIf="useSyncFilterForTable == true && filter == null" style="color: white">Sync: {{choosenSync}} - Filter: All product types</th>
                 <th *ngIf="useSyncFilterForTable == false" style="color: white">Filter: {{missionName}} {{platformNumber}} ({{productType}})</th>
                 <th *ngFor="let column of completenessDataList" style="padding: 0 0.5rem;">{{column.date}}</th>
             </thead>

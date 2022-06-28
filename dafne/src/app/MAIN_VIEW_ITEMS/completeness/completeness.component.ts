@@ -39,7 +39,7 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
   public serviceLocalCentre = new Centre;
   public serviceRemoteCentreList = [];
   public serviceAllCentreList = [];
-  public localCentre: Centre = new Centre;
+  public localCentre;
   public totalMissionList = AppConfig.settings.satelliteList;
   public missionFiltered = this.totalMissionList[0];
   public productTypeFiltered = this.missionFiltered.productType[0];
@@ -61,12 +61,6 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
   public feSynchronizers = []
   public beSynchronizers = []
   public serviceTypeList = []
-  /* public serviceTypeList = [
-    "Single Instance",
-    "Front-End",
-    "Back-End",
-    "All"
-  ] */
   public serviceType: string;
   public serviceTypeChoosen: number = 1;
   public choosenSync: string;
@@ -237,7 +231,8 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
             icon: 'place',
             color: 'white',
             latitude: '0.0',
-            longitude: '0.0'
+            longitude: '0.0',
+            isCSC: false
           };
         }
 
@@ -286,6 +281,7 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
       /* Set initial status for sync filters */
       this.serviceTypeChoosen = 1;
       if (this.siSynchronizers[0]) {
+        this.choosenSync = this.siSynchronizers[0].Label
         this.tempFilter = this.siSynchronizers[0].FilterParam
         this.canSubmit = true
       } else {
@@ -402,6 +398,7 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
         let tempStartDate = new Date(this.startDate);
         let tempTimeDifference = tempStopDate.getTime() - tempStartDate.getTime();
         this.tempDaysNumber = tempTimeDifference / (1000 * 3600 * 24) + 1;
+
         for (var i = 0; i < this.tempDaysNumber; i++) {
           let tempFilteredDate = new Date(tempStartDate.getTime() + i*(1000*3600*24));
           let tempFilteredDateString: string = tempFilteredDate.toISOString().slice(0, 10);
@@ -452,7 +449,7 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.useSyncFilter == true) {
       this.authenticationService.getFilterCompleteness(body).subscribe(
         (res: object) => {
-          if (res) {            
+          if (res) {
             this.completenessDailyDataList[index] = res;
             this.completenessDailyGetDone[index] = true;
             this.sumDailyCompleteness();
@@ -467,6 +464,8 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
       this.authenticationService.getCompleteness(body).subscribe(
         (res: object) => {
           if (res) {
+            console.log("getCompleteness - res: " + JSON.stringify(res, null, 2));
+          
             this.completenessDailyDataList[index] = res;
             this.completenessDailyGetDone[index] = true;
             this.sumDailyCompleteness();
@@ -569,15 +568,16 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
   saveAsCSV() {
     if (this.completenessDataList.length > 0) {
       var csvContent: string = '';
-      var table = document.getElementById('data-table');
-      for (var r = 0; r < table.childElementCount; r++) {
-        for (var c = 0; c < table.children[r].childElementCount; c++) {
-          if (table.children[r].children[c].innerHTML.includes(',')) {
-            csvContent += '"'+table.children[r].children[c].innerHTML+'"'
-          } else {
-            csvContent += table.children[r].children[c].innerHTML;
-          }
-          if (!(c == (table.children[r].childElementCount - 1) && r == (table.childElementCount - 1))) csvContent += ',';
+      var table = <HTMLTableElement>document.getElementById('data-table');
+      for (var h = 0; h < table.tHead.childElementCount; h++) {
+        csvContent += '"' + table.tHead.children[h].textContent + '"';
+        if (h != table.tHead.childElementCount - 1) csvContent += ',';
+      }
+      csvContent += '\n';
+      for (var r = 0; r < table.rows.length; r++) {
+        for (var c = 0; c < table.rows[r].cells.length; c++) {
+          csvContent += '"' + table.rows[r].cells[c].innerText + '"';
+          if (!(c == (table.rows[r].childElementCount - 1) && r == (table.childElementCount - 1))) csvContent += ',';
         }
         r < (table.childElementCount - 1) ? csvContent += '\n' : null;
       }
