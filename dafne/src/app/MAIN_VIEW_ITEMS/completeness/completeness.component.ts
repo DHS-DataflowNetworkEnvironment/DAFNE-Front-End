@@ -464,8 +464,6 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
       this.authenticationService.getCompleteness(body).subscribe(
         (res: object) => {
           if (res) {
-            console.log("getCompleteness - res: " + JSON.stringify(res, null, 2));
-          
             this.completenessDailyDataList[index] = res;
             this.completenessDailyGetDone[index] = true;
             this.sumDailyCompleteness();
@@ -490,10 +488,16 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
       tempJsonCompleteness.push(this.completenessDailyDataList[i][0]);
     }
     this.completenessDataList = tempJsonCompleteness;
-    /* Sort completeness by ID and then set Local first*/
+    for (var i = 0; i < this.completenessDataList.length; i++) {
+      for (var k = 0; k < this.completenessDataList[i].values.length; k++) {
+        this.completenessDataList[i].values[k].isCSC = this.serviceAllCentreList.filter(a => a.id == this.completenessDataList[i].values[k].id)[0].isCSC;
+      }
+    }
+    /* Sort completeness by ID, then set Local first, then put CSC services at the end*/
     for (var i = 0; i < this.completenessDataList.length; i++) {
       this.completenessDataList[i].values.sort(this.getSortOrder("id"));
       this.setLocalFirst(this.completenessDataList[i].values);
+      this.completenessDataList[i].values.sort(this.getSortOrder("isCSC"));
     }
     this.daysNumber = this.tempDaysNumber;
     this.sectionRadians = (2 * Math.PI) / this.daysNumber;
