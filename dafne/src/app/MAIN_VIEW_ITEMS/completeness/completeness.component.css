@@ -95,7 +95,11 @@ input {
     height: 2rem;
     max-width: 6rem;
     position: relative;
+    box-shadow: 0 0 0 40px var(--modal-bg-color) inset !important;
 }
+/* input:autofill {
+    background: var(--modal-bg-color)
+} */
 #filter-string {
     color: var(--main-text-color);
     font-size: 0.75rem;
