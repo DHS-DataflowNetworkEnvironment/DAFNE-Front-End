@@ -352,8 +352,6 @@ export class ServiceAvailabilityComponent implements OnInit {
         );
       }
     } else {
-      console.log("Availability - this.requestedServiceAvailabilityList.length: " + this.requestedServiceAvailabilityList.length);
-      
       /* Export Daily Availability */
       if (this.requestedServiceAvailabilityList.length > 0) {
         var csvContent: string = '';

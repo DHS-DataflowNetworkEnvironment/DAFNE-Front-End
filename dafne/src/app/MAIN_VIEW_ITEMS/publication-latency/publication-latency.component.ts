@@ -472,8 +472,6 @@ export class PublicationLatencyComponent implements OnInit {
           );
         }
       } else {
-        console.log("Latency - this.publicationLatencyList.length: " + this.requestedPublicationLatencyList.length);
-        
         /* Export Daily Latency */
         if (this.requestedPublicationLatencyList.length > 0) {
           var csvContent: string = '';
