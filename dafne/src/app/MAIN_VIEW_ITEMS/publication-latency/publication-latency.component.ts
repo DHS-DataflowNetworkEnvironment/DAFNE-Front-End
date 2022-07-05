@@ -261,7 +261,7 @@ export class PublicationLatencyComponent implements OnInit {
               this.requestedWeeksNumber = Math.ceil((((tempTimeDifference + (this.weekdayShift + this.weekdayStopShift) * this.millisPerDay ) / this.millisPerDay) + 1) / 7);
               this.requestedPublicationLatencyList = [];
               this.publicationLatencyList = res.values;
-              
+
               for (var i = 0; i < this.requestedWeeksNumber; i++) {
                 this.requestedPublicationLatencyList[i] = {
                   day: new Date(Date.parse(this.startDate) - (this.weekdayShift * this.millisPerDay) + (i * this.millisPerWeek)).toISOString().slice(0,10),
@@ -274,9 +274,6 @@ export class PublicationLatencyComponent implements OnInit {
                   number_of_measurements: 0,
                   source: ""
                 }
-              }
-
-              for (var i = 0; i < this.requestedWeeksNumber; i++) {
                 for (var k = 0; k < this.latencyWeeksNumber; k++) {
                   if (this.publicationLatencyList[k].day == this.requestedPublicationLatencyList[i].day) {
                     if (this.publicationLatencyList[k].average_fe == null) {
@@ -326,9 +323,6 @@ export class PublicationLatencyComponent implements OnInit {
                   number_of_measurements: 0,
                   source: ""
                 }
-              }
-
-              for (var i = 0; i < this.requestedDaysNumber; i++) {
                 for (var k = 0; k < this.latencyDaysNumber; k++) {
                   if (this.publicationLatencyList[k].day == this.requestedPublicationLatencyList[i].day) {
                     if (this.publicationLatencyList[k].average_fe == null) {
@@ -449,7 +443,7 @@ export class PublicationLatencyComponent implements OnInit {
     } else {
       if (this.isWeekly == true) {
         /* Export Weekly Latency */
-        if (this.publicationLatencyList.length > 0) {
+        if (this.requestedPublicationLatencyList.length > 0) {
           var csvContent: string = '';
           var table = <HTMLTableElement>document.getElementById('data-table');
           for (var h = 0; h < table.tHead.childElementCount; h++) {
@@ -478,8 +472,10 @@ export class PublicationLatencyComponent implements OnInit {
           );
         }
       } else {
+        console.log("Latency - this.publicationLatencyList.length: " + this.requestedPublicationLatencyList.length);
+        
         /* Export Daily Latency */
-        if (this.publicationLatencyList.length > 0) {
+        if (this.requestedPublicationLatencyList.length > 0) {
           var csvContent: string = '';
           var table = <HTMLTableElement>document.getElementById('data-table');
           for (var h = 0; h < table.tHead.childElementCount; h++) {
