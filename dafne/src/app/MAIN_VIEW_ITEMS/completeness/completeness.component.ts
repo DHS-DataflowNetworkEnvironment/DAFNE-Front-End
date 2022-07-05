@@ -242,6 +242,9 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getSynchronizers() {
+    this.siSynchronizers = []
+    this.feSynchronizers = []
+    this.beSynchronizers = []
     this.authenticationService.getSISynchronizers().subscribe(
       (res: any) => {
         for (var i = 0; i < Object.keys(res).length; i++) {
