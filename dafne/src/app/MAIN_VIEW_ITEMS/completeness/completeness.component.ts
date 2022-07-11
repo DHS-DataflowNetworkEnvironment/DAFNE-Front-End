@@ -257,7 +257,6 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
             this.siSynchronizers.push(res[i].synchronizers[k]);
           }
         }
-        console.log("getSISynchronizers - res: " + JSON.stringify(res, null, 2));
       }
     );
     this.authenticationService.getFESynchronizers().subscribe(
@@ -268,7 +267,6 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
             this.feSynchronizers.push(res[i].synchronizers[k])
           }
         }
-        console.log("getFESynchronizers - res: " + JSON.stringify(res, null, 2));
       }
     );
     this.authenticationService.getBESynchronizers().subscribe(
@@ -279,7 +277,6 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
             this.beSynchronizers.push(res[i].synchronizers[k])
           }
         }
-        console.log("getBESynchronizers - res: " + JSON.stringify(res, null, 2));
       }
     );
   }
