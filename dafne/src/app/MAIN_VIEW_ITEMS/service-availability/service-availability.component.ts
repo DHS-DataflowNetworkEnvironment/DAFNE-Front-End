@@ -44,13 +44,15 @@ export class ServiceAvailabilityComponent implements OnInit {
     format: "YYYY-MM-DD",
     firstDayOfWeek: "mo",
     min: "2010-01-01",
-    max: this.todayDate
+    max: this.todayDate,
+    unSelectOnClick: false
   };
   public stopDatePickerConfig: IDatePickerConfig = {
     format: "YYYY-MM-DD",
     firstDayOfWeek: "mo",
     min: "2010-01-01",
-    max: this.todayDate
+    max: this.todayDate,
+    unSelectOnClick: false
   };
   public selectorText = [
     "Bar Chart",
@@ -111,13 +113,15 @@ export class ServiceAvailabilityComponent implements OnInit {
                 format: "YYYY-MM-DD",
                 firstDayOfWeek: "mo",
                 min: tempMinDate,
-                max: this.todayDate
+                max: this.todayDate,
+                unSelectOnClick: false
               };
               this.stopDatePickerConfig = {
                 format: "YYYY-MM-DD",
                 firstDayOfWeek: "mo",
                 min: tempMinDate,
-                max: this.todayDate
+                max: this.todayDate,
+                unSelectOnClick: false
               };
               this.init_P5();
             }
