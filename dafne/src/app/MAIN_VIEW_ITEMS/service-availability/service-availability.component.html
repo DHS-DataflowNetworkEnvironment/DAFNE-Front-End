@@ -35,12 +35,14 @@
             <!-- Date Title -->
             <h5 *ngIf="isWeekly == true" class="availability-chart-title">WEEKLY</h5>
             <h5 *ngIf="isWeekly == false" class="availability-chart-title">DAILY</h5>
-            <!-- Buttons -->
+            <!-- Chart Buttons -->
             <h2 id="buttons-title">CHART</h2>
             <button (click)="chartChangeTo('Bar Chart')">Bar Chart</button>
             <button *ngIf="isWeekly==false" (click)="chartChangeTo('Calendar Chart')">Calendar Chart</button>
 
-            <h2 id="legend-title">LEGEND</h2>
+            <!-- Legend -->
+            <hr>
+            <h2>LEGEND</h2>
             <ng-template ngFor let-color [ngForOf]="availabilityColors" let-i="index">
                 <div *ngIf="i>0" class="color-threshold" [ngStyle]="{'background-color': availabilityColors[availabilityColors.length-1-i].color}">&gt;<span *ngIf="i==availabilityColors.length - 1">=</span> {{availabilityColors[availabilityColors.length-1-i].threshold}}% &lt;= {{availabilityColors[availabilityColors.length-i].threshold}}%</div>
             </ng-template>
@@ -49,6 +51,13 @@
                 <span *ngIf="averageServiceAvailability >= 0"> {{averageServiceAvailability.toFixed(2)}}%</span>
                 <span *ngIf="averageServiceAvailability < 0"> ---</span>
             </div>
+
+            <!-- Buttons and info -->
+            <hr>
+            <h6 *ngIf="isWeekly == true && firstWeeklySubmitted" class="button-info" style="text-align: center;">Click on a bar to show the days of that week</h6>
+            <h6 *ngIf="isWeekly == false && firstWeeklySubmitted" class="button-info" style="text-align: center;">Click below to go back to weekly</h6>
+            <button *ngIf="isWeekly == true && firstDailySubmitted" class="button-info" id="back-to-daily-button" (click)="onBackToDailyClicked()">Back to daily</button>
+            <button *ngIf="isWeekly == false && firstWeeklySubmitted" class="button-info" id="back-to-weekly-button" (click)="onBackToWeeklyClicked()">Back to weekly</button>       
         </section>
     </div>
 </div>

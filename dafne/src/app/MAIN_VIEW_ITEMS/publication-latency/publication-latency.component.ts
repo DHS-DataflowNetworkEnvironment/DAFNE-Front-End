@@ -74,6 +74,16 @@ export class PublicationLatencyComponent implements OnInit {
   public latencyColors;
   public tempSelectedFilterSyncLabel;
   public selectedFilterSyncLabel;
+  public precWeekly_selectedFilterSyncLabel;
+  public precWeekly_requestedPublicationLatencyList: Array<Latency> = [];
+  public precWeekly_startDate;
+  public precWeekly_stopDate;
+  public precWeekly_requestedWeeksNumber;
+  public precDaily_selectedFilterSyncLabel;
+  public precDaily_requestedPublicationLatencyList: Array<Latency> = [];
+  public precDaily_startDate;
+  public precDaily_stopDate;
+  public precDaily_requestedDaysNumber;
 
   public syncServiceUrl: Array<string>;
   public syncList;
@@ -81,6 +91,8 @@ export class PublicationLatencyComponent implements OnInit {
 
   public isWeekly: boolean = false;
   public askForWeekly: boolean = false;
+  public firstDailySubmitted: boolean = false;
+  public firstWeeklySubmitted: boolean = false;
 
   constructor(
     public authenticationService: AuthenticationService,
@@ -295,11 +307,19 @@ export class PublicationLatencyComponent implements OnInit {
               this.showDetailLatency = false;
               this.p5Chart.setClickTimeoutId(undefined);
               this.p5Chart.windowResized();
+
+              /* Save Last Data */
+              this.precWeekly_selectedFilterSyncLabel = this.selectedFilterSyncLabel;
+              this.precWeekly_requestedPublicationLatencyList = this.requestedPublicationLatencyList;
+              this.precWeekly_startDate = this.startDate;
+              this.precWeekly_stopDate = this.stopDate;
+              this.precWeekly_requestedWeeksNumber = this.requestedWeeksNumber;
             }
+            this.firstWeeklySubmitted = true;
           }
         );
       } else {
-        /* Dailiy */
+        /* Daily */
         this.isWeekly = false;
         this.authenticationService.getPublicationLatency(this.localCentre.id, body).subscribe(
           (res) => {
@@ -344,7 +364,15 @@ export class PublicationLatencyComponent implements OnInit {
               this.showDetailLatency = false;
               this.p5Chart.setClickTimeoutId(undefined);
               this.p5Chart.windowResized();
+
+              /* Save Last Data */
+              this.precDaily_selectedFilterSyncLabel = this.selectedFilterSyncLabel;
+              this.precDaily_requestedPublicationLatencyList = this.requestedPublicationLatencyList;
+              this.precDaily_startDate = this.startDate;
+              this.precDaily_stopDate = this.stopDate;
+              this.precDaily_requestedDaysNumber = this.requestedDaysNumber;
             }
+            this.firstDailySubmitted = true;
           }
         );
       }
@@ -381,6 +409,8 @@ export class PublicationLatencyComponent implements OnInit {
             }
           }
           this.showDetailLatency = true;
+          this.p5Chart.setClickTimeoutId(undefined);
+          this.p5Chart.windowResized();
         }
       }
     );
@@ -390,7 +420,41 @@ export class PublicationLatencyComponent implements OnInit {
     if (this.showDetailLatency) {
       this.showDetailLatency = false;
       this.p5Chart.setClickTimeoutId(undefined);
+      this.p5Chart.windowResized();
+      (<HTMLInputElement>document.getElementById("weekly-checkbox")).checked = false;
     }
+  }
+
+  onBackToDailyClicked() {
+    this.showDetailLatency = false;
+    this.askForWeekly = false;
+    this.isWeekly = false;
+    this.selectedFilterSyncLabel = this.precDaily_selectedFilterSyncLabel;
+    this.tempSelectedFilterSyncLabel = this.selectedFilterSyncLabel;
+    this.requestedPublicationLatencyList = this.precDaily_requestedPublicationLatencyList;
+    this.startDate = this.precDaily_startDate;
+    this.stopDate = this.precDaily_stopDate;
+    this.requestedDaysNumber = this.precDaily_requestedDaysNumber;
+    (<HTMLInputElement>document.getElementById("weekly-checkbox")).checked = false;
+    (<HTMLSelectElement>document.getElementById("synchronizer-select")).value = this.selectedFilterSyncLabel;
+    this.p5Chart.setClickTimeoutId(undefined);
+    this.p5Chart.windowResized();
+  }
+
+  onBackToWeeklyClicked() {
+    this.showDetailLatency = false;
+    this.askForWeekly = true;
+    this.isWeekly = true;
+    this.selectedFilterSyncLabel = this.precWeekly_selectedFilterSyncLabel;
+    this.tempSelectedFilterSyncLabel = this.selectedFilterSyncLabel;
+    this.requestedPublicationLatencyList = this.precWeekly_requestedPublicationLatencyList;
+    this.startDate = this.precWeekly_startDate;
+    this.stopDate = this.precWeekly_stopDate;
+    this.requestedWeeksNumber = this.precWeekly_requestedWeeksNumber;
+    (<HTMLInputElement>document.getElementById("weekly-checkbox")).checked = true;
+    (<HTMLSelectElement>document.getElementById("synchronizer-select")).value = this.selectedFilterSyncLabel;
+    this.p5Chart.setClickTimeoutId(undefined);
+    this.p5Chart.windowResized();
   }
 
   toggleTable() {
@@ -668,9 +732,9 @@ export class PublicationLatencyComponent implements OnInit {
         maxValue = 0;
         if (this.isWeekly == true) {
           /* Weekly */
-          for (var i = 0; i < this.latencyWeeksNumber; i++) {
-            if (this.publicationLatencyList[i].average_latency > maxValue) {
-              maxValue = this.publicationLatencyList[i].average_latency;
+          for (var i = 0; i < this.requestedWeeksNumber; i++) {
+            if (this.requestedPublicationLatencyList[i].average_latency > maxValue) {
+              maxValue = this.requestedPublicationLatencyList[i].average_latency;
             }
           }
           if (maxValue == 0) maxValue = this.latencyColors[0].threshold;
@@ -745,6 +809,11 @@ export class PublicationLatencyComponent implements OnInit {
               p.fill(this.rgbConvertToArray(this.latencyColors[4].color));
             }
             
+            if (this.requestedPublicationLatencyList[i].average_latency == 0) {
+              p.stroke(this.rgbConvertToArray(this.latencyColors[4].color));
+              p.line(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2, sectionXCenter + sectionXFilledDim2, yCenter + chartYDim2);
+            }
+            
             p.noStroke();
             p.rect(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2, sectionXFilledDim, -((this.requestedPublicationLatencyList[i].average_latency < 0 ? 0 : this.requestedPublicationLatencyList[i].average_latency * chartYDim / maxValue)));
   
@@ -790,9 +859,9 @@ export class PublicationLatencyComponent implements OnInit {
           }
         } else {
           /* Daily */          
-          for (var i = 0; i < this.latencyDaysNumber; i++) {
-            if (this.publicationLatencyList[i].average_latency > maxValue) {
-              maxValue = this.publicationLatencyList[i].average_latency;
+          for (var i = 0; i < this.requestedDaysNumber; i++) {
+            if (this.requestedPublicationLatencyList[i].average_latency > maxValue) {
+              maxValue = this.requestedPublicationLatencyList[i].average_latency;
             }
           }
           if (maxValue == 0) maxValue = this.latencyColors[0].threshold;
@@ -865,6 +934,11 @@ export class PublicationLatencyComponent implements OnInit {
               p.fill(this.rgbConvertToArray(this.latencyColors[4].color));
             }
             
+            if (this.requestedPublicationLatencyList[i].average_latency == 0) {
+              p.stroke(this.rgbConvertToArray(this.latencyColors[4].color));
+              p.line(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2, sectionXCenter + sectionXFilledDim2, yCenter + chartYDim2);
+            }
+            
             p.noStroke();
             p.rect(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2, sectionXFilledDim, -(this.requestedPublicationLatencyList[i].average_latency < 0 ? 0 : this.requestedPublicationLatencyList[i].average_latency * chartYDim / maxValue));
 
@@ -915,9 +989,9 @@ export class PublicationLatencyComponent implements OnInit {
         maxValue = 0;
         if (this.isWeekly == true) {
           /* Weekly */
-          for (var i = 0; i < this.latencyWeeksNumber; i++) {
-            if (this.publicationLatencyList[i].average_latency > maxValue) {
-              maxValue = this.publicationLatencyList[i].average_latency;
+          for (var i = 0; i < this.requestedWeeksNumber; i++) {
+            if (this.requestedPublicationLatencyList[i].average_latency > maxValue) {
+              maxValue = this.requestedPublicationLatencyList[i].average_latency;
             }
           }
           if (maxValue == 0) maxValue = this.latencyColors[0].threshold;
@@ -1042,9 +1116,9 @@ export class PublicationLatencyComponent implements OnInit {
           }
         } else {
           /* Daily */
-          for (var i = 0; i < this.latencyDaysNumber; i++) {
-            if (this.publicationLatencyList[i].average_latency > maxValue) {
-              maxValue = this.publicationLatencyList[i].average_latency;
+          for (var i = 0; i < this.requestedDaysNumber; i++) {
+            if (this.requestedPublicationLatencyList[i].average_latency > maxValue) {
+              maxValue = this.requestedPublicationLatencyList[i].average_latency;
             }
           }
           if (maxValue == 0) maxValue = this.latencyColors[0].threshold;

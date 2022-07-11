@@ -72,8 +72,19 @@ export class ServiceAvailabilityComponent implements OnInit {
   public availabilityColors;
   public averageColor = AppConfig.settings.averageAvailabilityColor;
 
+  public precWeekly_requestedServiceAvailabilityList: Array<Availability> = [];
+  public precWeekly_startDate;
+  public precWeekly_stopDate;
+  public precWeekly_requestedWeeksNumber;
+  public precDaily_requestedServiceAvailabilityList: Array<Availability> = [];
+  public precDaily_startDate;
+  public precDaily_stopDate;
+  public precDaily_requestedDaysNumber;
+
   public isWeekly: boolean = false;
   public askForWeekly: boolean = false;
+  public firstDailySubmitted: boolean = false;
+  public firstWeeklySubmitted: boolean = false;
 
   constructor(
     public authenticationService: AuthenticationService,
@@ -253,7 +264,14 @@ export class ServiceAvailabilityComponent implements OnInit {
             }
             this.p5Chart.setClickTimeoutId(undefined);
             this.p5Chart.windowResized();
+
+            /* Save Last Data */
+            this.precWeekly_requestedServiceAvailabilityList = this.requestedServiceAvailabilityList;
+            this.precWeekly_startDate = this.startDate;
+            this.precWeekly_stopDate = this.stopDate;
+            this.precWeekly_requestedWeeksNumber = this.requestedWeeksNumber;
           }
+          this.firstWeeklySubmitted = true;
         }
       );
     } else {
@@ -298,10 +316,41 @@ export class ServiceAvailabilityComponent implements OnInit {
             }
             this.p5Chart.setClickTimeoutId(undefined);
             this.p5Chart.windowResized();
+
+            /* Save Last Data */
+            this.precDaily_requestedServiceAvailabilityList = this.requestedServiceAvailabilityList;
+            this.precDaily_startDate = this.startDate;
+            this.precDaily_stopDate = this.stopDate;
+            this.precDaily_requestedDaysNumber = this.requestedDaysNumber;
           }
+          this.firstDailySubmitted = true;
         }
       );
     }    
+  }
+
+  onBackToDailyClicked() {
+    this.askForWeekly = false;
+    this.isWeekly = false;
+    this.requestedServiceAvailabilityList = this.precDaily_requestedServiceAvailabilityList;
+    this.startDate = this.precDaily_startDate;
+    this.stopDate = this.precDaily_stopDate;
+    this.requestedDaysNumber = this.precDaily_requestedDaysNumber;
+    (<HTMLInputElement>document.getElementById("weekly-checkbox")).checked = false;
+    this.p5Chart.setClickTimeoutId(undefined);
+    this.p5Chart.windowResized();
+  }
+
+  onBackToWeeklyClicked() {
+    this.askForWeekly = true;
+    this.isWeekly = true;
+    this.requestedServiceAvailabilityList = this.precWeekly_requestedServiceAvailabilityList;
+    this.startDate = this.precWeekly_startDate;
+    this.stopDate = this.precWeekly_stopDate;
+    this.requestedWeeksNumber = this.precWeekly_requestedWeeksNumber;
+    (<HTMLInputElement>document.getElementById("weekly-checkbox")).checked = true;
+    this.p5Chart.setClickTimeoutId(undefined);
+    this.p5Chart.windowResized();
   }
 
   toggleTable() {

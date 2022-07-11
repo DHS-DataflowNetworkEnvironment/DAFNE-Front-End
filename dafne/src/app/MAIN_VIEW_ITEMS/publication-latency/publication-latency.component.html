@@ -41,7 +41,7 @@
             <h5 *ngIf="showDetailLatency == false && isWeekly == true" class="latency-chart-title">WEEKLY</h5>
             <h5 *ngIf="showDetailLatency == false && isWeekly == false" class="latency-chart-title">DAILY</h5>
             <h5 *ngIf="showDetailLatency == true" class="latency-chart-title">{{latencyDetailDate}} DETAIL</h5>
-            <!-- Buttons -->
+            <!-- Chart Buttons -->
             <h2 id="buttons-title">CHART</h2>
             <button (click)="chartChangeTo('Bar Chart')">Bar Chart</button>
             <button (click)="chartChangeTo('Line Chart')">Line Chart</button>
@@ -55,8 +55,13 @@
             <div class="color-threshold" [ngStyle]="{'background-color': latencyColors[3].color}">&gt;4 hours to 12 hours</div>
             <div class="color-threshold" [ngStyle]="{'background-color': latencyColors[4].color}">&lt;4 hours</div>
             <hr>
-            <h6 *ngIf="showDetailLatency == false" style="text-align: center;">Click on a date to see hourly details</h6>
-            <button *ngIf="showDetailLatency == true" id="back-to-period-button" (click)="onBackToPeriodClicked()">Back to Period</button>
+            <!-- Buttons and info -->
+            <h6 *ngIf="showDetailLatency == false && isWeekly == true && firstDailySubmitted" class="button-info" style="text-align: center;">Click on a bar to show the days of that week</h6>
+            <h6 *ngIf="showDetailLatency == false && isWeekly == false && firstWeeklySubmitted" class="button-info" style="text-align: center;">Click on a bar to show the details of that day</h6>
+            <button *ngIf="showDetailLatency == false && isWeekly == true && firstDailySubmitted" class="button-info" id="back-to-daily-button" (click)="onBackToDailyClicked()">Back to daily</button>
+            <button *ngIf="showDetailLatency == false && isWeekly == false && firstWeeklySubmitted" class="button-info" id="back-to-weekly-button" (click)="onBackToWeeklyClicked()">Back to weekly</button>
+            <h6 *ngIf="showDetailLatency == true" class="button-info" style="text-align: center;">Click below to go back to daily</h6>
+            <button *ngIf="showDetailLatency == true" class="button-info" id="back-to-period-button" (click)="onBackToPeriodClicked()">Back to daily</button>
         </section>
     </div>
 </div>

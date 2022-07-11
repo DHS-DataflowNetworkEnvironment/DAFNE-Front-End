@@ -172,7 +172,7 @@
     color: var(--main-bg-color);;
 }
 
-#back-to-period-button {
+#back-to-period-button, #back-to-daily-button, #back-to-weekly-button {
     background-color: dodgerblue !important;
 }
 
