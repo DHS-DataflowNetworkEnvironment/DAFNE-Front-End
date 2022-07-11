@@ -8,7 +8,6 @@ import { Centre } from '../../models/centre';
 import { AlertComponent } from '../../alert/alert.component';
 import { MessageService } from '../../services/message.service';
 import { NavigationEnd, Router } from '@angular/router';
-import { stringify } from 'querystring';
 
 declare var $: any;
 
@@ -24,7 +23,8 @@ $(window).resize(function() {
   styleUrls: ['./completeness.component.css']
 })
 export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
-  navigationSubscription;
+  private navigationSubscription;
+  private autorefreshSubscription;
 
   public p5Chart;
   public serviceList: any;
@@ -131,6 +131,10 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
         });
       }
     )
+    this.autorefreshSubscription = this.messageService.invokeAutoRefresh.subscribe(() => {
+      this.messageService.showSpinner(false);
+      this.getSynchronizers();
+    });
   }
 
   ngOnInit(): void {
@@ -253,6 +257,7 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
             this.siSynchronizers.push(res[i].synchronizers[k]);
           }
         }
+        console.log("getSISynchronizers - res: " + JSON.stringify(res, null, 2));
       }
     );
     this.authenticationService.getFESynchronizers().subscribe(
@@ -263,6 +268,7 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
             this.feSynchronizers.push(res[i].synchronizers[k])
           }
         }
+        console.log("getFESynchronizers - res: " + JSON.stringify(res, null, 2));
       }
     );
     this.authenticationService.getBESynchronizers().subscribe(
@@ -273,6 +279,7 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
             this.beSynchronizers.push(res[i].synchronizers[k])
           }
         }
+        console.log("getBESynchronizers - res: " + JSON.stringify(res, null, 2));
       }
     );
   }
