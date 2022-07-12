@@ -318,6 +318,39 @@ export class AuthenticationService {
     ));
   }
 
+  getFESynchronizersV2() {
+    // get FE synchronizers from the back-end v2
+    return this.http.get<any>(AppConfig.settings.apiUrl + `/synchronizers/v2fe`)
+    .pipe(
+    catchError(err => {
+        console.error(err);
+        return throwError(err);
+        }
+    ));
+  }
+
+  getBESynchronizersV2() {
+    // get BE synchronizers from the back-end v2
+    return this.http.get<any>(AppConfig.settings.apiUrl + `/synchronizers/v2be`)
+    .pipe(
+    catchError(err => {
+        console.error(err);
+        return throwError(err);
+        }
+    ));
+  }
+
+  getSISynchronizersV2() {
+    // get SI synchronizers from the back-end v2
+    return this.http.get<any>(AppConfig.settings.apiUrl + `/synchronizers/v2si`)
+    .pipe(
+    catchError(err => {
+        console.error(err);
+        return throwError(err);
+        }
+    ));
+  }
+
   deleteSynchronizer(id: number, body: object) {
     // delete one sync
     const options = {

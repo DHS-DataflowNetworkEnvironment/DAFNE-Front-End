@@ -249,7 +249,7 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
     this.siSynchronizers = []
     this.feSynchronizers = []
     this.beSynchronizers = []
-    this.authenticationService.getSISynchronizers().subscribe(
+    this.authenticationService.getSISynchronizersV2().subscribe(
       (res: any) => {
         for (var i = 0; i < Object.keys(res).length; i++) {
           for (var k = 0; k < res[i].synchronizers.length; k++) {
@@ -259,7 +259,7 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }
     );
-    this.authenticationService.getFESynchronizers().subscribe(
+    this.authenticationService.getFESynchronizersV2().subscribe(
       (res: any) => {        
         for (var i = 0; i < Object.keys(res).length; i++) {
           for (var k = 0; k < res[i].synchronizers.length; k++) {
@@ -269,7 +269,7 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }
     );
-    this.authenticationService.getBESynchronizers().subscribe(
+    this.authenticationService.getBESynchronizersV2().subscribe(
       (res: any) => {        
         for (var i = 0; i < Object.keys(res).length; i++) {
           for (var k = 0; k < res[i].synchronizers.length; k++) {
