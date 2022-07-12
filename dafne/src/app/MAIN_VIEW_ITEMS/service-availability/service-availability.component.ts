@@ -305,7 +305,7 @@ export class ServiceAvailabilityComponent implements OnInit {
   
             /* Calculate week-day shift */
             this.weekdayShift = (tempStartDate.getDay() == 0 ? 6 : tempStartDate.getDay() - 1);
-            if (this.weekdayShift == 6 && this.requestedDaysNumber == 30) {
+            if ((this.weekdayShift == 6 && this.requestedDaysNumber >= 30) || (this.weekdayShift == 5 && this.requestedDaysNumber == 31)) {
               this.rowNumber = 6;
             } else {
               this.rowNumber = 5;
