@@ -658,7 +658,7 @@ export class ServiceAvailabilityComponent implements OnInit {
               p.textSize(percentageFontSize);
               p.noStroke();
               p.fill(lineColor);
-              p.text((this.requestedServiceAvailabilityList[i].percentage == null || this.requestedServiceAvailabilityList[i].percentage < 0) ? "NaN" : this.requestedServiceAvailabilityList[i].percentage == 100 ? "100.00%": p.nf(this.requestedServiceAvailabilityList[i].percentage, 2, 2)+"%", 
+              p.text((this.requestedServiceAvailabilityList[i].percentage == null || this.requestedServiceAvailabilityList[i].percentage < 0) ? "NaN" : this.requestedServiceAvailabilityList[i].percentage == 100 ? "100.00%": this.requestedServiceAvailabilityList[i].percentage.toFixed(2) +"%", 
                       sectionXCenter, yCenter - chartYDim2 - 2 * dateFontSize);
             }
           } 
@@ -761,7 +761,7 @@ export class ServiceAvailabilityComponent implements OnInit {
               p.textSize(percentageFontSize);
               p.noStroke();
               p.fill(lineColor);
-              p.text((this.requestedServiceAvailabilityList[i].percentage == null || this.requestedServiceAvailabilityList[i].percentage < 0) ? "NaN" : this.requestedServiceAvailabilityList[i].percentage == 100 ? "100.00%": p.nf(this.requestedServiceAvailabilityList[i].percentage, 2, 2)+"%", 
+              p.text((this.requestedServiceAvailabilityList[i].percentage == null || this.requestedServiceAvailabilityList[i].percentage < 0) ? "NaN" : this.requestedServiceAvailabilityList[i].percentage == 100 ? "100.00%": this.requestedServiceAvailabilityList[i].percentage.toFixed(2) +"%", 
                       sectionXCenter, yCenter - chartYDim2 - 2 * dateFontSize);
             }
           } 
