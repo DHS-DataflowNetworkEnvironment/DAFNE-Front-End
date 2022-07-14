@@ -834,7 +834,7 @@ export class PublicationLatencyComponent implements OnInit {
               p.textSize(valueFontSize);
               p.noStroke();
               p.fill(lineColor);
-              p.text(this.requestedPublicationLatencyList[i].average_latency == null ? "NaN" : this.millisToHHMMSS(this.requestedPublicationLatencyList[i].average_latency), 
+              p.text((this.requestedPublicationLatencyList[i].average_latency == null || this.requestedPublicationLatencyList[i].average_latency == -1) ? "NaN" : this.millisToHHMMSS(this.requestedPublicationLatencyList[i].average_latency), 
                       sectionXCenter, yCenter - chartYDim2 - 2 * dateFontSize);
             }
           } 
@@ -959,7 +959,7 @@ export class PublicationLatencyComponent implements OnInit {
               p.textSize(valueFontSize);
               p.noStroke();
               p.fill(lineColor);
-              p.text(this.requestedPublicationLatencyList[i].average_latency == null ? "NaN" : this.millisToHHMMSS(this.requestedPublicationLatencyList[i].average_latency), 
+              p.text((this.requestedPublicationLatencyList[i].average_latency == null || this.requestedPublicationLatencyList[i].average_latency == -1) ? "NaN" : this.millisToHHMMSS(this.requestedPublicationLatencyList[i].average_latency), 
                       sectionXCenter, yCenter - chartYDim2 - 2 * dateFontSize);
             }
           } 
@@ -1078,7 +1078,6 @@ export class PublicationLatencyComponent implements OnInit {
               /* Selector box */
               p.stroke(230);
               p.fill(255, 30);
-              //p.rect(sectionXCenter - sectionXFilledDim2, yCenter - chartYDim2, sectionXFilledDim, chartYDim + 2 * sinOfAngle + 4 * dateFontSize);
               p.line(sectionXCenter, yCenter - chartYDim2, sectionXCenter, yCenter + chartYDim2);
               this.mouseIsOnList[i] = true;
 
@@ -1086,7 +1085,7 @@ export class PublicationLatencyComponent implements OnInit {
               p.textSize(valueFontSize);
               p.noStroke();
               p.fill(lineColor);
-              p.text(this.requestedPublicationLatencyList[i].average_latency == null ? "NaN" : this.millisToHHMMSS(this.requestedPublicationLatencyList[i].average_latency), 
+              p.text((this.requestedPublicationLatencyList[i].average_latency == null || this.requestedPublicationLatencyList[i].average_latency == -1) ? "NaN" : this.millisToHHMMSS(this.requestedPublicationLatencyList[i].average_latency), 
                       sectionXCenter, yCenter - chartYDim2 - 2 * dateFontSize);
             }
 
@@ -1195,12 +1194,11 @@ export class PublicationLatencyComponent implements OnInit {
             p.text(tempText, 0, 0);
             p.pop();
 
-            /* Selector box */
+            /* If mouse on bars */
             if (p.mouseX > sectionXCenter - (chartXDim / this.requestedDaysNumber)/2 + tx && p.mouseX < sectionXCenter + (chartXDim / this.requestedDaysNumber)/2 + tx
                 && p.mouseY > yCenter - chartYDim2 + ty && p.mouseY < yCenter + chartYDim2 + sinOfAngle + 2*dateFontSize + ty) {
               p.stroke(230);
               p.fill(255, 30);
-              //p.rect(sectionXCenter - sectionXFilledDim2, yCenter - chartYDim2, sectionXFilledDim, chartYDim + 2 * sinOfAngle + 3 * dateFontSize);
               p.line(sectionXCenter, yCenter - chartYDim2, sectionXCenter, yCenter + chartYDim2);
               this.mouseIsOnList[i] = true;
 
@@ -1208,7 +1206,7 @@ export class PublicationLatencyComponent implements OnInit {
               p.textSize(valueFontSize);
               p.noStroke();
               p.fill(lineColor);
-              p.text(this.requestedPublicationLatencyList[i].average_latency == null ? "NaN" : this.millisToHHMMSS(this.requestedPublicationLatencyList[i].average_latency), 
+              p.text((this.requestedPublicationLatencyList[i].average_latency == null || this.requestedPublicationLatencyList[i].average_latency == -1) ? "NaN" : this.millisToHHMMSS(this.requestedPublicationLatencyList[i].average_latency), 
                       sectionXCenter, yCenter - chartYDim2 - 2 * dateFontSize);
             }
 
@@ -1322,7 +1320,7 @@ export class PublicationLatencyComponent implements OnInit {
           p.noStroke();
           p.rect(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2, sectionXFilledDim, -((this.publicationDetailLatencyList[i].latency_be < 0 ? 0 : this.publicationDetailLatencyList[i].latency_be) * chartYDim / maxValue));
 
-          /* if mouse is on bar */
+          /* If mouse on bars */
           if (p.mouseX > sectionXCenter - (chartXDim / this.latencyDetailNumber)/2 + tx && p.mouseX < sectionXCenter + (chartXDim / this.latencyDetailNumber)/2 + tx
                 && p.mouseY > yCenter - chartYDim2 + ty && p.mouseY < yCenter + chartYDim2 + 2 * dateFontSize + ty) {
 
@@ -1335,7 +1333,7 @@ export class PublicationLatencyComponent implements OnInit {
             p.textSize(valueFontSize);
             p.noStroke();
             p.fill(lineColor);
-            p.text(this.publicationDetailLatencyList[i].latency_be == null ? "NaN" : this.millisToHHMMSS(this.publicationDetailLatencyList[i].latency_be), 
+            p.text((this.publicationDetailLatencyList[i].latency_be == null || this.publicationDetailLatencyList[i].latency_be == -1) ? "NaN" : this.millisToHHMMSS(this.publicationDetailLatencyList[i].latency_be), 
                     sectionXCenter, yCenter - chartYDim2 - 2 * dateFontSize);
           }
         } 
@@ -1461,7 +1459,7 @@ export class PublicationLatencyComponent implements OnInit {
             p.noStroke();
             p.fill(lineColor);
             p.textAlign(p.CENTER, p.CENTER);
-            p.text(this.publicationDetailLatencyList[i].latency_be == null ? "NaN" : this.millisToHHMMSS(this.publicationDetailLatencyList[i].latency_be), 
+            p.text((this.publicationDetailLatencyList[i].latency_be == null || this.publicationDetailLatencyList[i].latency_be == -1) ? "NaN" : this.millisToHHMMSS(this.publicationDetailLatencyList[i].latency_be), 
                     sectionXCenter, yCenter - chartYDim2 - 2 * dateFontSize);
           }
         }
