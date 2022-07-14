@@ -405,13 +405,17 @@ export class PublicationLatencyComponent implements OnInit {
           for (var i = 0; i < this.latencyDetailNumber; i++) {
             if (this.publicationDetailLatencyList[i].latency_fe != null) {
               this.publicationDetailLatencyList[i].source = 'FE';
+              this.publicationDetailLatencyList[i].latency = this.publicationDetailLatencyList[i].latency_fe;
             } else if (this.publicationDetailLatencyList[i].latency_fe == null 
               && this.publicationDetailLatencyList[i].latency_be != null) {
                 this.publicationDetailLatencyList[i].source = 'BE';
+                this.publicationDetailLatencyList[i].latency = this.publicationDetailLatencyList[i].latency_be;
             } else {
               this.publicationDetailLatencyList[i].source = 'null';
+              this.publicationDetailLatencyList[i].latency = null;
             }
           }
+          
           this.showDetailLatency = true;
           this.p5Chart.setClickTimeoutId(undefined);
           this.p5Chart.windowResized();
@@ -1245,8 +1249,8 @@ export class PublicationLatencyComponent implements OnInit {
       p.fillDayBarChart = () => {
         maxValue = 0;
         for (var i = 0; i < this.latencyDetailNumber; i++) {
-          if (this.publicationDetailLatencyList[i].latency_be > maxValue) {
-            maxValue = this.publicationDetailLatencyList[i].latency_be;
+          if (this.publicationDetailLatencyList[i].latency > maxValue) {
+            maxValue = this.publicationDetailLatencyList[i].latency;
           }
         }
         if (maxValue == 0) maxValue = this.latencyColors[0].threshold;
@@ -1306,19 +1310,19 @@ export class PublicationLatencyComponent implements OnInit {
           p.line(xCenter - chartXDim2 + (i + 1) * chartXDim / this.latencyDetailNumber, yCenter + chartYDim2 + 5, xCenter - chartXDim2 + (i + 1) * chartXDim / this.latencyDetailNumber, yCenter + chartYDim2);
           /* Bars */
           p.rectMode(p.CORNER);
-          if (this.publicationDetailLatencyList[i].latency_be > this.latencyColors[0].threshold) {
+          if (this.publicationDetailLatencyList[i].latency > this.latencyColors[0].threshold) {
             p.fill(this.rgbConvertToArray(this.latencyColors[0].color));
-          } else if (this.publicationDetailLatencyList[i].latency_be > this.latencyColors[1].threshold && this.publicationDetailLatencyList[i].latency_be <= this.latencyColors[0].threshold) {
+          } else if (this.publicationDetailLatencyList[i].latency > this.latencyColors[1].threshold && this.publicationDetailLatencyList[i].latency <= this.latencyColors[0].threshold) {
             p.fill(this.rgbConvertToArray(this.latencyColors[1].color));
-          } else if (this.publicationDetailLatencyList[i].latency_be > this.latencyColors[2].threshold && this.publicationDetailLatencyList[i].latency_be <= this.latencyColors[1].threshold) {
+          } else if (this.publicationDetailLatencyList[i].latency > this.latencyColors[2].threshold && this.publicationDetailLatencyList[i].latency <= this.latencyColors[1].threshold) {
             p.fill(this.rgbConvertToArray(this.latencyColors[2].color));
-          } else if (this.publicationDetailLatencyList[i].latency_be > this.latencyColors[3].threshold && this.publicationDetailLatencyList[i].latency_be <= this.latencyColors[2].threshold) {
+          } else if (this.publicationDetailLatencyList[i].latency > this.latencyColors[3].threshold && this.publicationDetailLatencyList[i].latency <= this.latencyColors[2].threshold) {
             p.fill(this.rgbConvertToArray(this.latencyColors[3].color));
-          } else if (this.publicationDetailLatencyList[i].latency_be >= this.latencyColors[4].threshold && this.publicationDetailLatencyList[i].latency_be <= this.latencyColors[3].threshold) {
+          } else if (this.publicationDetailLatencyList[i].latency >= this.latencyColors[4].threshold && this.publicationDetailLatencyList[i].latency <= this.latencyColors[3].threshold) {
             p.fill(this.rgbConvertToArray(this.latencyColors[4].color));
           }
           p.noStroke();
-          p.rect(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2, sectionXFilledDim, -((this.publicationDetailLatencyList[i].latency_be < 0 ? 0 : this.publicationDetailLatencyList[i].latency_be) * chartYDim / maxValue));
+          p.rect(sectionXCenter - sectionXFilledDim2, yCenter + chartYDim2, sectionXFilledDim, -((this.publicationDetailLatencyList[i].latency < 0 ? 0 : this.publicationDetailLatencyList[i].latency) * chartYDim / maxValue));
 
           /* If mouse on bars */
           if (p.mouseX > sectionXCenter - (chartXDim / this.latencyDetailNumber)/2 + tx && p.mouseX < sectionXCenter + (chartXDim / this.latencyDetailNumber)/2 + tx
@@ -1333,7 +1337,7 @@ export class PublicationLatencyComponent implements OnInit {
             p.textSize(valueFontSize);
             p.noStroke();
             p.fill(lineColor);
-            p.text((this.publicationDetailLatencyList[i].latency_be == null || this.publicationDetailLatencyList[i].latency_be == -1) ? "NaN" : this.millisToHHMMSS(this.publicationDetailLatencyList[i].latency_be), 
+            p.text((this.publicationDetailLatencyList[i].latency == null || this.publicationDetailLatencyList[i].latency == -1) ? "NaN" : this.millisToHHMMSS(this.publicationDetailLatencyList[i].latency), 
                     sectionXCenter, yCenter - chartYDim2 - 2 * dateFontSize);
           }
         } 
@@ -1366,8 +1370,8 @@ export class PublicationLatencyComponent implements OnInit {
       p.fillDayLineChart = () => {
         maxValue = 0;
         for (var i = 0; i < this.latencyDetailNumber; i++) {
-          if (this.publicationDetailLatencyList[i].latency_be > maxValue) {
-            maxValue = this.publicationDetailLatencyList[i].latency_be;
+          if (this.publicationDetailLatencyList[i].latency > maxValue) {
+            maxValue = this.publicationDetailLatencyList[i].latency;
           }
         }
         if (maxValue == 0) maxValue = this.latencyColors[0].threshold;
@@ -1397,7 +1401,7 @@ export class PublicationLatencyComponent implements OnInit {
         for (var i = 0; i < this.latencyDetailNumber; i++) {
           let sectionXCenter = xCenter - chartXDim2 + chartXDim / (2 * this.latencyDetailNumber) + i * chartXDim / this.latencyDetailNumber;
           xpoint[i] = sectionXCenter;
-          ypoint[i] = yCenter + chartYDim2 -((this.publicationDetailLatencyList[i].latency_be < 0 ? 0 : this.publicationDetailLatencyList[i].latency_be) * chartYDim / maxValue);
+          ypoint[i] = yCenter + chartYDim2 -((this.publicationDetailLatencyList[i].latency < 0 ? 0 : this.publicationDetailLatencyList[i].latency) * chartYDim / maxValue);
           
           /* Draw Curve */
           p.stroke(0,255,255);
@@ -1459,7 +1463,7 @@ export class PublicationLatencyComponent implements OnInit {
             p.noStroke();
             p.fill(lineColor);
             p.textAlign(p.CENTER, p.CENTER);
-            p.text((this.publicationDetailLatencyList[i].latency_be == null || this.publicationDetailLatencyList[i].latency_be == -1) ? "NaN" : this.millisToHHMMSS(this.publicationDetailLatencyList[i].latency_be), 
+            p.text((this.publicationDetailLatencyList[i].latency == null || this.publicationDetailLatencyList[i].latency == -1) ? "NaN" : this.millisToHHMMSS(this.publicationDetailLatencyList[i].latency), 
                     sectionXCenter, yCenter - chartYDim2 - 2 * dateFontSize);
           }
         }
