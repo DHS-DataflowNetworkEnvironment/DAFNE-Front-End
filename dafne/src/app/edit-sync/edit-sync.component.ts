@@ -507,7 +507,6 @@ export class EditSyncComponent implements OnInit, OnDestroy {
   }
 
   refreshPage() {
-    this.getSynchronizers();
     this.router.navigate(['edit-synchronizers'], { skipLocationChange: true });
   }
 }
