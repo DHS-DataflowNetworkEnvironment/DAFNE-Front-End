@@ -82,13 +82,15 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
     format: "YYYY-MM-DD",
     firstDayOfWeek: "mo",
     min: "2010-01-01",
-    max: this.todayDate
+    max: this.todayDate,
+    unSelectOnClick: false
   };
   public stopDatePickerConfig: IDatePickerConfig = {
     format: "YYYY-MM-DD",
     firstDayOfWeek: "mo",
     min: "2010-01-01",
-    max: this.todayDate
+    max: this.todayDate,
+    unSelectOnClick: false
   };
 
   public selectorText = [
