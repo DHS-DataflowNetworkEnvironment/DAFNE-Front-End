@@ -49,11 +49,11 @@
             <!-- Legend -->
             <hr>
             <h2>LEGEND</h2>
-            <div class="color-threshold" [ngStyle]="{'background-color': latencyColors[0].color}">&gt;72 hours</div>
-            <div class="color-threshold" [ngStyle]="{'background-color': latencyColors[1].color}">&gt;36 hours to 72 hours</div>
-            <div class="color-threshold" [ngStyle]="{'background-color': latencyColors[2].color}">&gt;12 hours to 36 hours</div>
-            <div class="color-threshold" [ngStyle]="{'background-color': latencyColors[3].color}">&gt;4 hours to 12 hours</div>
-            <div class="color-threshold" [ngStyle]="{'background-color': latencyColors[4].color}">&lt;4 hours</div>
+            <div class="color-threshold" [ngStyle]="{'background-color': latencyColors[0].color}">&gt;{{millisToHHMM(latencyColors[0].threshold)}}</div>
+            <div class="color-threshold" [ngStyle]="{'background-color': latencyColors[1].color}">&gt;{{millisToHHMM(latencyColors[1].threshold)}} to {{millisToHHMM(latencyColors[0].threshold)}}</div>
+            <div class="color-threshold" [ngStyle]="{'background-color': latencyColors[2].color}">&gt;{{millisToHHMM(latencyColors[2].threshold)}} to {{millisToHHMM(latencyColors[1].threshold)}}</div>
+            <div class="color-threshold" [ngStyle]="{'background-color': latencyColors[3].color}">&gt;{{millisToHHMM(latencyColors[3].threshold)}} to {{millisToHHMM(latencyColors[2].threshold)}}</div>
+            <div class="color-threshold" [ngStyle]="{'background-color': latencyColors[4].color}">&lt;{{millisToHHMM(latencyColors[3].threshold)}}</div>
             <hr>
             <!-- Buttons and info -->
             <h6 *ngIf="showDetailLatency == false && isWeekly == true && firstDailySubmitted" class="button-info" style="text-align: center;">Click on a bar to show the days of that week</h6>

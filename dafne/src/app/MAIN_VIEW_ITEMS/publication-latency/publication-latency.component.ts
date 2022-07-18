@@ -1563,6 +1563,15 @@ export class PublicationLatencyComponent implements OnInit {
     return timeStr;
   }
 
+  millisToHHMM(millisTot) {
+    var millis_num = parseInt(millisTot, 10);
+    var sec_num = millis_num/1000;
+    var hours   = Math.floor(sec_num / 3600);
+    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+    var timeStr = hours.toString(10).padStart(2, '0') + "h:" + minutes.toString(10).padStart(2, '0') + "m";
+    return timeStr;
+  }
+
   getWeekEndDateText(weekStartText) {
     return new Date(Date.parse(weekStartText) + (this.millisPerDay * 6)).toISOString().slice(0, 10)
   }
