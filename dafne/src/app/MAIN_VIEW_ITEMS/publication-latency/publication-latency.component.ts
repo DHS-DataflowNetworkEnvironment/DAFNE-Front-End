@@ -241,6 +241,18 @@ export class PublicationLatencyComponent implements OnInit {
     }
   }
 
+  onFilterButtonSubmit(): void {
+    let weeklyCheckbox: HTMLInputElement = <HTMLInputElement>document.getElementById("weekly-checkbox");
+    if (weeklyCheckbox.checked == true) {
+      /* Weekly */
+      this.firstDailySubmitted = false;
+    } else {
+      /* Daily */
+      this.firstWeeklySubmitted = false;
+    }
+    this.onFilterSubmit();
+  }
+
   onFilterSubmit(): void {
     if (this.localCentre.id == -1) {
       this.alert.showErrorAlert("No local Centre is set", "Please setup one Centre as local");

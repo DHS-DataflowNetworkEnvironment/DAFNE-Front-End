@@ -19,7 +19,7 @@
                         [(ngModel)]="stopDate" (ngModelChange)="onStopDateChanged($event)" [config]="stopDatePickerConfig" placeholder="YYYY-MM-DD">
                     </dp-date-picker>
                 </div>
-                <button type="submit" class="btn btn-primary col-1" id="filter-submit-button" (click)="onFilterSubmit()">Filter</button>
+                <button type="submit" class="btn btn-primary col-1" id="filter-submit-button" (click)="onFilterButtonSubmit()">Filter</button>
             </div>
         </form>
     </div>
@@ -51,11 +51,9 @@
                 <span *ngIf="averageServiceAvailability >= 0"> {{averageServiceAvailability.toFixed(2)}}%</span>
                 <span *ngIf="averageServiceAvailability < 0"> ---</span>
             </div>
-
-            <!-- Buttons and info -->
             <hr>
+            <!-- Buttons and info -->            
             <h6 *ngIf="isWeekly == true && firstWeeklySubmitted" class="button-info" style="text-align: center;">Click on a bar to show the days of that week</h6>
-            <h6 *ngIf="isWeekly == false && firstWeeklySubmitted" class="button-info" style="text-align: center;">Click below to go back to weekly</h6>
             <button *ngIf="isWeekly == true && firstDailySubmitted" class="button-info" id="back-to-daily-button" (click)="onBackToDailyClicked()">Back to daily</button>
             <button *ngIf="isWeekly == false && firstWeeklySubmitted" class="button-info" id="back-to-weekly-button" (click)="onBackToWeeklyClicked()">Back to weekly</button>       
         </section>

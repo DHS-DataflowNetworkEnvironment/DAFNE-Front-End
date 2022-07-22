@@ -25,7 +25,7 @@
                         [(ngModel)]="stopDate" (ngModelChange)="onStopDateChanged($event)" [config]="stopDatePickerConfig" placeholder="YYYY-MM-DD">
                     </dp-date-picker>
                 </div>
-                <button type="submit" class="btn btn-primary col-1" id="filter-submit-button" (click)="onFilterSubmit()">Filter</button>
+                <button type="submit" class="btn btn-primary col-1" id="filter-submit-button" (click)="onFilterButtonSubmit()">Filter</button>
             </div>
         </form>
     </div>
@@ -56,12 +56,11 @@
             <div class="color-threshold" [ngStyle]="{'background-color': latencyColors[4].color}">&lt;{{millisToHHMM(latencyColors[3].threshold)}}</div>
             <hr>
             <!-- Buttons and info -->
-            <h6 *ngIf="showDetailLatency == false && isWeekly == true && firstDailySubmitted" class="button-info" style="text-align: center;">Click on a bar to show the days of that week</h6>
-            <h6 *ngIf="showDetailLatency == false && isWeekly == false && firstWeeklySubmitted" class="button-info" style="text-align: center;">Click on a bar to show the details of that day</h6>
+            <h6 *ngIf="showDetailLatency == false && isWeekly == true && firstWeeklySubmitted" class="button-info" style="text-align: center;">Click on a bar to show the days of that week</h6>
+            <h6 *ngIf="showDetailLatency == false && isWeekly == false && firstDailySubmitted" class="button-info" style="text-align: center;">Click on a bar to show the details of that day</h6>
+            <button *ngIf="showDetailLatency == true" class="button-info" id="back-to-period-button" (click)="onBackToPeriodClicked()">Back to daily</button>
             <button *ngIf="showDetailLatency == false && isWeekly == true && firstDailySubmitted" class="button-info" id="back-to-daily-button" (click)="onBackToDailyClicked()">Back to daily</button>
             <button *ngIf="showDetailLatency == false && isWeekly == false && firstWeeklySubmitted" class="button-info" id="back-to-weekly-button" (click)="onBackToWeeklyClicked()">Back to weekly</button>
-            <h6 *ngIf="showDetailLatency == true" class="button-info" style="text-align: center;">Click below to go back to daily</h6>
-            <button *ngIf="showDetailLatency == true" class="button-info" id="back-to-period-button" (click)="onBackToPeriodClicked()">Back to daily</button>
         </section>
     </div>
 </div>

@@ -78,10 +78,12 @@ export class ServiceAvailabilityComponent implements OnInit {
   public precWeekly_startDate;
   public precWeekly_stopDate;
   public precWeekly_requestedWeeksNumber;
+  public precWeekly_averageServiceAvailability;
   public precDaily_requestedServiceAvailabilityList: Array<Availability> = [];
   public precDaily_startDate;
   public precDaily_stopDate;
   public precDaily_requestedDaysNumber;
+  public precDaily_averageServiceAvailability;
 
   public isWeekly: boolean = false;
   public askForWeekly: boolean = false;
@@ -214,6 +216,18 @@ export class ServiceAvailabilityComponent implements OnInit {
     }
   }
 
+  onFilterButtonSubmit(): void {
+    let weeklyCheckbox: HTMLInputElement = <HTMLInputElement>document.getElementById("weekly-checkbox");
+    if (weeklyCheckbox.checked == true) {
+      /* Weekly */
+      this.firstDailySubmitted = false;
+    } else {
+      /* Daily */
+      this.firstWeeklySubmitted = false;
+    }
+    this.onFilterSubmit();
+  }
+
   onFilterSubmit(): void {
     if (this.localCentre.id == -1) {
       this.alert.showErrorAlert("No Local Centre Found", "Please check if a local centre has been configured");
@@ -274,6 +288,7 @@ export class ServiceAvailabilityComponent implements OnInit {
             this.precWeekly_startDate = this.startDate;
             this.precWeekly_stopDate = this.stopDate;
             this.precWeekly_requestedWeeksNumber = this.requestedWeeksNumber;
+            this.precWeekly_averageServiceAvailability = this.averageServiceAvailability;
           }
           this.firstWeeklySubmitted = true;
         }
@@ -326,6 +341,7 @@ export class ServiceAvailabilityComponent implements OnInit {
             this.precDaily_startDate = this.startDate;
             this.precDaily_stopDate = this.stopDate;
             this.precDaily_requestedDaysNumber = this.requestedDaysNumber;
+            this.precDaily_averageServiceAvailability = this.averageServiceAvailability;
           }
           this.firstDailySubmitted = true;
         }
@@ -340,6 +356,7 @@ export class ServiceAvailabilityComponent implements OnInit {
     this.startDate = this.precDaily_startDate;
     this.stopDate = this.precDaily_stopDate;
     this.requestedDaysNumber = this.precDaily_requestedDaysNumber;
+    this.averageServiceAvailability = this.precDaily_averageServiceAvailability;
     (<HTMLInputElement>document.getElementById("weekly-checkbox")).checked = false;
     this.p5Chart.setClickTimeoutId(undefined);
     this.p5Chart.windowResized();
@@ -352,6 +369,7 @@ export class ServiceAvailabilityComponent implements OnInit {
     this.startDate = this.precWeekly_startDate;
     this.stopDate = this.precWeekly_stopDate;
     this.requestedWeeksNumber = this.precWeekly_requestedWeeksNumber;
+    this.averageServiceAvailability = this.precWeekly_averageServiceAvailability;
     (<HTMLInputElement>document.getElementById("weekly-checkbox")).checked = true;
     this.p5Chart.setClickTimeoutId(undefined);
     this.p5Chart.windowResized();
