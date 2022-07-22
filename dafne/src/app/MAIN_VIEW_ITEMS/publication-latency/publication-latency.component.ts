@@ -1281,7 +1281,7 @@ export class PublicationLatencyComponent implements OnInit {
         }
 
         let datePrintAddendum = Math.ceil(((this.latencyDetailNumber * 2) / 100) * (1/sf));
-        for (var i = 0; i < this.latencyDetailNumber; i = i + datePrintAddendum) { 
+        for (var i = 0; i < this.latencyDetailNumber; i = i + datePrintAddendum) {
           let sectionXCenter = xCenter - chartXDim2 + chartXDim / (2 * this.latencyDetailNumber) + i * chartXDim / this.latencyDetailNumber;
 
           /* xAxis Text */
@@ -1432,7 +1432,7 @@ export class PublicationLatencyComponent implements OnInit {
         }
 
         let datePrintAddendum = Math.ceil(((this.latencyDetailNumber * 2) / 100) * (1/sf));
-        for (var i = 0; i < this.latencyDetailNumber; i = i + datePrintAddendum) { 
+        for (var i = 0; i < this.latencyDetailNumber; i = i + datePrintAddendum) {
           let sectionXCenter = xCenter - chartXDim2 + chartXDim / (2 * this.latencyDetailNumber) + i * chartXDim / this.latencyDetailNumber;
           /* Rotate Dates */
           let tempText = this.publicationDetailLatencyList[i].timezone.slice(11, 16);
@@ -1461,7 +1461,9 @@ export class PublicationLatencyComponent implements OnInit {
           }
           p.text(tempText, 0, 0);
           p.pop();
-
+        }
+        for (var i = 0; i < this.latencyDetailNumber; i++) {
+          let sectionXCenter = xCenter - chartXDim2 + chartXDim / (2 * this.latencyDetailNumber) + i * chartXDim / this.latencyDetailNumber;
           /* if mouse is on bar */
           if (p.mouseX > sectionXCenter - (chartXDim / this.latencyDetailNumber)/2 + tx && p.mouseX < sectionXCenter + (chartXDim / this.latencyDetailNumber)/2 + tx
                 && p.mouseY > yCenter - chartYDim2 + ty && p.mouseY < yCenter + chartYDim2 + 2 * dateFontSize + ty) {
