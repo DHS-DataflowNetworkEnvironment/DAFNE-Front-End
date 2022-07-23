@@ -11,7 +11,7 @@
                 <div>
                     <label class="form-label">Synch:</label>
                     <select id="synchronizer-select" class="form-select" (change)="onFilterSyncChange($event)">
-                        <option [value]="sync.Label" *ngFor="let sync of syncList">{{sync.Label}}</option>
+                        <option [value]="sync.Label" *ngFor="let sync of syncList" title="URL: {{sync.serviceUrl}}">{{sync.Label}}</option>
                     </select>
                 </div>
                 <div class="date-picker">
