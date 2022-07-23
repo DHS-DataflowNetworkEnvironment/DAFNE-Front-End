@@ -48,7 +48,7 @@ export class EditSyncComponent implements OnInit, OnDestroy {
   private autorefreshSubscription;
   private navigationSubscription;
   private pageRefreshed: boolean = true;
-  public isLocalConfigured = false;
+  public isLocalConfigured = true;
   public syncList = [];
   public currentSync: Synchronizer = new Synchronizer();
   public tempDeleteSync = {
@@ -89,22 +89,12 @@ export class EditSyncComponent implements OnInit, OnDestroy {
 
     this.autorefreshSubscription = this.messageService.invokeAutoRefresh.subscribe(() => {
       this.messageService.showSpinner(false);
-      this.getLocalCentre();
-      this.getSynchronizers();
+      this.ngOnInit();
     });
   }
 
   ngOnInit(): void {
-    this.messageService.localCurrentMessage.subscribe(message => {
-      if (message == false) {
-        this.isLocalConfigured = false;       
-      } else {
-        this.messageService.showSpinner(true);
-        this.isLocalConfigured = true;
-        this.getLocalCentre();
-        this.getSynchronizers();
-      }      
-    });
+    this.getLocalCentre();
 
     let inputs = document.querySelectorAll('input.form-control');
     inputs.forEach((input) => {
@@ -151,8 +141,13 @@ export class EditSyncComponent implements OnInit, OnDestroy {
       (res: object) => {
         /* Get Local Centre */
         if (Object.values(res).filter((x) => x.local == true)[0]) {
+          this.isLocalConfigured = true;
           this.localCentre = Object.values(res).filter((x) => x.local == true)[0];
+          this.messageService.setLocalPresent(true);
+          this.getSynchronizers();
         } else {
+          this.isLocalConfigured = false; 
+          this.messageService.setLocalPresent(false);
           this.localCentre = {
             name: "No Local",
             color: "#ffffff"
