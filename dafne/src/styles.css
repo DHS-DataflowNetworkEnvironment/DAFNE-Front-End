@@ -20,6 +20,7 @@ html, body {
     --table-border-color: #6A6D76;
     --list-bg-color: #222a35a0;
     --checked-color: #007bff;
+    --chart-timing-bg-color: #ccff00;
     color: var(--main-text-color);
 }
 * {

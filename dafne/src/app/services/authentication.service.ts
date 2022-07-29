@@ -274,6 +274,39 @@ export class AuthenticationService {
     ));
   }
 
+  getFESynchronizers() {
+    // get FE synchronizers from the back-end
+    return this.http.get<any>(AppConfig.settings.apiUrl + `/synchronizers/fe`)
+    .pipe(
+    catchError(err => {
+        console.error(err);
+        return throwError(err);
+        }
+    ));
+  }
+
+  getBESynchronizers() {
+    // get BE synchronizers from the back-end
+    return this.http.get<any>(AppConfig.settings.apiUrl + `/synchronizers/be`)
+    .pipe(
+    catchError(err => {
+        console.error(err);
+        return throwError(err);
+        }
+    ));
+  }
+
+  getSISynchronizers() {
+    // get SI synchronizers from the back-end
+    return this.http.get<any>(AppConfig.settings.apiUrl + `/synchronizers/si`)
+    .pipe(
+    catchError(err => {
+        console.error(err);
+        return throwError(err);
+        }
+    ));
+  }
+
   getSynchronizersV2() {
     // get synchronizers v2 from the back-end
     return this.http.get<any>(AppConfig.settings.apiUrl + `/synchronizers/v2`)
@@ -285,6 +318,38 @@ export class AuthenticationService {
     ));
   }
 
+  getFESynchronizersV2() {
+    // get FE synchronizers from the back-end v2
+    return this.http.get<any>(AppConfig.settings.apiUrl + `/synchronizers/v2fe`)
+    .pipe(
+    catchError(err => {
+        console.error(err);
+        return throwError(err);
+        }
+    ));
+  }
+
+  getBESynchronizersV2() {
+    // get BE synchronizers from the back-end v2
+    return this.http.get<any>(AppConfig.settings.apiUrl + `/synchronizers/v2be`)
+    .pipe(
+    catchError(err => {
+        console.error(err);
+        return throwError(err);
+        }
+    ));
+  }
+
+  getSISynchronizersV2() {
+    // get SI synchronizers from the back-end v2
+    return this.http.get<any>(AppConfig.settings.apiUrl + `/synchronizers/v2si`)
+    .pipe(
+    catchError(err => {
+        console.error(err);
+        return throwError(err);
+        }
+    ));
+  }
 
   deleteSynchronizer(id: number, body: object) {
     // delete one sync
@@ -303,6 +368,21 @@ export class AuthenticationService {
     // get completeness
     return this.http.post<any>(
       AppConfig.settings.apiUrl + `/products/completeness`,
+      body,
+      httpOptions
+    )
+    .pipe(
+    catchError(err => {
+        console.error(err);
+        return throwError(err);
+        }
+    ));
+  }
+
+  getFilterCompleteness(body: object) {
+    // get completeness
+    return this.http.post<any>(
+      AppConfig.settings.apiUrl + `/products/filter-completeness`,
       body,
       httpOptions
     )
@@ -358,9 +438,37 @@ export class AuthenticationService {
     ));
   }
 
+  getServiceAvailabilityWeekly(id: number, body: object) {
+    return this.http.post<any>(
+      AppConfig.settings.apiUrl + `/centres/${id}/service/availability/weekly`,
+      body,
+      httpOptions
+    )
+    .pipe(
+    catchError(err => {
+        console.error(err);
+        return throwError(err);
+        }
+    ));
+  }
+
   getPublicationLatency(id: number, body: object) {
     return this.http.post<any>(
       AppConfig.settings.apiUrl + `/centres/${id}/service/latency/daily`,
+      body,
+      httpOptions
+    )
+    .pipe(
+    catchError(err => {
+        console.error(err);
+        return throwError(err);
+        }
+    ));
+  }
+
+  getPublicationLatencyWeekly(id: number, body: object) {
+    return this.http.post<any>(
+      AppConfig.settings.apiUrl + `/centres/${id}/service/latency/weekly`,
       body,
       httpOptions
     )

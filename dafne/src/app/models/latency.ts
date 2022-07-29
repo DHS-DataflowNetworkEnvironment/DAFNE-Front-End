@@ -17,5 +17,6 @@ export class DayLatency {
     synch_label: string = "";
     latency_fe: number = null;
     latency_be: number = null;
+    latency: number = null;
     source: string = "";
 }

@@ -23,7 +23,7 @@
     "averageAvailabilityColor": "#00d0ff",
     "dataRefreshTime": 300000,
     "apiUrl": "<back-end-url>",
-    "version": "2.0.2",
+    "version": "3.0.1",
     "satelliteList": [
         {
             "name": "Sentinel-1",
@@ -72,7 +72,10 @@
                 "SY_2_VGP___",
                 "SY_2_VG1___",
                 "SY_2_V10___",
-                "SR_2_LAN___"            
+                "SR_2_LAN___",
+                "SR_2_LAN_SI",
+                "SR_2_LAN_HY",
+                "SR_2_LAN_LI"
             ],
             "platform": [
                 "A",

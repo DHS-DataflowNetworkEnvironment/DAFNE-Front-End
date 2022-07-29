@@ -23,7 +23,8 @@ $(window).resize(function() {
   styleUrls: ['./completeness.component.css']
 })
 export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
-  navigationSubscription;
+  private navigationSubscription;
+  private autorefreshSubscription;
 
   public p5Chart;
   public serviceList: any;
@@ -35,10 +36,10 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
   public sectionRadians: number = 0;
   public allCentreList;
   public remoteCentreList;
-  public serviceLocalCentre: Centre = new Centre;
-  public serviceRemoteCentreList: Centre[] = [];
-  public serviceAllCentreList: Centre[] = [];
-  public localCentre: Centre = new Centre;
+  public serviceLocalCentre = new Centre;
+  public serviceRemoteCentreList = [];
+  public serviceAllCentreList = [];
+  public localCentre;
   public totalMissionList = AppConfig.settings.satelliteList;
   public missionFiltered = this.totalMissionList[0];
   public productTypeFiltered = this.missionFiltered.productType[0];
@@ -47,7 +48,23 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
   public platformNumberList = this.missionFiltered.platform[0];
   public platformNumber: string = this.platformNumberList[0];
   public platformNumberFiltered: string = this.platformNumber;
+  public filter: string;
+  public tempFilter: string;
+  public syncList = [];
+  public syncBackendLength: number;
+  public syncBackendLengthArray = [];
+  public serviceUrlBackendList = [];
+  public intelligentSyncSupported = [];
   public bodyMission: string;
+
+  public siSynchronizers = []
+  public feSynchronizers = []
+  public beSynchronizers = []
+  public serviceTypeList = []
+  public serviceType: string;
+  public serviceTypeChoosen: number = 1;
+  public choosenSync: string;
+  public canSubmit: boolean = true;
 
   public today = new Date();
   public todayDate: string = this.today.toISOString().slice(0, 10);
@@ -65,13 +82,15 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
     format: "YYYY-MM-DD",
     firstDayOfWeek: "mo",
     min: "2010-01-01",
-    max: this.todayDate
+    max: this.todayDate,
+    unSelectOnClick: false
   };
   public stopDatePickerConfig: IDatePickerConfig = {
     format: "YYYY-MM-DD",
     firstDayOfWeek: "mo",
     min: "2010-01-01",
-    max: this.todayDate
+    max: this.todayDate,
+    unSelectOnClick: false
   };
 
   public selectorText = [
@@ -84,6 +103,9 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
   public chartType: string = this.selectorText[2];
   public doResetZoom: boolean = false;
   public centreNumber: number = 0;
+
+  public useSyncFilter: boolean = false;
+  public useSyncFilterForTable: boolean = null;
 
   constructor(
     private el: ElementRef,
@@ -99,6 +121,21 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
         this.serviceAllCentreList = [];
         this.getServices();
       }
+    });
+    this.authenticationService.getAllServiceTypes().subscribe(
+      (res: any) => {
+        this.serviceTypeList = res.filter(a => a.id < 4).sort(this.getSortOrder("id"));
+        this.serviceTypeList.push({
+          "id": 99,
+          "service_type": "All",
+          "createdAt": "",
+          "updatedAt": ""
+        });
+      }
+    )
+    this.autorefreshSubscription = this.messageService.invokeAutoRefresh.subscribe(() => {
+      this.messageService.showSpinner(false);
+      this.getSynchronizers();
     });
   }
 
@@ -127,7 +164,8 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
         this.serviceList = res.filter(a => a.service_type != 3);
         
         for (var i = 0; i < this.serviceList.length; i++) {
-            this.getServiceType(i, this.serviceList[i].service_type);
+          this.serviceList[i].service_type_id = this.serviceList[i].service_type
+          this.getServiceType(i, this.serviceList[i].service_type);
         }
         this.getCentresData();
       }
@@ -158,6 +196,12 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
           /* Copy service centres one by one into tempServiceCentre */
           let tempServiceCentre = this.allCentreList.filter(a => a.name == this.serviceList[i].centre)[0];
 
+          /* Add "is-CSC-flag" for every centre */
+          tempServiceCentre.isCSC = false;
+          if (tempServiceCentre.name == this.serviceList[i].centre && this.serviceList[i].service_type_id > 3) {      
+            tempServiceCentre.isCSC = true;
+          }
+
           /* Copy tempServiceCentre first into a complete list... */
           this.serviceAllCentreList.push(tempServiceCentre);
     
@@ -168,8 +212,14 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
         this.serviceAllCentreList.sort(this.getSortOrder("id"));
         this.setLocalFirst(this.serviceAllCentreList);
         
+        /* Sort All Centres to put CSC at the end */
+        this.serviceAllCentreList.sort(this.getSortOrder("isCSC"));
+        
         /* Sort serviceRemoteCentreList[] by ID */
         this.serviceRemoteCentreList.sort(this.getSortOrder("id"));
+
+        /* Sort Remote Centres to put CSC at the end */
+        this.serviceRemoteCentreList.sort(this.getSortOrder("isCSC"));
         
         /* Get complete Centre List (also those without a service..) and copy into 'remoteCentreList[]' */
         this.remoteCentreList = Object.values(res).filter((x) => x.local === null);
@@ -187,14 +237,150 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
             icon: 'place',
             color: 'white',
             latitude: '0.0',
-            longitude: '0.0'
+            longitude: '0.0',
+            isCSC: false
           };
         }
-        
-        // uncomment to get completeness on page load:
-        //this.onFilterSubmit();
+
+        this.getSynchronizers();
       }
     );
+  }
+
+  getSynchronizers() {
+    this.siSynchronizers = []
+    this.feSynchronizers = []
+    this.beSynchronizers = []
+    this.authenticationService.getSISynchronizersV2().subscribe(
+      (res: any) => {
+        for (var i = 0; i < Object.keys(res).length; i++) {
+          for (var k = 0; k < res[i].synchronizers.length; k++) {
+            res[i].synchronizers[k].serviceUrl = res[i].serviceUrl;
+            this.siSynchronizers.push(res[i].synchronizers[k]);
+          }
+        }
+      }
+    );
+    this.authenticationService.getFESynchronizersV2().subscribe(
+      (res: any) => {        
+        for (var i = 0; i < Object.keys(res).length; i++) {
+          for (var k = 0; k < res[i].synchronizers.length; k++) {
+            res[i].synchronizers[k].serviceUrl = res[i].serviceUrl;
+            this.feSynchronizers.push(res[i].synchronizers[k])
+          }
+        }
+      }
+    );
+    this.authenticationService.getBESynchronizersV2().subscribe(
+      (res: any) => {        
+        for (var i = 0; i < Object.keys(res).length; i++) {
+          for (var k = 0; k < res[i].synchronizers.length; k++) {
+            res[i].synchronizers[k].serviceUrl = res[i].serviceUrl;
+            this.beSynchronizers.push(res[i].synchronizers[k])
+          }
+        }
+      }
+    );
+  }
+
+  onUseFilterCheckboxChange() {
+    var chkBox = <HTMLInputElement>document.getElementById('use-filter-checkbox');
+    this.useSyncFilter = chkBox.checked;
+    if (this.useSyncFilter) {
+      /* Set initial status for sync filters */
+      this.serviceTypeChoosen = 1;
+      if (this.siSynchronizers[0]) {
+        this.choosenSync = this.siSynchronizers[0].Label
+        this.tempFilter = this.siSynchronizers[0].FilterParam
+        this.canSubmit = true
+      } else {
+        this.tempFilter = "NaN"
+        this.canSubmit = false
+      }
+    } else {
+      /* Set initial status for manual filters */
+      this.missionFiltered = this.totalMissionList[0];
+      this.productTypeFiltered = this.missionFiltered.productType[0];
+      this.missionName = this.missionFiltered.name;
+      this.productType = this.productTypeFiltered;
+      this.platformNumberList = this.missionFiltered.platform[0];
+      this.platformNumber = this.platformNumberList[0];
+      this.platformNumberFiltered = this.platformNumber;
+
+      this.canSubmit = true
+    }
+  }
+
+  onServiceTypeChange(serviceType) {
+    if (serviceType.target.value == this.serviceTypeList[0].service_type) {  //Single Instance
+      this.serviceTypeChoosen = 1;
+      if (this.siSynchronizers[0]) {
+        this.choosenSync = this.siSynchronizers[0].Label
+        this.tempFilter = this.siSynchronizers[0].FilterParam
+        this.canSubmit = true
+      } else {
+        this.tempFilter = "NaN"
+        this.canSubmit = false
+      }
+    } else if (serviceType.target.value == this.serviceTypeList[1].service_type) { // Front-End
+      this.serviceTypeChoosen = 2;
+      if (this.feSynchronizers[0]) {
+        this.choosenSync = this.feSynchronizers[0].Label
+        this.tempFilter = this.feSynchronizers[0].FilterParam
+        this.canSubmit = true
+      } else {
+        this.tempFilter = "NaN"
+        this.canSubmit = false
+      }
+    } else if (serviceType.target.value == this.serviceTypeList[2].service_type) { // Back-End
+      this.serviceTypeChoosen = 3;
+      if (this.beSynchronizers[0]) {
+        this.choosenSync = this.beSynchronizers[0].Label
+        this.tempFilter = this.beSynchronizers[0].FilterParam
+        this.canSubmit = true
+      } else {
+        this.tempFilter = "NaN"
+        this.canSubmit = false
+      }
+    } else if (serviceType.target.value == this.serviceTypeList[3].service_type) {  // All..
+      this.serviceTypeChoosen = 4;
+      if (this.siSynchronizers[0]) {
+        this.choosenSync = this.siSynchronizers[0].Label
+        this.tempFilter = this.siSynchronizers[0].FilterParam
+        this.canSubmit = true
+      } else if (this.feSynchronizers[0]) {
+        this.choosenSync = this.feSynchronizers[0].Label
+        this.tempFilter = this.feSynchronizers[0].FilterParam
+        this.canSubmit = true
+      } else if (this.beSynchronizers[0]) {
+        this.choosenSync = this.beSynchronizers[0].Label
+        this.tempFilter = this.beSynchronizers[0].FilterParam
+        this.canSubmit = true
+      } else {
+        this.tempFilter = "NaN"
+        this.canSubmit = false
+      }
+    }
+  }
+
+  onSyncChange(sync) {
+    this.choosenSync = sync.target.value;
+    let tempF;
+    tempF = this.siSynchronizers.filter(a => a.Label == sync.target.value)[0];
+    if (tempF !== undefined) {
+      this.tempFilter = tempF.FilterParam;
+      return;
+    }
+    tempF = this.feSynchronizers.filter(a => a.Label == sync.target.value)[0];
+    if (tempF !== undefined) {
+      this.tempFilter = tempF.FilterParam;
+      return;
+    }
+    tempF = this.beSynchronizers.filter(a => a.Label == sync.target.value)[0];
+    if (tempF !== undefined) {
+      this.tempFilter = tempF.FilterParam;
+      return;
+    }
   }
 
   onMissionChange(mission) {
@@ -214,71 +400,122 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  onFilterSubmit(): void {    
-    /* Get values from filters: */
-    this.missionName = this.missionFiltered.name;
-    this.productType = this.productTypeFiltered;
-    if (this.platformNumberFiltered == '---') {
-      this.platformNumber = '';
-    } else {
-      this.platformNumber = this.platformNumberFiltered;
-    }
-    this.bodyMission = this.missionFiltered.acronym + this.platformNumber;
-    let tempStopDate = new Date(this.stopDate);
-    let tempStartDate = new Date(this.startDate);
-    let tempTimeDifference = tempStopDate.getTime() - tempStartDate.getTime();
-    this.tempDaysNumber = tempTimeDifference / (1000 * 3600 * 24) + 1;
-  
-    for (var i = 0; i < this.tempDaysNumber; i++) {
-      let tempFilteredDate = new Date(tempStartDate.getTime() + i*(1000*3600*24));
-      let tempFilteredDateString: string = tempFilteredDate.toISOString().slice(0, 10);
+  onFilterSubmit(): void {
+    if (this.canSubmit) {
+      if (this.useSyncFilter == true) {
+        let tempStopDate = new Date(this.stopDate);
+        let tempStartDate = new Date(this.startDate);
+        let tempTimeDifference = tempStopDate.getTime() - tempStartDate.getTime();
+        this.tempDaysNumber = tempTimeDifference / (1000 * 3600 * 24) + 1;
 
-      let body: object = {
-        "mission":this.bodyMission,
-        "productType":this.productType,
-        "startDate":tempFilteredDateString,
-        "stopDate":tempFilteredDateString
-      };
-      this.completenessDailyGetDone[i] = false;   
-      this.getDailyCompleteness(body, i);
+        for (var i = 0; i < this.tempDaysNumber; i++) {
+          let tempFilteredDate = new Date(tempStartDate.getTime() + i*(1000*3600*24));
+          let tempFilteredDateString: string = tempFilteredDate.toISOString().slice(0, 10);
+
+          let body: object = {
+            "filter":this.tempFilter,
+            "startDate":tempFilteredDateString,
+            "stopDate":tempFilteredDateString
+          };
+          this.completenessDailyGetDone[i] = false;   
+          this.getDailyCompleteness(body, i);
+        }
+      } else {
+        /* Get values from filters: */
+        this.missionName = this.missionFiltered.name;
+        this.productType = this.productTypeFiltered;
+        if (this.platformNumberFiltered == '---') {
+          this.platformNumber = '';
+        } else {
+          this.platformNumber = this.platformNumberFiltered;
+        }
+        this.bodyMission = this.missionFiltered.acronym + this.platformNumber;
+        let tempStopDate = new Date(this.stopDate);
+        let tempStartDate = new Date(this.startDate);
+        let tempTimeDifference = tempStopDate.getTime() - tempStartDate.getTime();
+        this.tempDaysNumber = tempTimeDifference / (1000 * 3600 * 24) + 1;
+      
+        for (var i = 0; i < this.tempDaysNumber; i++) {
+          let tempFilteredDate = new Date(tempStartDate.getTime() + i*(1000*3600*24));
+          let tempFilteredDateString: string = tempFilteredDate.toISOString().slice(0, 10);
+
+          let body: object = {
+            "mission":this.bodyMission,
+            "productType":this.productType,
+            "startDate":tempFilteredDateString,
+            "stopDate":tempFilteredDateString
+          };
+          this.completenessDailyGetDone[i] = false;   
+          this.getDailyCompleteness(body, i);
+        }
+      }
+    } else {
+      this.alert.showErrorAlert("No synchronizers configured for the selected service type", "Please select another service type");
     }
   }
 
   getDailyCompleteness(body, index) {
-    this.authenticationService.getCompleteness(body).subscribe(
-      (res: object) => {
-        if (res) {
-          this.completenessDailyDataList[index] = res;
-          this.completenessDailyGetDone[index] = true;
-          this.sumDailyCompleteness();
-        } else {
-          this.completenessDailyDataList[index] = [];
+    if (this.useSyncFilter == true) {
+      this.authenticationService.getFilterCompleteness(body).subscribe(
+        (res: object) => {
+          if (res) {
+            this.completenessDailyDataList[index] = res;
+            this.completenessDailyGetDone[index] = true;
+            this.sumDailyCompleteness();
+          } else {
+            this.completenessDailyDataList[index] = [];
+          }
+          this.useSyncFilterForTable = this.useSyncFilter
+          this.filter = this.tempFilter;
         }
-      }
-    );
+      );
+    } else {
+      this.authenticationService.getCompleteness(body).subscribe(
+        (res: object) => {
+          if (res) {
+            this.completenessDailyDataList[index] = res;
+            this.completenessDailyGetDone[index] = true;
+            this.sumDailyCompleteness();
+          } else {
+            this.completenessDailyDataList[index] = [];
+          }
+          this.useSyncFilterForTable = this.useSyncFilter
+        }
+      );
+    }
   }
 
   sumDailyCompleteness() {
-    let tempGetReady = true;
     for (var i = 0; i < this.tempDaysNumber; i++) {
       if (this.completenessDailyGetDone[i] == false) {
-        tempGetReady = false;
         return;
       }
     }
+    
     let tempJsonCompleteness:object[] = [];
     for (var i = 0; i < this.tempDaysNumber; i++) {
       tempJsonCompleteness.push(this.completenessDailyDataList[i][0]);
     }
     this.completenessDataList = tempJsonCompleteness;
-    /* Sort completeness by ID and then set Local first*/
+
+    for (var i = 0; i < this.completenessDataList.length; i++) {
+      for (var k = 0; k < this.completenessDataList[i].values.length; k++) {
+        this.completenessDataList[i].values[k].isCSC = this.serviceAllCentreList.filter(a => a.id == this.completenessDataList[i].values[k].id)[0].isCSC;
+      }
+    }
+    /* Sort completeness by ID, then set Local first, then put CSC services at the end*/
     for (var i = 0; i < this.completenessDataList.length; i++) {
       this.completenessDataList[i].values.sort(this.getSortOrder("id"));
       this.setLocalFirst(this.completenessDataList[i].values);
+      this.completenessDataList[i].values.sort(this.getSortOrder("isCSC"));
     }
     this.daysNumber = this.tempDaysNumber;
     this.sectionRadians = (2 * Math.PI) / this.daysNumber;
-    this.centreNumber = this.serviceAllCentreList.length;
+    if (this.useSyncFilter) {
+      this.centreNumber = this.completenessDataList[0].values.length;
+    } else {
+      this.centreNumber = this.serviceAllCentreList.length;
+    }
   }
 
   onStartDateChanged(date) {
@@ -345,21 +582,29 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
   saveAsCSV() {
     if (this.completenessDataList.length > 0) {
       var csvContent: string = '';
-      var table = document.getElementById('data-table');
-      for (var r = 0; r < table.childElementCount; r++) {
-        for (var c = 0; c < table.children[r].childElementCount; c++) {
-          csvContent += table.children[r].children[c].innerHTML;
-          if (!(c == (table.children[r].childElementCount - 1) && r == (table.childElementCount - 1))) csvContent += ',';
+      var table = <HTMLTableElement>document.getElementById('data-table');
+      for (var h = 0; h < table.tHead.childElementCount; h++) {
+        csvContent += '"' + table.tHead.children[h].textContent + '"';
+        if (h != table.tHead.childElementCount - 1) csvContent += ',';
+      }
+      csvContent += '\n';
+      for (var r = 0; r < table.rows.length; r++) {
+        for (var c = 0; c < table.rows[r].cells.length; c++) {
+          csvContent += '"' + table.rows[r].cells[c].innerText + '"';
+          if (!(c == (table.rows[r].childElementCount - 1) && r == (table.childElementCount - 1))) csvContent += ',';
         }
         r < (table.childElementCount - 1) ? csvContent += '\n' : null;
       }
-      let tempCompleteCsvMissionName = this.missionFiltered.acronym + this.platformNumber;
+      let tempCompleteCsvMissionName
+      if (this.useSyncFilter) {
+        tempCompleteCsvMissionName = 'Sync(' + this.choosenSync + ')';
+      } else {
+        tempCompleteCsvMissionName = 'Mission(' + this.missionFiltered.acronym + this.platformNumber + ')_Product(' + this.productType + ')';
+      }
       this.csvService.exportToCsv(
-        'DAFNE-Mission('
-        + tempCompleteCsvMissionName
-        + ')_Product('
-        + this.productType 
-        + ')_From('
+        'DAFNE-Completeness_'
+        + tempCompleteCsvMissionName 
+        + '_From('
         + table.children[0].children[1].innerHTML
         + ')_To('
         + table.children[0].children[table.children[0].childElementCount - 1].innerHTML
@@ -406,8 +651,8 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
       let labelBackgroundColor = p.color('#12222fcc')
       let lineColor = p.color('#aaaaaa');
       let pieStrokeColor = p.color(200);
-      let blankRadiusX = 20;
-      let blankRadiusY = 9;
+      let blankRadiusX = 25;
+      let blankRadiusY = 10;
       let blankRadius2X = 2 * blankRadiusX;
       let blankRadius2Y = 2 * blankRadiusY;
       let tempSum = 0;
@@ -417,8 +662,9 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
       let tempSumPeriod = 0;
       let zeroDiameter = 80;
       let zeroRadius = zeroDiameter / 2;
+      let pieTextRadiusGap = pieExtRadius/4;
 
-      let dateFontSize = 10;
+      let dateFontSize = 12;
       let valueFontSize = 10;
 
       let barGapScale = 30.0;
@@ -502,6 +748,7 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
         p.resizeCanvas(canvasWidth, canvasHeight);
         canvasWidth = canvas.clientWidth * sf;
         canvasHeight = canvas.clientHeight * sf;
+        if (canvasHeight < 240) canvasHeight = 240;
         xCenter = canvasWidth / 2;
         yCenter = canvasHeight / 2;
         pieExtDiameter = (canvasWidth > canvasHeight) ? canvasHeight - blankYDim : canvasWidth - blankXDim;
@@ -510,6 +757,7 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
         chartYDim = (canvasHeight - blankYDim);
         chartXDim2 = chartXDim / 2;
         chartYDim2 = chartYDim / 2;
+        pieTextRadiusGap = pieExtRadius/4;
       };
 
       p.calcMaxSumVal = () => {
@@ -540,6 +788,14 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
 
       p.fillSunburstSingleChart = () => {
         let centreAngle = (this.sectionRadians / this.centreNumber);
+
+        /* Mouse angle and distance calc */
+        let mouseAngle = p.PI - (p.atan2((p.mouseX - tx) - xCenter, (p.mouseY - ty) - yCenter) + p.HALF_PI);
+        let mouseDist = p.dist(xCenter, yCenter, (p.mouseX - tx), (p.mouseY - ty));
+        let pieRadiusHover = [];
+        let pieBeginHover = [];
+        let isHovering = false;
+
         /* Draw Pie Slices*/
         for (var i = 0; i < this.daysNumber; i++) {
           /* Radial lines */
@@ -551,12 +807,17 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
           p.noStroke();
           p.textSize(dateFontSize);
           p.arcText(this.completenessDataList[i].date, xCenter, yCenter, this.sectionRadians * i + this.sectionRadians / 2, -(pieExtRadius + zeroRadius + 10));
+          pieRadiusHover.push([]);
+          pieBeginHover.push([]);
+
           /* Coloured arcs */
           for (var k = 0; k < this.centreNumber; k++) {
             var pieRadius = (this.completenessDataList[i].values[k].value < 0 ? 0 : this.completenessDataList[i].values[k].value);
-            pieRadius = pieExtDiameter * pieRadius / maxSumValue;
+            pieRadius = pieRadius * pieExtDiameter / maxSumValue;
             pieRadius += zeroDiameter;
+            pieRadiusHover[i].push(pieRadius);
             var pieBegin = this.sectionRadians * i + centreAngle * k - p.HALF_PI;
+            pieBeginHover[i].push(pieBegin);
             p.fill(this.serviceAllCentreList[k].color);
             p.stroke(pieStrokeColor);
             p.arc(xCenter, yCenter, pieRadius, pieRadius, pieBegin, pieBegin + centreAngle, p.PIE);
@@ -581,21 +842,67 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
           p.noStroke();
           p.text(p.int(maxSumValue / (nLines / (i + 1))), xCenter, yCenter - pieExtRadius / (nLines / (i + 1)) - zeroRadius + 1);
         }
-        /* Zero Circle */
-        p.stroke(pieStrokeColor);
-        p.fill(backgroundColor)
-        p.circle(xCenter, yCenter, zeroDiameter);
-        /* Zero Label */
-        p.stroke(lineColor);
-        p.fill(labelBackgroundColor);
-        p.rect(xCenter, yCenter - zeroRadius, blankRadius2X, blankRadius2Y, 5);
-        /* Zero text */
-        p.fill(lineColor);
-        p.noStroke();
-        p.text(0, xCenter, yCenter - zeroRadius + 1);
+
+        for (var i = 0; i < this.daysNumber; i++) {
+          for (var k = 0; k < this.centreNumber; k++) {
+            /* Check hover */
+            let hover = mouseDist < pieRadiusHover[i][k]/2 && mouseDist > zeroRadius && mouseAngle >= pieBeginHover[i][k] && mouseAngle < pieBeginHover[i][k] + centreAngle;
+            if (hover) {
+              isHovering = true;
+              p.fill(0, 0, 0, 127);
+              p.stroke(lineColor);
+              p.arc(xCenter, yCenter, pieRadiusHover[i][k], pieRadiusHover[i][k], pieBeginHover[i][k], pieBeginHover[i][k] + centreAngle);
+              /* Zero Circle */
+              p.stroke(pieStrokeColor);
+              p.fill(backgroundColor)
+              p.circle(xCenter, yCenter, zeroDiameter);
+              /* Zero Label */
+              p.stroke(lineColor);
+              p.fill(labelBackgroundColor);
+              p.rect(xCenter, yCenter - zeroRadius, blankRadius2X, blankRadius2Y, 5);
+              /* Zero text */
+              p.fill(lineColor);
+              p.noStroke();
+              p.text(0, xCenter, yCenter - zeroRadius + 1);
+
+              /* Draw values */
+              p.rectMode(p.CENTER);
+              let xTextPos = p.mouseX - tx;
+              let yTextPos = p.mouseY - ty - 25;
+              p.fill(0, 0, 0, 127);
+              p.stroke(255,255,255);
+              p.rect(xTextPos, yTextPos, blankRadius2X + 10, blankRadius2Y + 10, 5);
+              p.fill(255,255,255);
+              p.noStroke();
+              p.text(this.completenessDataList[i].values[k].value, xTextPos, yTextPos + 1);
+            }
+          }
+        }
+        if (!isHovering) {
+          /* Zero Circle */
+          p.stroke(pieStrokeColor);
+          p.fill(backgroundColor)
+          p.circle(xCenter, yCenter, zeroDiameter);
+          /* Zero Label */
+          p.stroke(lineColor);
+          p.fill(labelBackgroundColor);
+          p.rect(xCenter, yCenter - zeroRadius, blankRadius2X, blankRadius2Y, 5);
+          /* Zero text */
+          p.fill(lineColor);
+          p.noStroke();
+          p.text(0, xCenter, yCenter - zeroRadius + 1);
+        }
       };
 
       p.fillSunburstStackedChart = () => {
+        /* Mouse angle and distance calc */
+        let mouseAngle = p.PI - (p.atan2((p.mouseX - tx) - xCenter, (p.mouseY - ty) - yCenter) + p.HALF_PI);
+        let mouseDist = p.dist(xCenter, yCenter, (p.mouseX - tx), (p.mouseY - ty));
+        let pieRadiusHover = [];
+        let pieBeginHover = [];
+        let isHovering = false;
+        let hoveringText;
+
         /* Draw Pie Slices*/
         for (var i = 0; i < this.daysNumber; i++) {
           /* Radial lines */
@@ -607,18 +914,44 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
           p.noStroke();
           p.textSize(dateFontSize);
           p.arcText(this.completenessDataList[i].date, xCenter, yCenter, this.sectionRadians * i + this.sectionRadians / 2, -(pieExtRadius + zeroRadius + 10));
-          /* Coloured arcs */
-          for (var k = 0; k < this.centreNumber; k++) {
+          /* Coloured arcs calcs */
+          pieRadiusHover.push([]);
+          pieBeginHover.push([]);
+          for (var k = 0; k < this.centreNumber; k++) {         
             var pieRadius = (this.completenessDataList[i].values[k].value < 0 ? 0 : this.completenessDataList[i].values[k].value);
             for (var j = k + 1; j < this.centreNumber; j++) {
               if (this.completenessDataList[i].values[j].value > 0) pieRadius += this.completenessDataList[i].values[j].value;
             }
-            pieRadius = pieExtDiameter * pieRadius / maxSumValue;
+            pieRadius = pieRadius * pieExtDiameter / maxSumValue;
             pieRadius += zeroDiameter;
+            pieRadiusHover[i].push(pieRadius);
             var pieBegin = this.sectionRadians * i - p.HALF_PI;
+            pieBeginHover[i].push(pieBegin);
+          }
+        }
+
+        for (var i = 0; i < this.daysNumber; i++) {
+          for (var k = 0; k < this.centreNumber; k++) {
+            /* Check hover */
+            let hover = false;
+            if (k == this.centreNumber - 1) {
+              hover = mouseDist <= pieRadiusHover[i][k]/2 && mouseDist > zeroDiameter/2 && mouseAngle >= pieBeginHover[i][k] && mouseAngle < pieBeginHover[i][k] + this.sectionRadians;
+            } else {              
+              hover = mouseDist <= pieRadiusHover[i][k]/2 && mouseDist > pieRadiusHover[i][k+1]/2 && mouseAngle >= pieBeginHover[i][k] && mouseAngle < pieBeginHover[i][k] + this.sectionRadians;
+            }
+
+            /* Draw Arcs */
             p.fill(this.serviceAllCentreList[k].color);
             p.stroke(pieStrokeColor);
-            p.arc(xCenter, yCenter, pieRadius, pieRadius, pieBegin, pieBegin + this.sectionRadians, p.PIE);
+            p.arc(xCenter, yCenter, pieRadiusHover[i][k], pieRadiusHover[i][k], pieBeginHover[i][k], pieBeginHover[i][k] + this.sectionRadians, p.PIE);
+
+            /* Draw Hovered Arc */
+            if (hover) {             
+              isHovering = true;
+              hoveringText = this.completenessDataList[i].values[k].value;
+              p.fill(0, 0, 0, 127);
+              p.arc(xCenter, yCenter, pieRadiusHover[i][k], pieRadiusHover[i][k], pieBeginHover[i][k], pieBeginHover[i][k] + this.sectionRadians, p.PIE);
+            }
           }
         }
 
@@ -652,6 +985,19 @@ export class CompletenessComponent implements OnInit, AfterViewInit, OnDestroy {
         p.fill(lineColor);
         p.noStroke();
         p.text(0, xCenter, yCenter - zeroRadius + 1);
+        
+        /* Draw value */
+        if (isHovering) {
+          p.rectMode(p.CENTER);
+          let xTextPos = p.mouseX - tx;
+          let yTextPos = p.mouseY - ty - 25;
+          p.fill(0, 0, 0, 127);
+          p.stroke(255,255,255);
+          p.rect(xTextPos, yTextPos, blankRadius2X + 10, blankRadius2Y + 10, 5);
+          p.fill(255,255,255);
+          p.noStroke();
+          p.text(hoveringText, xTextPos, yTextPos + 1);
+        }
       };
 
       p.fillSingleBarChart = () => {

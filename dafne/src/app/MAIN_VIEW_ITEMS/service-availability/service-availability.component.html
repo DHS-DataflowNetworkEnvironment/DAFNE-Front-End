@@ -4,22 +4,26 @@
     <div id="filters-form-container">
         <form id="filters-form">
             <div id="filters-form-row">
+                <div class="weekly-div">
+                    <label class="form-label">Weekly Aggregation:</label>
+                    <input type="checkbox" class="form-control" id="weekly-checkbox" name="weekly-checkbox" (change)="onWeeklyCheckboxChange()" [checked]="false">
+                </div>
                 <div class="date-picker">
-                    <label class="form-label">Start Date:</label>
-                    <dp-date-picker class="" theme="dp-material" id="filter-start-date" name="filter-start-date"
+                    <label class="form-label">Start/Stop Date:</label>
+                    <dp-date-picker class="" theme="dp-material" id="filter-start-date" name="filter-start-date" (click)="onDateClick($event)"
                         [(ngModel)]="startDate" (ngModelChange)="onStartDateChanged($event)" [config]="startDatePickerConfig" placeholder="YYYY-MM-DD">
                     </dp-date-picker>
                 </div>
                 <div class="date-picker">
-                    <label class="form-label">Stop Date:</label>
-                    <dp-date-picker class="" theme="dp-material" id="filter-stop-date" name="filter-stop-date"
+                    <dp-date-picker class="" theme="dp-material" id="filter-stop-date" name="filter-stop-date" (click)="onDateClick($event)"
                         [(ngModel)]="stopDate" (ngModelChange)="onStopDateChanged($event)" [config]="stopDatePickerConfig" placeholder="YYYY-MM-DD">
                     </dp-date-picker>
                 </div>
-                <button type="submit" class="btn btn-primary col-1" id="filter-submit-button" (click)="onFilterSubmit()">Filter</button>
+                <button type="submit" class="btn btn-primary col-1" id="filter-submit-button" (click)="onFilterButtonSubmit()">Filter</button>
             </div>
         </form>
     </div>
+
     <div id="main-row-container">
         <!-- Charts -->
         <div id="p5ServiceAvailabilityCanvas-column-div">
@@ -28,11 +32,17 @@
         </div>
         <!-- Selectors -->
         <section id="selectors-container">
+            <!-- Date Title -->
+            <h5 *ngIf="isWeekly == true" class="availability-chart-title">WEEKLY</h5>
+            <h5 *ngIf="isWeekly == false" class="availability-chart-title">DAILY</h5>
+            <!-- Chart Buttons -->
             <h2 id="buttons-title">CHART</h2>
             <button (click)="chartChangeTo('Bar Chart')">Bar Chart</button>
-            <button (click)="chartChangeTo('Calendar Chart')">Calendar Chart</button>
+            <button *ngIf="isWeekly==false" (click)="chartChangeTo('Calendar Chart')">Calendar Chart</button>
 
-            <h2 id="legend-title">LEGEND</h2>
+            <!-- Legend -->
+            <hr>
+            <h2>LEGEND</h2>
             <ng-template ngFor let-color [ngForOf]="availabilityColors" let-i="index">
                 <div *ngIf="i>0" class="color-threshold" [ngStyle]="{'background-color': availabilityColors[availabilityColors.length-1-i].color}">&gt;<span *ngIf="i==availabilityColors.length - 1">=</span> {{availabilityColors[availabilityColors.length-1-i].threshold}}% &lt;= {{availabilityColors[availabilityColors.length-i].threshold}}%</div>
             </ng-template>
@@ -41,6 +51,11 @@
                 <span *ngIf="averageServiceAvailability >= 0"> {{averageServiceAvailability.toFixed(2)}}%</span>
                 <span *ngIf="averageServiceAvailability < 0"> ---</span>
             </div>
+            <hr>
+            <!-- Buttons and info -->            
+            <h6 *ngIf="isWeekly == true && firstWeeklySubmitted" class="button-info" style="text-align: center;">Click on a bar to show the days of that week</h6>
+            <button *ngIf="isWeekly == true && firstDailySubmitted" class="button-info" id="back-to-daily-button" (click)="onBackToDailyClicked()">Back to daily</button>
+            <button *ngIf="isWeekly == false && firstWeeklySubmitted" class="button-info" id="back-to-weekly-button" (click)="onBackToWeeklyClicked()">Back to weekly</button>       
         </section>
     </div>
 </div>
@@ -53,12 +68,23 @@
     </div>
     <div id="table-div">
         <table id="data-table">
-            <thead>
+            <!-- Weekly Availability -->
+            <thead *ngIf="isWeekly == true">
+                <th style="color: white">{{localCentre.name}}</th>
+                <ng-template ngFor let-availability [ngForOf]="requestedServiceAvailabilityList" let-i="index">
+                    <th style="padding: 0 0.5rem; white-space: pre;">Week <div>from: {{availability.date}} </div><div>to: {{getWeekEndDateText(availability.date)}}</div></th>
+                </ng-template>
+            </thead>
+
+            <!-- Daily Availability -->
+            <thead *ngIf="isWeekly == false">
                 <th style="color: white">{{localCentre.name}}</th>
                 <ng-template ngFor let-availability [ngForOf]="requestedServiceAvailabilityList" let-i="index">
                     <th style="padding: 0 0.5rem;">{{availability.date}}</th>
                 </ng-template>
             </thead>
+
+            <!-- Data -->
             <tr>
                 <td style="color: var(--main-text-color)">TotalRequests</td>
                 <ng-template ngFor let-availability [ngForOf]="requestedServiceAvailabilityList" let-i="index">
