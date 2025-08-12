@@ -1,0 +1,52 @@
+@use 'vars' as *;
+
+/* Availability only legend */
+#legend-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+#legend-container.hidden {
+  display: none;
+}
+.color-threshold-div {
+  width: 100%;
+  height: 1.25rem;
+  line-height: 1.25rem;
+  text-align: center;
+  font-size: $small-font-size;
+  color: black;
+}
+.color-threshold-div:first-of-type {
+  border-radius: 3px 3px 0 0;
+}
+.color-threshold-div:last-of-type {
+  border-radius: 0 0 3px 3px;
+}
+
+.average-legend {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.75rem;
+
+}
+.average-legend span {
+  width: 100%;
+  border-radius: 3px;
+}
+
+.chart-back-button-info {
+  background-color: $checked-color;
+  color: $main-buttons-text-color;
+  font-size: $small-font-size;
+  width: 100%;
+  border-width: 0;
+  border-radius: 5px;
+  line-height: 1.5rem;
+}
+.chart-hint {
+  margin: 0;
+}

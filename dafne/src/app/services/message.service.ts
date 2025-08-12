@@ -15,6 +15,12 @@ export class MessageService {
   private spinnerMessageSource = new BehaviorSubject(false);
   spinnerCurrentMessage = this.spinnerMessageSource.asObservable();
 
+  private sidebarMessageSource = new BehaviorSubject(false);
+  sidebarMessage = this.sidebarMessageSource.asObservable();
+
+  private refreshLocalMessageSource = new BehaviorSubject(null);
+  refreshLocalMessage = this.refreshLocalMessageSource.asObservable();
+
   invokeAutoRefresh = new EventEmitter();
 
   constructor() { }
@@ -34,5 +40,13 @@ export class MessageService {
 
   autoRefresh() {
     this.invokeAutoRefresh.emit();
+  }
+
+  hideSidebar(hide: boolean) {
+    this.sidebarMessageSource.next(hide);
+  }
+
+  refreshLocalCentre() {
+    this.refreshLocalMessageSource.next(null);
   }
 }

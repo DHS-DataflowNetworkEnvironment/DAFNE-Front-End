@@ -1,0 +1,81 @@
+@use 'vars' as *;
+
+#header-container {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  background-color: $main-bg-color;
+  width: 100%;
+  height: 3rem;
+  line-height: 3rem;
+  padding: 0 1rem 0 1rem;
+  align-items: center;
+  z-index: 99;
+  box-shadow: $main-shadow;
+}
+#header-left-div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1.5rem;
+}
+#header-title {
+  font-size: $title-font-size;
+  white-space: nowrap;
+}
+#dafne-logo {
+  padding: 0.3rem 0;
+  height: 2.5rem;
+}
+
+#header-right-div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  gap: 1rem;
+}
+.header-icon-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center
+}
+.dropdown-menu {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap:2rem;
+  right: 0.5rem;
+  top: 3rem;
+  background-color: $menu-bg-color;
+  border-radius: 0 0 0.25rem 0.25rem;
+  padding: 1rem;
+  box-shadow: $main-shadow;
+  z-index: 90;
+  opacity: 1.0;
+  transform: translateY(0);
+  transition: opacity 150ms ease-in-out, transform 150ms ease-in-out;
+  pointer-events: auto;
+}
+.dropdown-menu.hidden {
+  transform: translateY(-5rem);
+  opacity: 0;
+  pointer-events: none;
+}
+.menu-item {
+  border: none;
+  background-color: transparent;
+  color: $main-text-color;
+  font-size: $secondary-title-font-size;
+  white-space: nowrap;
+}
+.menu-item:disabled {
+  color: $nd-color;
+}

@@ -1,0 +1,150 @@
+@use 'vars' as *;
+
+#sidebar-inner-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  height: 100%;
+  z-index: 9;
+}
+#sidebar-title {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  height: 2rem;
+  min-height: 2rem;
+  background-color: $title-bg-color;
+  align-items: center;
+  padding-left: 0.5rem;
+  font-size: $secondary-title-font-size;
+}
+#sidebar-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+  height: 100%;
+  background-color: $main-bg-color;
+  padding: 1rem 0.5rem 0.5rem 0.5rem;
+  overflow-y: auto;
+  gap: 1.0rem;
+}
+
+.sidebar-element-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+  gap: 0.5rem;
+}
+
+.sidebar-element {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+}
+.sidebar-element-title-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+.sidebar-element-title {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  white-space: nowrap;
+  gap: 0.5rem;
+  height: 2rem;
+  font-size: $main-font-size;
+}
+.sidebar-element-title-inset {
+  color: $main-buttons-text-color;
+  font-size: $main-font-size;
+}
+.sidebar-element-container.disabled .sidebar-element-title, .sidebar-element-container.disabled .sidebar-element-button {
+  opacity: 0.5;
+  cursor: default;
+  pointer-events: none;
+}
+.sidebar-element-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 8rem;
+  background-color: $windows-bg-color;
+  border-radius: 0.25rem;
+  padding: 0 0.5rem;
+  font-size: $small-font-size;
+  box-shadow: $main-shadow;
+}
+.sidebar-element-body.centered {
+  align-items: center;
+  justify-content: center;
+  min-height: 2rem;
+  font-size: $main-font-size;
+}
+.sidebar-element-placeholder-text {
+  color: $windows-title-color;
+  font-style: italic;
+}
+.sidebar-element-button {
+  border: none;
+  width: 4rem;
+  height: 1.5rem;
+  border-radius: 0.25rem;
+  background-color: $main-buttons-bg-color;
+  color: white;
+}
+
+.sidebar-arrow-container {
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding-left: 0.25rem;
+  background-color: $main-bg-color;
+  box-shadow: 7px 0px 7px 0px rgba(0,0,0,0.5);
+  border-radius: 0 0.25rem 0.25rem 0;
+  width: 1.5rem;
+  height: 3rem;
+  right: -1.5rem;
+  top: 45%;
+  z-index: 0;
+}
+.sidebar-arrow-container .svg-icon {
+  transition: opacity 250ms ease-in-out;
+}
+.sidebar-arrow-container:hover > .svg-icon {
+  opacity: 0.7;
+}
+.sidebar-arrow-container:active > .svg-icon {
+  opacity: 0.5;
+}
+#sidebar-left-arrow {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+}
+#sidebar-right-arrow {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+}
+.sidebar-arrow-container.hidden {
+  display: none;
+}

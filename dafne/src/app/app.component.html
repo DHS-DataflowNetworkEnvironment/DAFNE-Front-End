@@ -1,7 +1,14 @@
-<div class="container-fluid">
+<div id="main-app-container">
+  <div id="header-container">
     <app-header></app-header>
+  </div>
+  <div id="body-container">
     <router-outlet></router-outlet>
-    <app-toast></app-toast>
-    <app-alert></app-alert>
-    <app-spinner></app-spinner>
+  </div>
+  <div id="footer-container">
+    <app-footer></app-footer>
+  </div>
+  <!-- <app-toast></app-toast> -->
+  <app-alert></app-alert>
+  <app-spinner></app-spinner>
 </div>

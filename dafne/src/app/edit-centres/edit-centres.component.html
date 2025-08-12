@@ -1,173 +1,181 @@
-<div class="central-div row">
-    <div class="main-view-content ml-auto" id="main-view-content">
-        <div class="edit-centres-page-title">Edit Centres</div>
-        <div class="edit-centres-page-content">
-            <div class="title-row row">
-                <p class="table-title">Centres List</p>
-                <button *ngIf="this.authenticationService.currentUser.isAdmin" class="add-centre-button btn btn-primary ml-auto" (click)="addNewCentre()">Add Centre<i class="plus-icon fas fa-plus"></i></button>
-            </div>
-            <table id="edit-centre-table">
-                <tr>
-                    <th>Name</th>
-                    <th>Latitude</th>
-                    <th>Longitude</th>
-                    <th>Color</th>
-                    <th>Local</th>
-                    <th>Description</th>
-                    <th *ngIf="this.authenticationService.currentUser.isAdmin">Actions</th>
-                </tr>
-                <tr *ngFor="let centre of centreList">
-                    <td class="cell-name" [ngStyle]="{'color': centre.color }">{{centre.name}}</td>
-                    <td class="cell-latitude" [ngStyle]="{'color': centre.color }">{{centre.latitude}}</td>
-                    <td class="cell-longitude" [ngStyle]="{'color': centre.color }">{{centre.longitude}}</td>
-                    <td class="cell-color"><div id="color-rect" [ngStyle]="{'background-color': centre.color }"></div></td>
-                    <td class="cell-local" [ngStyle]="{'color': centre.local == true ? centre.color : 'lightgrey' }">
-                        {{centre.local == true ? "local" : "remote"}}
-                    </td>
-                    <td class="cell-description" [ngStyle]="{'color': centre.color }">{{centre.description}}</td>
-                    <td *ngIf="this.authenticationService.currentUser.isAdmin" class="cell-actions">
-                        <i class="fas fa-pen action" style="color: orange" (click)="editCentre(centre.id)"></i>
-                        <i class="fas fa-trash action" style="color: red" (click)="deleteCentre(centre.id)"></i>
-                    </td>
-                </tr>
-            </table>
+<div class="main-parent-view-content">
+    <div class="main-page-title">
+      <p>Edit Centres</p>
+    </div>
+    <div class="main-page-content">
+      <div class="main-page-inner-container">
+        <div class="edit-title-container">
+            <p class="edit-table-title">Centres List</p>
+            @if (isAdmin()) {
+            <button class="edit-add-button hover-el" (click)="addNewCentre()" title="Add Centre">Add Centre<svg class="svg-icon plus-icon"><use href="assets/icons/dafne_symbols.svg#icon-plus"/></svg></button>
+            }
         </div>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>Color</th>
+                <th>Local</th>
+                <th>Description</th>
+                @if (isAdmin()) {
+                <th>Actions</th>
+                }
+            </tr>
+            <tr *ngFor="let centre of centreList">
+                <td class="cell-name" [ngStyle]="{'color': centre.color }">{{centre.name}}</td>
+                <td class="cell-latitude" [ngStyle]="{'color': centre.color }">{{centre.latitude}}</td>
+                <td class="cell-longitude" [ngStyle]="{'color': centre.color }">{{centre.longitude}}</td>
+                <td class="cell-color"><div class="color-rect" [ngStyle]="{'background-color': centre.color }" [title]="centre.color"></div></td>
+                <td class="cell-local" [ngStyle]="{'color': centre.local == true ? centre.color : 'lightgrey' }">
+                    {{centre.local == true ? "local" : "remote"}}
+                </td>
+                <td class="cell-description" [ngStyle]="{'color': centre.color }">{{centre.description}}</td>
+                @if (isAdmin()) {
+                <td>
+                    <div class="cell-actions">
+                        <div class="action-icon-container" title="Edit Centre">
+                            <svg class="icon-edit hover-el" (click)="editCentre(centre.id)"><use href="assets/icons/dafne_symbols.svg#icon-edit"/></svg>
+                        </div>
+                        <div class="action-icon-container" title="Delete Centre">
+                            <svg class="icon-delete hover-el" (click)="deleteCentre(centre.id)"><use href="assets/icons/dafne_symbols.svg#icon-delete"/></svg>
+                        </div>
+                    </div>
+                </td>
+                }
+            </tr>
+        </table>
+      </div>
     </div>
 </div>
-<app-footer class="footer row"></app-footer>
 
 <!-- Add Modal -->
-<div class="modal fade" id="addCentreModal" tabindex="-1" aria-labelledby="addCentreModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">ADD CENTRE</h5>
-            </div>
-            <div class="modal-body">
-                <form id="addCentreForm">
-                    <div class="mb-1">
-                        <label for="add_name" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="add_name" [value]="tempCentre.name">
-                        <small id="nameHelp" class="form-text">Length: 1 - 60 characters</small>
+<div class="modal hidden" id="addCentreModal" tabindex="-1">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h4 class="modal-title">ADD CENTRE</h4>
+        </div>
+        <hr class="modal-hr">
+        <div class="modal-body">
+            <form id="addCentreForm" [formGroup]="addCentreForm" (ngSubmit)="onAddSubmit()">
+                <div class="form-input-div column">
+                    <label for="add-name" class="form-label">Name</label>
+                    <input type="text" class="form-text-input full-width" id="add-name" formControlName="addCentreName" required>
+                    <small id="nameHelp" class="validation-message">Length: 1 - 60 characters</small>
+                </div>
+                <div class="form-input-group-div">
+                    <div class="form-input-div column">
+                        <label for="add-latitude" class="form-label">Latitude</label>
+                        <input type="text" class="form-text-input" id="add-latitude" formControlName="addCentreLatitude" required>
+                        <small id="latitudeHelp" class="validation-message">Input a number in the range:<br>[-90.0, 90.0]</small>
                     </div>
-                    <div class="input-group mb-1">
-                        <div class="mb-1">
-                            <label for="add_latitude" class="form-label">Latitude</label>
-                            <input type="number" class="form-control" id="add_latitude" [value]="tempCentre.latitude">
-                            <small id="latitudeHelp" class="form-text">Input a number in the range:<br>[-90.0, 90.0]</small>
-                        </div>
-                        <div class="mb-1 ml-auto">
-                            <label for="add_longitude" class="form-label">Longitude</label>
-                            <input type="number" class="form-control" id="add_longitude" [value]="tempCentre.longitude">
-                            <small id="longitudeHelp" class="form-text">Input a number in the range:<br>[-180.0, 180.0]</small>
-                        </div>
+                    <div class="form-input-div column">
+                        <label for="add-longitude" class="form-label">Longitude</label>
+                        <input type="text" class="form-text-input" id="add-longitude" formControlName="addCentreLongitude" required>
+                        <small id="longitudeHelp" class="validation-message">Input a number in the range:<br>[-180.0, 180.0]</small>
                     </div>
-                    <div class="input-group mb-1">
-                        <div class="mb-1">
-                            <label for="add_color" class="form-label">Color</label>
-                            <div class="input-group" id="add_color-div">
-                                <input type="button" class="form-control" id="add_color-picker"
-                                        [(colorPicker)]="tempCentre.color" cpWidth='400px' cpHeight="300px"
-                                        [cpOKButton]="true" [cpOKButtonClass]="'btn btn-primary'"
-                                        [cpCancelButton]="true" [cpCancelButtonClass]="'btn btn-secondary'"
-                                        cpOutputFormat="hex" [style.background]="tempCentre.color">
-                                <input type="text" class="form-control" id="add_color" [value]="tempCentre.color">
-                                <small id="colorHelp" class="form-text">Hex color in the form #rrggbb</small>
-                            </div>
-                        </div>
-                        <div class="mb-1 ml-auto">
-                            <label for="add_local" class="form-label">Local</label>
-                            <input type="checkbox" class="form-control" id="add_local" name="local-checkbox" [checked]="false">
+                </div>
+                <div class="form-input-group-div">
+                    <div class="form-input-div column">
+                        <label for="add-color" class="form-label">Color</label>
+                        <div class="input-group" class="form-color-div">
+                            <label class="form-color-selector-label"><input type="color" id="add-color-selector" class="form-color-selector" (change)="onAddColorChanged($event)" required></label>
+                            <input type="text" class="form-text-input right" id="add-color" (change)="onAddColorTextChanged($event)" formControlName="addCentreColor" required>
+                            <small id="colorHelp" class="validation-message">Hex color in the form #rrggbb</small>
                         </div>
                     </div>
-                    <div class="mb-1">
-                        <label for="add_description" class="form-label">Description</label>
-                        <input type="text" class="form-control" id="add_description" [value]="tempCentre.description">
-                        <small id="descriptionHelp" class="form-text">Anything</small>
+                    <div class="form-input-div column">
+                        <label for="add-local" class="form-label">Local</label>
+                        <input type="checkbox" id="add-local" class="form-checkbox" name="local-checkbox" formControlName="addCentreLocal">
                     </div>
-                    <div class="row" >
-                        <button type="button" class="btn btn-secondary ml-auto m-3" data-bs-dismiss="modal" aria-label="Close">Close</button>
-                        <button type="submit" class="btn btn-primary m-3" (click)="onAddSubmit()">Submit</button>
-                    </div>
-                </form>
-            </div>
+                </div>
+                <div class="form-input-div column">
+                    <label for="add-description" class="form-label">Description</label>
+                    <input type="text" class="form-text-input full-width" id="add-description" formControlName="addCentreDescription">
+                    <small id="descriptionHelp" class="validation-message">Anything</small>
+                </div>
+                <div class="form-input-div row" >
+                    <button type="button" class="form-button close rect hover-el" (click)="onClosePressed()">CANCEL</button>
+                    <button type="submit" class="form-button submit rect hover-el">SUBMIT</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
 <!-- Edit Modal -->
-<div class="modal fade" id="editCentreModal" tabindex="-1" aria-labelledby="editCentreModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">EDIT CENTRE</h5>
-            </div>
-            <div class="modal-body">
-                <form id="editCentreForm">
-                    <div class="mb-1">
-                        <label for="edit_name" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="edit_name" [(ngModel)]="tempCentre.name" name="edit_name">
-                        <small id="nameHelp" class="form-text">Length: 1 - 60 characters</small>
+<div class="modal hidden" id="editCentreModal" tabindex="-1" >
+    <div class="modal-container">
+        <div class="modal-header">
+            <h4 class="modal-title">EDIT CENTRE</h4>
+        </div>
+        <hr class="modal-hr">
+        <div class="modal-body">
+            <form id="editCentreForm" [formGroup]="editCentreForm" (ngSubmit)="onEditSubmit(tempCentreIdToEdit)">
+                <div class="form-input-div column">
+                    <label for="edit-name" class="form-label">Name</label>
+                    <input type="text" class="form-text-input full-width" id="edit-name" name="edit-name" formControlName="editCentreName">
+                    <small id="nameHelp" class="validation-message">Length: 1 - 60 characters</small>
+                </div>
+                <div class="form-input-group-div">
+                    <div class="form-input-div column">
+                        <label for="edit-latitude" class="form-label">Latitude</label>
+                        <input type="text" class="form-text-input" id="edit-latitude" name="edit-latitude" formControlName="editCentreLatitude">
+                        <small id="latitudeHelp" class="validation-message">Input a number in the range:<br>[-90.0, 90.0]</small>
                     </div>
-                    <div class="input-group mb-1">
-                        <div class="mb-1">
-                            <label for="edit_latitude" class="form-label">Latitude</label>
-                            <input type="text" class="form-control" id="edit_latitude" [(ngModel)]="tempCentre.latitude" name="edit_latitude">
-                            <small id="latitudeHelp" class="form-text">Input a number in the range:<br>[-90.0, 90.0]</small>
-                        </div>
-                        <div class="mb-1 ml-auto">
-                            <label for="edit_longitude" class="form-label">Longitude</label>
-                            <input type="text" class="form-control" id="edit_longitude" [(ngModel)]="tempCentre.longitude" name="edit_longitude">
-                            <small id="latitudeHelp" class="form-text">Input a number in the range:<br>[-180.0, 180.0]</small>
-                        </div>
+                    <div class="form-input-div column">
+                        <label for="edit-longitude" class="form-label">Longitude</label>
+                        <input type="text" class="form-text-input" id="edit-longitude" name="edit-longitude" formControlName="editCentreLongitude">
+                        <small id="latitudeHelp" class="validation-message">Input a number in the range:<br>[-180.0, 180.0]</small>
                     </div>
-                    <div class="input-group mb-1">
-                        <div>
-                            <label for="edit_color" class="form-label">Color</label>
-                            <div class="input-group" id="edit_color-div">
-                                <input type="button" class="form-control" id="edit_color-picker"
-                                        [(colorPicker)]="tempCentre.color" cpWidth='400px' cpHeight="300px"
-                                        [cpOKButton]="true" [cpOKButtonClass]="'btn btn-primary'"
-                                        [cpCancelButton]="true" [cpCancelButtonClass]="'btn btn-secondary'"
-                                        cpOutputFormat="hex" [style.background]="tempCentre.color" />
-                                <input type="text" class="form-control" id="edit_color" [value]="tempCentre.color">
-                                <small id="colorHelp" class="form-text">Hex color in the form #rrggbb</small>
-                            </div>
-                        </div>
-                        <div class="mb-1 ml-auto">
-                            <label for="edit_local" class="form-label">Local</label>
-                            <input type="checkbox" class="form-control" id="edit_local" name="local-checkbox" [(ngModel)]="tempCentre.local">
+                </div>
+                <div class="form-input-group-div">
+                    <div class="form-input-div column">
+                        <label for="edit-color" class="form-label">Color</label>
+                        <div class="input-group" class="form-color-div">
+                            <label class="form-color-selector-label"><input type="color" id="edit-color-selector" class="form-color-selector" (change)="onEditColorChanged($event)" required></label>
+                            <input type="text" class="form-text-input right" id="edit-color" (change)="onEditColorTextChanged($event)" formControlName="editCentreColor" required>
+                            <small id="colorHelp" class="validation-message">Hex color in the form #rrggbb</small>
                         </div>
                     </div>
-                    <div class="mb-1">
-                        <label for="edit_description" class="form-label">Description</label>
-                        <input type="text" class="form-control" id="edit_description" [(ngModel)]="tempCentre.description" name="edit_description">
-                        <small id="descriptionHelp" class="form-text">Anything</small>
+                    <div class="form-input-div column">
+                        <label for="edit-local" class="form-label">Local</label>
+                        <input type="checkbox" id="edit-local" class="form-checkbox" name="local-checkbox" formControlName="editCentreLocal">
                     </div>
-                    <div class="row" >
-                        <button type="button" class="btn btn-secondary ml-auto m-3" data-bs-dismiss="modal" aria-label="Close">Close</button>
-                        <button type="submit" class="btn btn-primary m-3" (click)="onEditSubmit(tempCentre.id)">Submit</button>
-                    </div>
-                </form>
-            </div>
+                </div>
+                <div class="form-input-div column">
+                    <label for="edit-description" class="form-label">Description</label>
+                    <input type="text" class="form-text-input full-width" id="edit-description" name="edit-description" formControlName="editCentreDescription">
+                    <small id="descriptionHelp" class="validation-message">Anything</small>
+                </div>
+                <div class="form-input-div row">
+                    <button type="button" class="form-button close rect hover-el" (click)="onClosePressed()">CANCEL</button>
+                    <button type="submit" class="form-button submit rect hover-el">SUBMIT</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+ 
 
 <!-- Delete Alert! -->
-<div class="modal fade" id="deleteCentreModal" tabindex="-1" aria-labelledby="deleteCentreModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><i class="fas fa-exclamation-triangle mr-4"></i>Deleting Centre: <span [ngStyle]="{'color': tempCentreColorToDelete}">{{tempCentreNameToDelete}}</span></h5>
-            </div>
-            <div class="modal-body">
-                <label>Are you sure?</label>
-                <div class="row">
-                    <button type="button" class="btn btn-secondary ml-auto" (click)="deleteCentreCanceled()" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary ml-4 mr-4" (click)="deleteCentreConfirmed()" data-bs-dismiss="modal">Yes</button>
+<div class="modal hidden" id="deleteCentreModal" tabindex="-1">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h4 class="modal-title">Deleting Centre: <span [ngStyle]="{'color': tempCentreColorToDelete}">{{tempCentreNameToDelete}}</span></h4>
+            <svg class="icon-warning"><use href="assets/icons/dafne_symbols.svg#icon-warning"/></svg>
+        </div>
+        <hr class="modal-hr">
+        <div class="modal-body">
+            <form id="deleteCentreForm" (ngSubmit)="deleteCentreConfirmed()">
+                <div class="form-input-div row-left">
+                    <label>Are you sure?</label>
                 </div>
-            </div>
+                <div class="form-input-div row" >
+                    <button type="button" class="form-button close rect hover-el" (click)="onClosePressed()">CANCEL</button>
+                    <button type="submit" class="form-button submit rect hover-el">YES</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

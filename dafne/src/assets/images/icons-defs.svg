@@ -1,0 +1,57 @@
+<svg>
+  <defs>
+
+    <symbol id="home-icon-svg">
+      <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+      <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+      <svg
+        width="256"
+        height="256"
+        viewBox="0 0 67.733332 67.733335"
+        version="1.1"
+        id="svg5"
+        inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+        sodipodi:docname="home-icon.svg"
+        xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+        xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:svg="http://www.w3.org/2000/svg">
+        <sodipodi:namedview
+          id="namedview7"
+          pagecolor="#060614"
+          bordercolor="#666666"
+          borderopacity="1.0"
+          inkscape:pageshadow="2"
+          inkscape:pageopacity="0"
+          inkscape:pagecheckerboard="0"
+          inkscape:document-units="mm"
+          showgrid="false"
+          units="px"
+          width="256px"
+          inkscape:zoom="1.8116734"
+          inkscape:cx="122.53864"
+          inkscape:cy="134.13013"
+          inkscape:window-width="1920"
+          inkscape:window-height="1011"
+          inkscape:window-x="0"
+          inkscape:window-y="32"
+          inkscape:window-maximized="1"
+          inkscape:current-layer="layer1" />
+        <defs
+          id="defs2" />
+        <g
+          inkscape:label="Livello 1"
+          inkscape:groupmode="layer"
+          id="layer1">
+          <path
+            style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:5.29167;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+            d="M 12,65 V 30 H 3 L 34,3 65,30 H 56 V 65 H 41 V 52 H 27 v 13 z"
+            id="path857"
+            sodipodi:nodetypes="cccccccccccc" />
+        </g>
+      </svg>
+
+    </symbol>
+  </defs>
+</svg>

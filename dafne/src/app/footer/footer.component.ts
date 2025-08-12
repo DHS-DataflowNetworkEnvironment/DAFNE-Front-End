@@ -1,22 +1,27 @@
-import { Component, OnInit, Inject} from '@angular/core';
-import { AppConfig } from '../services/app.config';
-import { AuthenticationService } from '../services/authentication.service';
+import { Component, OnInit } from '@angular/core';
+import { ConfigService } from 'src/app/services/config.service';
+import { AuthenticationService } from 'src/app/services/authentication.service';
 
 @Component({
   selector: 'app-footer',
+  imports: [],
   templateUrl: './footer.component.html',
-  styleUrls: ['./footer.component.css']
+  styleUrl: './footer.component.scss'
 })
 export class FooterComponent implements OnInit {
+  public centreLogoPath: string = "";
+  public softwareVersion: string = "";
   
-  public centreLogoPath = AppConfig.settings.centreBackupLogoPath;
-  public softwareVersion = AppConfig.settings.version;
-  
-  constructor(public authenticationService: AuthenticationService) { }
+  constructor(
+    public authenticationService: AuthenticationService,
+    public configService: ConfigService
+  ) { }
 
   ngOnInit(): any {
-    if (AppConfig.settings.centreLogoPath != "") {
-      this.centreLogoPath = AppConfig.settings.centreLogoPath;
+    this.centreLogoPath = this.configService.getConfig().centreBackupLogoPath;
+    this.softwareVersion = this.configService.getConfig().version;
+    if (this.configService.getConfig().centreLogoPath != "") {
+      this.centreLogoPath = this.configService.getConfig().centreLogoPath;
     }
   }
 }

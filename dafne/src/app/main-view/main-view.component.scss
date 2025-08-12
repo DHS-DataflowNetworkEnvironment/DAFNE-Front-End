@@ -1,0 +1,29 @@
+@use 'vars' as *;
+
+/* Main view */
+#body-inner-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100vw;
+  max-width: 100vw;
+  height: 100%;
+  padding: 0.5rem 0;
+}
+#sidebar-container {
+  width: $sidebar-width;
+  height: 100%;
+  margin-right: 0.5rem;
+
+  transition: margin 250ms ease-in-out;
+}
+#sidebar-container.hidden {
+  margin-left: $sidebar-width-pad;
+}
+#main-view-content {
+  position: relative;
+  width: calc(100vw - $sidebar-width);
+  height: 100%;
+  flex-grow: 1;
+}

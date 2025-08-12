@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+
 import { EditSyncComponent } from './edit-sync.component';
 
 describe('EditSyncComponent', () => {
@@ -7,12 +8,10 @@ describe('EditSyncComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ EditSyncComponent ]
+      imports: [EditSyncComponent]
     })
     .compileComponents();
-  });
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(EditSyncComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

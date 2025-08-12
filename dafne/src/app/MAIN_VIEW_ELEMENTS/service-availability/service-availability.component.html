@@ -1,0 +1,177 @@
+<div class="main-parent-view-content">
+  <div class="main-page-title">Service availability</div>
+  <div class="main-page-content">
+    <div class="filters-form-container">
+      <form id="sa-filters-form" class="filters-form" (ngSubmit)="onFilterButtonSubmit()"
+          [formGroup]="filterForm">
+        <div class="form-input-div row filter-outer-div">
+          <div class="filter-inner-div">
+            <label for="weekly-checkbox" class="form-label extra-small-font-size">Weekly Aggregation:</label>
+            <input type="checkbox" class="form-checkbox" id="weekly-checkbox" name="weekly-checkbox"
+                  (change)="onWeeklyCheckboxChange()" formControlName="filterWeekly">
+          </div>
+          <div class="filter-inner-div">
+            <label class="form-label extra-small-font-size">Start/Stop Date:</label>
+            <input type="date" class="form-text-input date-input extra-small-font-size" id="start-date" (change)="onStartDateChanged()" formControlName="filterStartDate" />
+            <input type="date" class="form-text-input date-input extra-small-font-size" id="stop-date" (change)="onStopDateChanged()" formControlName="filterStopDate" />
+          </div>
+          <button type="submit" class="form-button submit rect hover-el">Filter</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="main-chart-container">
+      <div class="p5Canvas-column-div">
+          <div id="p5ServiceAvailabilityCanvas" class="p5Canvas-div"></div>
+      </div>
+      <!-- Chart-sidebar -->
+      <section class="chart-sidebar-container">
+        <!-- Date Title -->
+        @if (isWeekly) {
+        <h5 class="chart-sidebar-title">WEEKLY</h5>
+        }
+        @else {
+        <h5 class="chart-sidebar-title">DAILY</h5>
+        }
+
+        <!-- Chart Buttons -->
+        <div>
+          <h2 class="chart-buttons-title">CHART</h2>
+          <div class="chart-sidebar-inner-container">
+            <button class="chart-sidebar-button hover-el" (click)="chartChangeTo('Bar Chart')">Bar Chart</button>
+            <button class="chart-sidebar-button hover-el" (click)="chartChangeTo('Calendar Chart')">Calendar Chart</button>
+          </div>
+        </div>
+        <div class="chart-sidebar-inner-container">
+          <button class="chart-sidebar-button reset-zoom hover-el" (click)="onResetZoomClicked()">Reset Zoom</button>
+        </div>
+
+          <!-- Legend -->
+        <div id="legend-container" class="">
+          <h2 class="legend-buttons-title">LEGEND</h2>
+
+          <div class="chart-sidebar-inner-container">
+            <div class="chart-sidebar-legend-container">
+              <ng-template ngFor let-color [ngForOf]="availabilityColors" let-i="index">
+                @if (i>0) {
+                <div class="color-threshold-div"
+                    [ngStyle]="{'background-color': availabilityColors[availabilityColors.length-1-i].color}">
+                    &gt;@if(i==availabilityColors.length - 1){<span>=</span>}
+                    {{availabilityColors[availabilityColors.length-1-i].threshold}}% &lt;=
+                    {{availabilityColors[availabilityColors.length-i].threshold}}%
+                </div>
+                }
+              </ng-template>
+            </div>
+
+            <div class="color-threshold-div average-legend">
+              @if (averageServiceAvailability >= 0) {
+              <span [ngStyle]="{'background-color': averageColor}">Average:
+                  {{averageServiceAvailability.toFixed(2)}}%</span>
+              }
+              @else {
+              <span [ngStyle]="{'background-color': averageColor}">Average: ---</span>
+              }
+            </div>
+          </div>
+        </div>
+        <!-- Buttons and info -->
+        @if (isWeekly == true && firstDailySubmitted) {
+        <button class="chart-back-button-info hover-el" id="back-to-daily-button"
+            (click)="onBackToDailyClicked()">Back to daily</button>
+        }
+        @else if (isWeekly == false && firstWeeklySubmitted) {
+        <button class="chart-back-button-info hover-el" id="back-to-weekly-button"
+            (click)="onBackToWeeklyClicked()">Back to weekly</button>
+        }
+        @if (isWeekly == true && firstWeeklySubmitted && chartType == selectorText[0]) {
+        <h6 class="chart-hint" style="text-align: center;">Click on a bar to show the days of that week</h6>
+        }
+        @else if(isWeekly == true && firstWeeklySubmitted && chartType == selectorText[1]) {
+        <h6 class="chart-hint" style="text-align: center;">Click on a section to show the days of that week</h6>
+        }
+      </section>
+    </div>
+  </div>
+
+  <!-- Data Table -->
+  <div class="data-table-main-container hidden">
+      <div class="data-table-header-container">
+          <span>Data table</span>
+          <div class="export-div">
+              <label>Click to export data in csv format</label>
+              <button class="export-button hover-el" (click)="saveAsCSV()">Export</button>
+          </div>
+      </div>
+      <div class="data-table-inner-container">
+          <div class="table-div">
+              <table id="data-table">
+                  <!-- Weekly Availability -->
+                  <thead *ngIf="isWeekly == true">
+                      <th style="color: white">{{localCentre.name}}</th>
+                      <ng-template ngFor let-availability [ngForOf]="requestedServiceAvailabilityList" let-i="index">
+                          <th style="padding: 0 0.5rem; white-space: pre;">
+                              <div
+                                  *ngIf="availability.date < startDate || getWeekEndDateText(availability.date) > stopDate">
+                                  Partial Week ({{getWeekNumber(availability.date)}}) </div>
+                              <div
+                                  *ngIf="availability.date >= startDate && getWeekEndDateText(availability.date) <= stopDate">
+                                  Week ({{getWeekNumber(availability.date)}}) </div>
+                              <div>from: {{availability.date < startDate ? startDate : availability.date}} </div>
+                                      <div>to: {{getWeekEndDateText(availability.date) > stopDate ? stopDate :
+                                          getWeekEndDateText(availability.date)}}</div>
+                          </th>
+                      </ng-template>
+                  </thead>
+
+                  <!-- Daily Availability -->
+                  <thead *ngIf="isWeekly == false">
+                      <th style="color: white">{{localCentre.name}}</th>
+                      <ng-template ngFor let-availability [ngForOf]="requestedServiceAvailabilityList" let-i="index">
+                          <th style="padding: 0 0.5rem;">{{availability.date}}</th>
+                      </ng-template>
+                  </thead>
+
+                  <!-- Data -->
+                  <tr>
+                      <td>TotalRequests</td>
+                      <ng-template ngFor let-availability [ngForOf]="requestedServiceAvailabilityList" let-i="index">
+                          <td *ngIf="availability.percentage == -1" class="nan">NaN</td>
+                          <td *ngIf="availability.percentage != -1">
+                              {{availability.totalRequests}}</td>
+                      </ng-template>
+                  </tr>
+                  <tr>
+                      <td class="first-column">SuccessResponses</td>
+                      <ng-template ngFor let-availability [ngForOf]="requestedServiceAvailabilityList" let-i="index">
+                          <td *ngIf="availability.percentage == -1" class="nan">NaN</td>
+                          <td *ngIf="availability.percentage != -1">
+                              {{availability.successResponses}}</td>
+                      </ng-template>
+                  </tr>
+                  <tr>
+                      <td>Availability</td>
+                      <ng-template ngFor let-availability [ngForOf]="requestedServiceAvailabilityList" let-i="index">
+                          <td *ngIf="availability.percentage == -1" class="nan">NaN</td>
+                          <td *ngIf="availability.percentage == 0"
+                              [ngStyle]="{'background-color': getAvailabilityHexColorFromPerc(availability.percentage)}">{{availability.percentage.toFixed(2)}}%</td>
+                          <td *ngIf="availability.percentage > 0"
+                              [ngStyle]="{'background-color': getAvailabilityHexColorFromPerc(availability.percentage)}"
+                              style="color: #000;">{{availability.percentage.toFixed(2)}}%</td>
+                      </ng-template>
+                  </tr>
+              </table>
+          </div>
+      </div>
+      <div class="data-table-arrow-container data-table-up-arrow-container" (click)="onDataTableShow()">
+        <svg class="svg-icon data-table-up-arrow">
+          <use href="assets/icons/dafne_symbols.svg#icon-up-arrow" />
+        </svg>
+      </div>
+      <div class="data-table-arrow-container data-table-down-arrow-container hidden" (click)="onDataTableHide()">
+        <svg class="svg-icon data-table-down-arrow">
+          <use href="assets/icons/dafne_symbols.svg#icon-down-arrow" />
+        </svg>
+      </div>
+  </div>
+</div>

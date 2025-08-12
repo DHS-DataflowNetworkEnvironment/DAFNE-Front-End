@@ -1,15 +1,23 @@
-<div class="header row">
-      <img class="dafne-logo" src="assets/images/Logo_DAFNE_white.png" alt="DAFNE Logo">
-      <span>Dataflow Network Environment</span>
-      <i class="home-icon fa fa-home ml-auto" aria-hidden="true"></i>
-      <i class="account-icon" data-bs-toggle="dropdown" (click)="checkUserAuthenticated()">A</i>
-      <ul class="dropdown-menu" id="dropdown-menu" aria-labelledby="account-dropdown-button" >
-            <li id="centres-link"><a class="dropdown-item" routerLink="edit-centres" [skipLocationChange]="true" >Centres</a></li>
-            <li id="services-link"><a class="dropdown-item" routerLink="edit-services" [skipLocationChange]="true" >Services</a></li>
-            <li id="synchronizers-link"><a class="dropdown-item" routerLink="edit-synchronizers" [skipLocationChange]="true" >Synchronizers</a></li>
-            <li id="completeness-link"><a class="dropdown-item" [routerLink]="['/gui', { outlets: { centralBodyRouter: ['completeness-component']}}]" [skipLocationChange]="true">Completeness</a></li>
-            <li id="services-availability-link"><a class="dropdown-item" [routerLink]="['/gui', { outlets: { centralBodyRouter: ['service-availability']}}]" [skipLocationChange]="true" >Service Availability</a></li>
-            <li id="publication-latency-link"><a class="dropdown-item" [routerLink]="['/gui', { outlets: { centralBodyRouter: ['publication-latency-component']}}]" [skipLocationChange]="true">Publication Latency</a></li>
-            <li><a class="dropdown-item" (click)="logout()">Logout</a></li>
-      </ul>
+<div id="header-container">
+  <div id="header-left-div">
+    <img id="dafne-logo" src="assets/images/Logo_DAFNE_white.png" alt="DAFNE Logo">
+    <h4 id="header-title">Dataflow Network Environment</h4>
+  </div>
+  <div id="header-right-div">
+    <div class="header-icon-container" title="Home">
+      <svg class="svg-icon hover-el" (click)="onHomeClicked()"><use href="assets/icons/dafne_symbols.svg#icon-home"/></svg>
+    </div>
+    <div class="header-icon-container" title="Menu">
+      <svg class="svg-icon hover-el" id="header-menu-button" (click)="onMenuClicked()" (mouseover)="onMenuHover()" (mouseleave)="setHideMenuTimeout()"><use href="assets/icons/dafne_symbols.svg#icon-menu"/></svg>
+    </div>    
+  </div>
+</div>
+<div class="dropdown-menu hidden" (mouseover)="onMenuHover()" (mouseleave)="setHideMenuTimeout()">
+  <button class="menu-item hover-el" (click)="hideDropdown()" [routerLink]="['/gui', { outlets: { centralBodyRouter: ['edit-centres']}}]" [skipLocationChange]="true">Centres</button>
+  <button class="menu-item hover-el" (click)="hideDropdown()" [routerLink]="['/gui', { outlets: { centralBodyRouter: ['edit-services']}}]" [skipLocationChange]="true">Services</button>
+  <button class="menu-item" (click)="hideDropdown()" [routerLink]="['/gui', { outlets: { centralBodyRouter: ['edit-synchronizers']}}]" [skipLocationChange]="true" disabled>Synchronizers</button>
+  <button class="menu-item hover-el" (click)="hideDropdown()" [routerLink]="['/gui', { outlets: { centralBodyRouter: ['completeness']}}]" [skipLocationChange]="true">Completeness</button>
+  <button class="menu-item hover-el" (click)="hideDropdown()" [routerLink]="['/gui', { outlets: { centralBodyRouter: ['service-availability']}}]" [skipLocationChange]="true">Service availability</button>
+  <button class="menu-item" (click)="hideDropdown()" [routerLink]="['/gui', { outlets: { centralBodyRouter: ['publication-timeliness']}}]" [skipLocationChange]="true" disabled>Publication timeliness</button>
+  <button class="menu-item hover-el" (click)="logout()">Logout</button>
 </div>

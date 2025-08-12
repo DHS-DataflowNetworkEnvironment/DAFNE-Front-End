@@ -1,0 +1,773 @@
+@use 'vars' as *;
+@use "sass:color";
+
+html, body {
+  background-color: black;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  font-family: "NotesESA-Reg", Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  font-weight: 100;
+  color: $main-text-color;
+}
+p, button, input, span, div, a, ul {
+  margin: 0;
+  padding: 0;
+  font-family: "NotesESA-Reg", Arial, Helvetica, sans-serif;
+}
+hr {
+  border-color: $main-text-color;
+}
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+/* Works on Firefox and should work also on Chrome, Edge and Opera. Not on Safari */
+* {
+  scrollbar-color: $main-buttons-bg-color $scrollbar-bg-color;
+}
+/* Works on Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 12px;
+}
+
+*::-webkit-scrollbar-track {
+  background: $scrollbar-bg-color;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: $main-buttons-bg-color;
+  border-radius: 20px;
+  border: 3px solid $scrollbar-bg-color;
+}
+
+/* General classes */
+.hover-el:hover {
+  opacity: 0.7 !important;
+  transition: opacity 250ms ease-in-out;
+  cursor: pointer;
+}
+.hover-el:active {
+  color: $button-active-color !important;
+}
+.selected {
+  color: $checked-color !important;
+}
+.svg-icon{
+  width: 2rem;
+  height: 2rem;
+  color: $main-text-color;
+}
+.icon-warning {
+  width: 2.5rem;
+  height: 2.5rem;
+  color: $warning-color;
+}
+.icon-warning-title {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: $warning-color;
+}
+
+/* Table classes */
+.edit-title-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2rem 0;
+}
+.edit-table-title {
+  font-size: 2rem;
+}
+.edit-add-button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.25rem 0 1.5rem;
+  gap: 1rem;
+  height: 2.4rem;
+  background-color: $checked-color;
+  color: $main-buttons-text-color;
+  border-radius: 1.2rem;
+  border-width: 0;
+  font-size: $secondary-title-font-size;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th {
+  background-color: $table-header-bg-color;
+  font-size: $main-font-size;
+  padding: 0.25rem 0;
+  height: 1.75rem;
+  white-space: nowrap;
+}
+tr {
+  background-color: $table-cell-color;
+  font-size: $small-font-size;
+  padding: 0.1rem 0;
+  height: 1.5rem !important;
+}
+table, th, td {
+  border: 1px solid $table-border-color;
+  text-align: center;
+  font-family: "NotesESA-Reg", Arial, Helvetica, sans-serif;
+}
+.cell-color {
+  position: relative;
+}
+.color-rect {
+  width: 1rem;
+  height: 1rem;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -0.5rem;
+  margin-left: -0.5rem;
+}
+
+.cell-actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-evenly;
+}
+.action-icon-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+.icon-edit, .icon-delete {
+  width: 1.0rem;
+  height: 1.0rem;
+  cursor: pointer !important;
+}
+.icon-edit {
+  color: $warning-color;
+}
+.icon-delete {
+  color: $error-color;
+}
+.plus-icon {
+  color: $main-buttons-text-color;
+}
+.eye-icon-container {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.25rem;
+}
+.eye-icon {
+  width: 1.2rem;
+  height: 1.2rem;
+  cursor: pointer !important;
+}
+.nd-cell {
+  color: $nd-color;
+}
+
+/* Main pages container */
+.main-parent-view-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+}
+.main-page-title {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 2rem;
+  min-height: 2rem;
+  background-color: $title-bg-color;
+  align-items: center;
+  padding: 0 0.5rem;
+  font-size: $secondary-title-font-size;
+}
+.multi-admin-warning-message {
+  position: absolute;
+  top: 0.25rem;
+  right: 1rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  font-size: $main-font-size;
+}
+.multi-admin-warning-message.hidden {
+  display: none;
+}
+.main-page-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  flex-grow: 1;
+  background-color: $main-bg-color;
+  overflow-y: hidden;
+}
+.main-page-inner-container {
+  padding: 0 2rem;
+}
+
+/* Modal classes */
+.modal {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: #0005;
+  transition: 
+    background-color 250ms ease-in,
+    visibility 0ms linear 0ms;
+  
+  z-index: 999;
+}
+.modal.hidden {
+  background-color: #0000;
+  visibility: hidden;
+  transition: 
+    background-color 250ms ease-in,
+    visibility 10ms linear 250ms
+}
+.modal.hidden > .modal-container {
+  margin-bottom: 200px;
+  opacity: 0;
+}
+.modal-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 0px;
+  opacity: 1.0;
+  min-width: 18rem;
+  min-height: 12rem;
+  border-radius: 0.5rem;
+  background-color: $modal-bg-color;
+  box-shadow: 0px 0px 100px 0px rgba(0, 0, 0, 1.0);
+
+  transition: 
+    margin-bottom 250ms ease-in,
+    opacity 250ms ease-in;
+}
+.modal-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 0 2rem;
+  width: 100%;
+  height: 4rem;
+  font-size: $secondary-title-font-size;
+}
+.modal-hr {
+  width: 100%;
+  margin: 0;
+}
+.modal-body {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 2rem;
+  gap: 1rem;
+}
+.modal-body form{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-start;
+  width: 100%;
+  gap: 1rem;
+}
+
+
+.form-input-group-div {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 1rem;
+  width: 100%;
+}
+.form-input-div {
+  position: relative;
+  display: flex;
+  width: 100%;
+  font-size: $main-font-size;
+}
+.form-input-div.row {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+.form-input-div.row-left {
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: flex-start;
+  gap: 1rem;
+}
+.form-input-div.column {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0.5rem;
+}
+.password-input-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  position: relative;
+}
+.form-text-input {
+  background-color: $text-input-bg-color !important;
+  border-color: $text-input-bg-color;
+  color: $main-text-color;
+  width: 14rem;
+  height: 2rem;
+  border-radius: 0.25rem;
+  border-style: none;
+  font-size: $main-font-size !important;
+  cursor: text !important;
+  padding: 0 0.5rem;
+  text-align: left;
+}
+.form-text-input.right {
+  text-align: right;
+}
+.form-text-input.full-width {
+  width: 100%;
+}
+.form-text-input.shrink {
+  width: auto;
+}
+.form-text-input:disabled {
+  color: $nd-color;
+  cursor: default !important;
+}
+.form-text-input:autofill {
+  transition:
+    background-color 9999999s step-end,
+    background-image 9999999s step-end allow-discrete,
+    color 9999999s step-end;
+}
+.form-text-input::-webkit-outer-spin-button, .form-text-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(0.5);
+  cursor: pointer;
+}
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  filter: invert(1) brightness(0.7);
+}
+
+input[type="date"]::-webkit-datetime-edit-year-field {
+  color: inherit;
+}
+
+select.form-text-input {
+  cursor: pointer !important;
+}
+.form-text-input.date-input {
+  width: auto;
+}
+.form-color-div {
+  position: relative;
+}
+.form-color-selector-label {
+  position: absolute;
+  top: 0;
+  width: 2rem;
+  height: 2rem;
+  cursor: pointer;
+}
+.form-color-selector {
+  visibility: hidden;
+}
+.form-button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1.5rem;
+  gap: 1rem;
+  height: 2.4rem;
+  color: $main-buttons-text-color;
+  border-radius: 1.2rem;
+  border-width: 0;
+  font-size: $main-font-size;
+}
+.form-button.close {
+  background-color: $main-buttons-bg-color;
+}
+.form-button.submit {
+  background-color: $checked-color;
+}
+.form-button.rect {
+  height: 2.0rem;
+  border-radius: 0.25rem;
+}
+.form-checkbox {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  appearance: none;
+  background-color: $text-input-bg-color !important;
+  border-radius: 0.25rem;
+  border-style: none;
+  width: 2rem;
+  height: 2rem;
+  cursor: pointer;
+}
+.form-checkbox:checked:after {
+  content: '\2714';
+  color: $checked-color;
+  font-size: 2rem;
+}
+
+.form-text-input + small {
+  opacity: 0;
+  height: 0;
+  transition: opacity .4s ease-out;
+}
+.form-text-input.ng-invalid.ng-touched + small {
+  opacity: 1;
+  height: auto;
+  margin: 0.25rem 0 0 0.5rem;
+  transition: opacity .4s ease-out;
+}
+.validation-message {
+  color: $error-color;
+}
+.extra-small-font-size {
+  font-size: $extra-small-font-size !important;
+}
+
+/* Metrics pages */
+.filters-form {
+  position: absolute;
+  top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: $windows-bg-color;
+  border-radius: 0.25rem;
+  padding: 0.5rem 1rem;
+  font-size: $extra-small-font-size;
+  box-shadow: $main-shadow;
+}
+.filters-form .form-label {
+  white-space: nowrap;
+}
+
+/* Chart pages */
+.filters-form-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+.filter-outer-div {
+  gap: 2rem;
+}
+.filter-inner-div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  gap: 0.5rem;
+  font-size: $small-font-size;
+}
+
+.filter-inner-div.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+.main-chart-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* chart style */
+.chart-sidebar-title {
+  border-radius: 5px;
+  height: 1.5rem;
+  color: black;
+  line-height: 1.5rem;
+  background-color: $chart-timing-bg-color;
+  text-align: center;
+  font-size: $small-font-size;
+  margin: 0;
+}
+
+/* CHART */
+.p5Canvas-column-div {
+  flex-grow: 1;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  width: calc(100vw + $sidebar-width-pad - 10rem - 2rem);
+  height: 100%;
+}
+.p5Canvas-div {
+  width: 100%;
+  height: 100%;
+}
+
+/* Centres List */
+.centre-list-container {
+  position: absolute;
+  left: 1rem;
+  top: 4rem;
+  display: flex;
+  flex-direction: column;
+  background-color: #0008;
+  border: 1px solid black;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  width: 9rem;
+  overflow-y: auto;
+
+  gap: 1rem;
+}
+.centre-list {
+  list-style-type: none;
+}
+.centre-title {
+  color: $main-text-color;
+  font-size: $small-font-size;
+  border-bottom: 1px solid $main-text-color;
+  margin-bottom: 0.5rem;
+}
+.centre-name {
+  font-size: $small-font-size;
+}
+
+/* Selectors */
+.chart-sidebar-container {
+  position: absolute;
+  right: 1rem;
+  top: 4rem;
+  display: flex;
+  flex-direction: column;
+  background-color: #0008;
+  border: 1px solid black;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  width: 9rem;
+  overflow-y: auto;
+  gap: 1rem;
+}
+.chart-sidebar-inner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  border: 1px solid $table-border-color;
+  width: 100%;
+  padding: 0.25rem;
+  border-radius: 5px;
+  gap: 0.5rem;
+}
+.chart-sidebar-legend-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+}
+.chart-sidebar-button {
+  width: 100%;
+  background-color: $main-buttons-bg-color;
+  color: $main-buttons-text-color;
+  font-size: $small-font-size;
+  border-width: 0;
+  border-radius: 5px;
+  line-height: 1.5rem;
+}
+.chart-sidebar-button.reset-zoom {
+  background-color: color.adjust($main-buttons-bg-color, $lightness: -15%);
+}
+
+/* Legend */
+.chart-buttons-title, .legend-buttons-title {
+  font-size: $main-font-size;
+  text-align: center;
+  margin: 0;
+}
+
+/* Data Table */
+.data-table-main-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  margin-top: 0.5rem;
+  transition: margin 250ms ease-in-out;
+}
+.data-table-main-container.hidden {
+  margin-bottom: -3.5rem;
+}
+.data-table-main-container.hidden .data-table-inner-container {
+  height: 1rem;
+  max-height: 1rem;
+  min-height: 1rem;
+}
+.data-table-header-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  background-color: $title-bg-color;
+  width: 100%;
+  height: 2rem;
+  min-height: 2rem;
+  padding: 0 0.5rem;
+  font-size: $secondary-title-font-size;
+}
+.data-table-header-container label {
+  font-size: $small-font-size;
+}
+.export-div {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  line-height: 1.5rem;
+  gap: 1rem;
+}
+.export-button {
+  background-color: $main-buttons-bg-color;
+  color: $main-buttons-text-color;
+  font-size: $small-font-size;
+  border-width: 0;
+  border-radius: 5px;
+  line-height: 1.5rem;
+  margin-right: 1rem;
+  padding: 0rem 0.75rem;
+}
+.data-table-inner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  flex-grow: 1;
+  width: 100%;
+  padding: 0.5rem;
+  background-color: $main-bg-color;
+  border: none;
+  font-size: $extra-small-font-size;
+  border-width: 1px;
+  color: $main-text-color;
+  min-height: $chart-table-height;
+  height: $chart-table-height;
+  max-height: $chart-table-height;
+  gap: 0.25rem;
+
+  transition: height 250ms ease-in-out, min-height 250ms ease-in-out, max-height 250ms ease-in-out;
+}
+.table-div {
+  width: 100%;
+  overflow-x: auto;
+}
+.table-div th {
+  font-size: $small-font-size;
+}
+.table-div td:first-child, .table-div th:first-child{
+  padding: 0 0.5rem;
+}
+.table-div td:first-child {
+  padding: 0 0.5rem;
+  background-color: color.adjust($table-cell-color, $lightness: 5%);
+}
+.table-div th:first-child{
+  padding: 0 0.5rem;
+  background-color: color.adjust($table-cell-color, $lightness: -8%);
+}
+.table-div td.nan {
+  color: $nd-color;
+}
+.table-div .na {
+  color: $nd-color;
+}
+
+/* Arrow container */
+.data-table-arrow-container {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 0.25rem;
+  background-color: $main-bg-color;
+  box-shadow: 0px -7px 7px 0px rgba(0,0,0,0.5);
+  border-radius: 0.25rem 0.25rem 0 0;
+  width: 3rem;
+  height: 1.5rem;
+  top: -1.5rem;
+  z-index: 0;
+}
+.data-table-arrow-container .svg-icon {
+  transition: opacity 250ms ease-in-out;
+}
+.data-table-arrow-container:hover > .svg-icon {
+  opacity: 0.7;
+}
+.data-table-arrow-container:active > .svg-icon {
+  opacity: 0.5;
+}
+.data-table-up-arrow {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+}
+.data-table-down-arrow {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+}
+.data-table-arrow-container.hidden {
+  display: none;
+}
+
+
+@font-face {
+  font-family: "NotesESA-Reg";
+  src: local("NotesESA-Reg"), url(assets/fonts/NotesESA/NotesEsaReg.otf) format("opentype");
+}
+@font-face {
+  font-family: "NotesESA-Bol";
+  src: local("NotesESA-Bol"), url(assets/fonts/NotesESA/NotesEsaBol.otf) format("opentype");
+}

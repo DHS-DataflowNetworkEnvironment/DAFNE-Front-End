@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+
 import { EditCentresComponent } from './edit-centres.component';
 
 describe('EditCentresComponent', () => {
@@ -7,12 +8,10 @@ describe('EditCentresComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ EditCentresComponent ]
+      imports: [EditCentresComponent]
     })
     .compileComponents();
-  });
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(EditCentresComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

@@ -1,52 +1,58 @@
-import { Component, ElementRef, AfterViewInit } from '@angular/core';
-import { AuthenticationService } from '../services/authentication.service';
-import { Router } from '@angular/router';
-
-declare var $: any;
+import { Component, OnInit } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
+import { AuthenticationService } from 'src/app/services/authentication.service';
 
 @Component({
   selector: 'app-header',
+  imports: [RouterModule],
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.css']
+  styleUrl: './header.component.scss'
 })
-export class HeaderComponent implements AfterViewInit {
+export class HeaderComponent implements OnInit {
   public isAuthenticated = false;
+  private menuHideTimeout: number = 1000;
+  private menuHideTimeoutId: any;
+  private menuButton: any;
+  private dropdownMenu: any;
 
   constructor(
-    public authenticationService: AuthenticationService,
-    private elementRef: ElementRef,
+    private authenticationService: AuthenticationService,
     private router: Router
-  ) {  }
+  ) {}
 
-  ngAfterViewInit(): void {
-    this.elementRef.nativeElement.querySelector('.home-icon').addEventListener("click", this.navHome.bind(this));
+  ngOnInit(): void {
+    this.menuButton = <HTMLElement>document.querySelector('#header-menu-button')!;
+    this.dropdownMenu = <HTMLElement>document.querySelector('.dropdown-menu')!;
   }
-  /* Hide menu if not authenticated */
-  checkUserAuthenticated() {
-    if (this.authenticationService.isAuthenticated) {      
-      $(".dropdown-menu").css("visibility", "visible");
+
+  onMenuClicked() {
+    if (this.dropdownMenu.classList.contains('hidden')) {
+      this.dropdownMenu.classList.remove('hidden');
+      this.menuButton.classList.add('selected');
+      this.setHideMenuTimeout();
     } else {
-      $(".dropdown-menu").css("visibility", "hidden");
+      this.hideDropdown();
     }
   }
-
-  navHome(event) {
-    if (this.authenticationService.isAuthenticated) {
-      this.router.navigate(['/gui', { outlets: { centralBodyRouter: ['network-component', 'homeView']}}], { skipLocationChange: true });
-    }   
+  setHideMenuTimeout() {
+    clearTimeout(this.menuHideTimeoutId);
+    this.menuHideTimeoutId = setTimeout(() => {
+      this.hideDropdown();
+    }, this.menuHideTimeout);
   }
-
+  hideDropdown() {
+    this.dropdownMenu.classList.add('hidden');
+    this.menuButton.classList.remove('selected');
+  }
+  onMenuHover() {
+    clearTimeout(this.menuHideTimeoutId);
+  }
+  onHomeClicked() {
+    this.router.navigate(['/gui', { outlets: { centralBodyRouter: ['network-component', 'homeView']}}], { skipLocationChange: true });
+  }
   logout() {
-    this.authenticationService.logout().subscribe(
-      (res: object) => {
-        localStorage.removeItem('token');
-        this.authenticationService.isAuthenticated = false;
-        this.authenticationService.currentUser = null;
-        window.location.reload();
-      },
-      error => {
-        console.log(error);
-        console.log(error.status);
-      });
+    this.hideDropdown();
+    this.authenticationService.logout();
   }
 }
+

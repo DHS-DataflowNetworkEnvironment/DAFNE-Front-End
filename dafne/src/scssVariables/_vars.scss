@@ -1,0 +1,78 @@
+/* Custom properties */
+$scrollbar-bg-color: #29333c;
+$main-text-color: #aaadb6;
+$main-buttons-bg-color: #6a6d76;
+$main-buttons-text-color: white;
+$main-bg-color: #12222f;
+$modal-bg-color: #29333c;
+$title-bg-color: #29333c;
+$menu-bg-color: #29333c;
+$text-input-bg-color: #111111;
+$windows-bg-color: #1f2b37;
+$windows-title-color: #5f5f6f;
+$brighter-text-color: #aaaaaa;
+$table-header-bg-color: #000;
+$table-border-color: #6A6D76;
+$table-cell-color: #29333c;
+$list-bg-color: #222a35a0;
+$checked-color: #007bff;
+$chart-timing-bg-color: #ccff00;
+$button-active-color: #888888;
+$nd-color: #5f5f6f;
+$warning-color: #ffa039;
+$error-color: #ff001e;
+$spinner-color: #007bff;
+
+$title-font-size: 1.5rem;
+$secondary-title-font-size: 1.25rem;
+$main-font-size: 1.0rem;
+$small-font-size: 0.8rem;
+$extra-small-font-size: 0.7rem;
+$icon-size: 2rem;
+
+$sidebar-width: 17rem;
+$sidebar-width-pad: -17.5rem;
+$chart-table-height: 9.5rem;
+$chart-table-height-pad: -10.0rem;
+
+$main-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5);
+
+$spinner-radius: 1.2rem;
+$spinner-cos45: calc($spinner-radius * cos(45deg));
+$spinner-dot-radius: calc($spinner-radius / 2);
+
+:export {
+  scrollbarBgColor: $scrollbar-bg-color;
+  mainTextColor: $main-text-color;
+  mainButtons-bgColor: $main-buttons-bg-color;
+  mainButtons-textColor: $main-buttons-text-color;
+  mainBgColor: $main-bg-color;
+  modalBgColor: $modal-bg-color;
+  titleBgColor: $title-bg-color;
+  menuBgColor: $menu-bg-color;
+  textInputBgColor: $text-input-bg-color;
+  windowsBgColor: $windows-bg-color;
+  windowsTitleColor: $windows-title-color;
+  brighterTextColor: $brighter-text-color;
+  tableHeaderBgColor: $table-header-bg-color;
+  tableBorderColor: $table-border-color;
+  tableCellColor: $table-cell-color;
+  listBgColor: $list-bg-color;
+  checkedColor: $checked-color;
+  chartTimingBgColor: $chart-timing-bg-color;
+  buttonActiveColor: $button-active-color;
+  ndColor: $nd-color;
+  warningColor: $warning-color;
+  errorColor: $error-color;
+  spinnerColor: $spinner-color;
+  titleFontSize: $title-font-size;
+  secondaryTitleFontSize: $secondary-title-font-size;
+  mainFontSize: $main-font-size;
+  smallFontSize: $small-font-size;
+  extraSmallFontSize: $extra-small-font-size;
+  iconSize: $icon-size;
+  sidebarWidth: $sidebar-width;
+  sidebarWidthPad: $sidebar-width-pad;
+  chartTableHeight: $chart-table-height;
+  chartTableHeightPad: $chart-table-height-pad;
+}

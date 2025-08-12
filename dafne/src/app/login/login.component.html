@@ -1,23 +1,38 @@
-<div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title">DAFNE Login</h5>
-        </div>
-        <div class="modal-body">
-            <form [formGroup]="loginForm" autocomplete="on">
-                <div class="formInput">
-                    <label for="login_username" class="form-label mr-3">Username</label>
-                    <input type="text" class="form-control" id="login_username" formControlName="username">
-                </div>
-                <div class="formInput">
-                    <label for="login_password" class="form-label mr-3">Password</label>
-                    <input type="password" class="form-control" id="login_password" formControlName="password">
-                    <i class="fas fa-eye" id="toggleLoginPassword" (click)="toggleLoginPasswordVisibility()"></i>
-                </div>
-                <div class="formInput">
-                    <button type="submit" class="btn btn-primary" (click)="onLoginSubmit()" data-bs-dismiss="modal">Login</button>
-                </div>
-            </form>
-        </div>
+<div class="modal">
+  <div class="modal-container">
+    <div class="modal-header">
+      <h4>DAFNE Login</h4>
     </div>
+    <hr class="modal-hr">
+    <div class="modal-body">
+      <form [formGroup]="login_form" (ngSubmit)="onLoginSubmit()">
+        <div class="form-input-div row">
+          <label for="login_username" class="form-label">Username:</label>
+          <input type="text" class="form-text-input" id="login_username" formControlName="login_username" placeholder="username" required>
+        </div>
+        <div class="form-input-div row">
+          <label for="login_password" class="form-label">Password:</label>
+          @if (passwordIsVisible) {
+            <div class="password-input-container">
+              <input type="text" class="form-text-input" id="login_password" formControlName="login_password" placeholder="password" required>
+              <div class="eye-icon-container" title="Hide password">
+                <svg class="eye-icon hover-el" (click)="toggleLoginPasswordVisibility()"><use href="assets/icons/dafne_symbols.svg#icon-eye-hide"/></svg>
+              </div>
+            </div>
+          }
+          @else {
+            <div class="password-input-container">
+              <input type="password" class="form-text-input" id="login_password" formControlName="login_password" placeholder="password" required>
+              <div class="eye-icon-container" title="Show password">
+                <svg class="eye-icon hover-el" (click)="toggleLoginPasswordVisibility()"><use href="assets/icons/dafne_symbols.svg#icon-eye-show"/></svg>
+              </div>
+            </div>       
+          }
+        </div>
+        <div class="form-input-div row">
+          <button type="submit" class="form-button submit hover-el" [disabled]="!login_form.valid">LOGIN</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>

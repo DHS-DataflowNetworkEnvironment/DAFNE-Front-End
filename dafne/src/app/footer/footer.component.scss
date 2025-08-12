@@ -1,0 +1,33 @@
+@use 'vars' as *;
+
+#footer-inner-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  padding: 0 1rem;
+}
+#footer-left-side {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+}
+#footer-right-side {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+img {
+  height: 1.5rem;
+}
+#software-version {
+  margin-left: 1rem;
+}
+.footer-user-info {
+  font-size: $small-font-size;
+}

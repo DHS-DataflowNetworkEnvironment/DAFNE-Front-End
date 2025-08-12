@@ -1,15 +1,20 @@
-<div class="modal fade" id="portal-alert" tabindex="-1" aria-labelledby="portal-alert" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="title">{{alertTitle}}</h5>
-          </div>
-          <div class="modal-body">
-              <label id="message">{{alertMessage}}</label>
-              <div class="row">
-                  <button type="button" class="btn btn-primary ml-auto" data-bs-dismiss="modal">Ok</button>
+<!-- Delete Alert! -->
+<div class="modal hidden" id="alertModal" tabindex="-1">
+  <div class="modal-container">
+      <div class="modal-header">
+          <h4 class="modal-title alert-modal-title">{{alertTitle}}</h4>
+          <svg class="icon-warning"><use href="assets/icons/dafne_symbols.svg#icon-warning"/></svg>
+      </div>
+      <hr class="modal-hr">
+      <div class="modal-body">
+          <form id="alertForm">
+              <div class="form-input-div row-left">
+                  <label class="modal-message alert-modal-message">{{alertMessage}}</label>
               </div>
-          </div>
+              <div class="form-input-div row" >
+                  <button type="button" class="form-button submit rect hover-el" (click)="alertConfirmed($event)">OK</button>
+              </div>
+          </form>
       </div>
   </div>
 </div>

@@ -1,0 +1,32 @@
+@use 'vars' as *;
+
+/* Centres List */
+#target-id-list-container {
+  position: absolute;
+  left: 1rem;
+  top: 4rem;
+  display: flex;
+  flex-direction: column;
+  background-color: #0008;
+  border: 1px solid black;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  width: 9rem;
+  overflow-y: auto;
+}
+#target-id-local {
+  list-style-type:none;
+  margin: 0;
+  font-size: 0.75rem;
+}
+#target-id-list {
+  list-style-type:none;
+  margin: 0;
+  font-size: 0.75rem;
+}
+#target-id-local-title {
+  border-bottom: 1px solid #fff;
+}
+#target-id-remote-title {
+  border-bottom: 1px solid #fff;    
+}

@@ -1,0 +1,23 @@
+<div id="network-view-inner-container">
+  <div class="main-page-title">
+    <p>{{mapTitle}}</p>
+  </div>
+  <div id="network-view-content" class="main-page-content">
+
+  </div>
+  <div class="centre-list-container">
+    <ul class="centre-list">
+        <li class="centre-title">Local:</li>
+        @if (localCentre.name === '') {
+          <li class="centre-name nd-cell" >N/D</li>
+        }
+        @else {
+          <li class="centre-name" [ngStyle]="{'color': localCentre.color}">{{localCentre.name}}</li>
+        }
+    </ul>
+    <ul class="centre-list">
+      <li class="centre-title">Remotes:</li> 
+      <li class="centre-name" *ngFor="let item of remoteCentreList; let i = index;" [ngStyle]='{color: item.color}'>{{item.name}}</li>
+    </ul>
+  </div>
+</div>

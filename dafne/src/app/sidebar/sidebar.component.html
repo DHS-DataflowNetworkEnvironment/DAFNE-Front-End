@@ -1,10 +1,77 @@
-<div class="sidebar-title">Details</div>
-<div class="sidebar-content">
-    <app-centre></app-centre>
-    <app-archive-info></app-archive-info>
-    <app-data-source-info></app-data-source-info>
-    <app-dhs-connected></app-dhs-connected>
-    <app-dhs-completeness></app-dhs-completeness>
-    <app-serv-availability></app-serv-availability>
-    <app-pub-latency></app-pub-latency>
+<div id="sidebar-inner-container">
+  <div id="sidebar-title">Details</div>
+  <div id="sidebar-content">
+    <section class="sidebar-element-container">
+      <svg class="svg-icon"><use href="assets/icons/dafne_symbols.svg#icon-home"/></svg>
+      <div class="sidebar-element">
+        <div class="sidebar-element-title">Centre</div>
+        <div class="sidebar-element-body centered" [ngStyle]="{'color': localCentre.color}">
+          @if (localCentre && localCentre.name) { <p>{{localCentre.name}}</p> }
+        </div>
+      </div>
+    </section>
+    <section class="sidebar-element-container">
+      <svg class="svg-icon"><use href="assets/icons/dafne_symbols.svg#icon-archive-info"/></svg>
+      <div class="sidebar-element">
+        <div class="sidebar-element-title">Archive info</div>
+        <div class="sidebar-element-body">
+          <p class="sidebar-element-placeholder-text">Rolling policy</p>
+        </div>
+      </div>
+    </section>
+    <section class="sidebar-element-container disabled">
+      <svg class="svg-icon"><use href="assets/icons/dafne_symbols.svg#icon-data-source-info"/></svg>
+      <div class="sidebar-element">
+        <div class="sidebar-element-title-container">
+          <div class="sidebar-element-title">Data sources info</div>
+          <button class="sidebar-element-button hover-el">Show</button>
+        </div>
+        <div class="sidebar-element-body">
+          <p class="sidebar-element-placeholder-text">Active data sources</p>
+        </div>
+      </div>
+    </section>
+    <section class="sidebar-element-container disabled">
+      <svg class="svg-icon"><use href="assets/icons/dafne_symbols.svg#icon-dhs-connected"/></svg>
+      <div class="sidebar-element">
+        <div class="sidebar-element-title-container">
+          <div class="sidebar-element-title">DHS connected:<div class="sidebar-element-title-inset">0</div></div>
+          <button class="sidebar-element-button hover-el">Show</button>
+        </div>
+      </div>
+    </section>
+    <section class="sidebar-element-container">
+      <svg class="svg-icon"><use href="assets/icons/dafne_symbols.svg#icon-dhs-completeness"/></svg>
+      <div class="sidebar-element">
+        <div class="sidebar-element-title-container">
+          <div class="sidebar-element-title">DHS completeness</div>
+          <button class="sidebar-element-button hover-el" [routerLink]="['/gui', { outlets: { centralBodyRouter: ['completeness']}}]" [skipLocationChange]="true">Launch</button>
+        </div>
+      </div>
+    </section>
+    <section class="sidebar-element-container">
+      <svg class="svg-icon"><use href="assets/icons/dafne_symbols.svg#icon-service-availability"/></svg>
+      <div class="sidebar-element">
+        <div class="sidebar-element-title-container">
+          <div class="sidebar-element-title">Service availability</div>
+          <button class="sidebar-element-button hover-el" [routerLink]="['/gui', { outlets: { centralBodyRouter: ['service-availability']}}]" [skipLocationChange]="true">Launch</button>
+        </div>
+      </div>
+    </section>
+    <section class="sidebar-element-container disabled">
+      <svg class="svg-icon"><use href="assets/icons/dafne_symbols.svg#icon-publication-timeliness"/></svg>
+      <div class="sidebar-element">
+        <div class="sidebar-element-title-container">
+          <div class="sidebar-element-title">Publication timeliness</div>
+          <button class="sidebar-element-button hover-el">Launch</button>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div id="sidebar-left-arrow-container" class="sidebar-arrow-container" (click)="onSidebarHide()">
+    <svg class="svg-icon" id="sidebar-left-arrow"><use href="assets/icons/dafne_symbols.svg#icon-left-arrow"/></svg>
+  </div>
+  <div id="sidebar-right-arrow-container" class="sidebar-arrow-container hidden" (click)="onSidebarShow()">
+    <svg class="svg-icon" id="sidebar-right-arrow"><use href="assets/icons/dafne_symbols.svg#icon-right-arrow"/></svg>
+  </div>
 </div>

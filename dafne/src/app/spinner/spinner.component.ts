@@ -1,28 +1,24 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Injectable } from '@angular/core';
-declare var $: any;
 
 @Injectable({ providedIn: 'root' })
 @Component({
   selector: 'app-spinner',
+  imports: [],
   templateUrl: './spinner.component.html',
-  styleUrls: ['./spinner.component.scss']
+  styleUrl: './spinner.component.scss'
 })
-
-export class SpinnerComponent implements OnInit {
+export class SpinnerComponent {
   public whoCalledMe: any = [];  // To handle multiple HTTP calls
 
   constructor() {
     this.setOff();
   }
 
-  ngOnInit() {
-  }
-
   setOn(parent = '') {
     this.whoCalledMe.push(parent);
     if (document.getElementById('portal-spinner')) {
-      document.getElementById('portal-spinner').style.visibility = 'visible';
+      document.getElementById('portal-spinner')!.style.visibility = 'visible';
     }
   }
 
@@ -36,7 +32,7 @@ export class SpinnerComponent implements OnInit {
     // Disable only if whoCalledMe is empty -> No pending HTTP requests!
     if (this.whoCalledMe.length === 0) {
       if (document.getElementById('portal-spinner')) {
-        document.getElementById('portal-spinner').style.visibility = 'hidden';
+        document.getElementById('portal-spinner')!.style.visibility = 'hidden';
       }
     }
   }

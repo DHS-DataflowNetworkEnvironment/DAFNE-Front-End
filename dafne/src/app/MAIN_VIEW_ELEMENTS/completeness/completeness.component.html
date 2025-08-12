@@ -1,0 +1,196 @@
+<div class="main-parent-view-content">
+  <div class="main-page-title">Completeness</div>
+  <div class="main-page-content">
+    <div class="filters-form-container">
+
+      <form id="co-filters-form" class="filters-form" (ngSubmit)="onFilterSubmit()" [formGroup]="filterForm">
+        <div class="form-input-div row filter-outer-div">
+          <div class="filter-inner-div disabled">
+            <label for="sync-filter-checkbox" class="form-label extra-small-font-size">Use sync filters:</label>
+            <input type="checkbox" class="form-checkbox extra-small-font-size" id="sync-filter-checkbox"
+              name="sync-filter-checkbox" (change)="onUseFilterCheckboxChange()" formControlName="filterUseSync">
+          </div>
+
+          @if (useSyncFilter) {
+          <!-- Sync filter -->
+          <div>
+            <label class="form-label">Service Type:</label>
+            <select id="service-type-select" class="form-text-input" (change)="onServiceTypeChange($event)"
+              formControlName="filterServiceType">
+              <option [ngValue]="serviceType.service_type" *ngFor="let serviceType of serviceTypeList">
+                {{serviceType.service_type}}</option>
+            </select>
+          </div>
+          <div class="select-sync-div">
+            <label class="form-label">Synch:</label>
+            <select *ngIf="serviceTypeChoosen < 4" id="sync-select" class="form-text-input"
+              (change)="onSyncChange($event)" formControlName="filterSync">
+              <optgroup *ngIf="serviceTypeChoosen == 1" label="Single Instance">
+                <option [ngValue]="sync.Label" *ngFor="let sync of siSynchronizers" title="URL: {{sync.serviceUrl}}">
+                  {{sync.Label}}</option>
+              </optgroup>
+              <optgroup *ngIf="serviceTypeChoosen == 2" label="Front-End">
+                <option [ngValue]="sync.Label" *ngFor="let sync of feSynchronizers" title="URL: {{sync.serviceUrl}}">
+                  {{sync.Label}}</option>
+              </optgroup>
+              <optgroup *ngIf="serviceTypeChoosen == 3" label="Back-End">
+                <option [ngValue]="sync.Label" *ngFor="let sync of beSynchronizers" title="URL: {{sync.serviceUrl}}">
+                  {{sync.Label}}</option>
+              </optgroup>
+              <option *ngIf="canSubmit == false">NaN</option>
+            </select>
+            <select *ngIf="serviceTypeChoosen == 4" id="sync-select" class="form-text-input"
+              (change)="onSyncChange($event)" formControlName="filterSync">
+              <optgroup label="Single Instance">
+                <option [ngValue]="sync.Label" *ngFor="let sync of siSynchronizers" title="URL: {{sync.serviceUrl}}">
+                  {{sync.Label}}</option>
+              </optgroup>
+              <optgroup label="Front-End">
+                <option [ngValue]="sync.Label" *ngFor="let sync of feSynchronizers" title="URL: {{sync.serviceUrl}}">
+                  {{sync.Label}}</option>
+              </optgroup>
+              <optgroup label="Back-End">
+                <option [ngValue]="sync.Label" *ngFor="let sync of beSynchronizers" title="URL: {{sync.serviceUrl}}">
+                  {{sync.Label}}</option>
+              </optgroup>
+              <option *ngIf="canSubmit == false">NaN</option>
+            </select>
+          </div>
+          <div class="filter-string-div">
+            <label class="form-label">Filter:</label>
+            <input type="text" class="form-control" id="filter-string" placeholder="All product types"
+              title="{{tempFilter}}" onkeydown="return false" formControlName="filterTempFilter">
+          </div>
+          }
+          @else {
+          <!-- Manual filter -->
+          <div class="filter-inner-div">
+            <label class="form-label extra-small-font-size">Mission:</label>
+            <select class="form-text-input shrink extra-small-font-size" id="filter-mission" (change)="onMissionChange()" formControlName="filterMission">
+              <option *ngFor="let mission of totalMissionList; let i = index;" [ngValue]="mission.acronym">{{mission.acronym}}</option>
+            </select>
+          </div>
+          <div class="filter-inner-div">
+            <label class="form-label extra-small-font-size">Product Type:</label>
+            <select class="form-text-input shrink extra-small-font-size" id="filter-product-type" formControlName="filterProductType">
+              <option *ngFor="let productType of missionFiltered.productType" [ngValue]="productType">{{productType}}</option>
+            </select>
+          </div>
+          <div class="filter-inner-div">
+            <label class="form-label extra-small-font-size">Platform N.:</label>
+            <select class="form-text-input shrink extra-small-font-size" id="filter-platform" formControlName="filterPlatform">
+              <option *ngFor="let platform of missionFiltered.platform" [ngValue]="platform">{{platform}}</option>
+            </select>
+          </div>
+          }
+
+          <!-- Dates -->
+          <div class="filter-inner-div">
+            <label class="form-label extra-small-font-size">Start/Stop Date:</label>
+            <input type="date" class="form-text-input date-input extra-small-font-size" id="start-date" (change)="onStartDateChanged()" formControlName="filterStartDate" />
+            <input type="date" class="form-text-input date-input extra-small-font-size" id="stop-date" (change)="onStopDateChanged()" formControlName="filterStopDate" />
+          </div>
+          <button type="submit" class="form-button submit rect hover-el">Filter</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="main-chart-container">
+      <!-- Center list -->
+      <section class="centre-list-container">
+        <ul class="centre-list">
+          <li class="centre-title">Local:</li>
+        @if (serviceLocalCentre.name === undefined || serviceLocalCentre.name === '') {
+          <li class="centre-name nd-cell" >N/D</li>
+        }
+        @else {
+          <li class="centre-name" [ngStyle]="{'color': serviceLocalCentre.color}">{{serviceLocalCentre.name}}</li>
+        }
+        </ul>
+        <ul class="centre-list">
+          <li class="centre-title">Remotes:</li> 
+        @for (item of serviceRemoteCentreList; track item;) {
+          <li *ngIf="useSyncFilter == true" class="centre-name">
+            <span *ngIf="item.isCSC == true" style='color: #5f5f6f'>{{item.name}} - (N/A)</span>
+            <span *ngIf="item.isCSC == false" [ngStyle]='{color: item.color}'>{{item.name}}</span>
+          </li>
+          <li *ngIf="useSyncFilter == false || useSyncFilter == null" class="centre-name">
+            <span [ngStyle]='{color: item.color}'>{{item.name}}</span>
+          </li>
+        }
+        </ul>
+      </section>
+
+      <!-- Charts -->
+      <div class="p5Canvas-column-div">
+        <div id="p5ServiceAvailabilityCanvas" class="p5Canvas-div"></div>
+      </div>
+
+      <!-- Chart-sidebar -->
+      <section class="chart-sidebar-container">
+        <!-- Chart style Title -->
+        <h5 class="chart-sidebar-title">{{chartType}}</h5>
+        <!-- Chart Buttons -->
+        <div>
+          <h2 class="chart-buttons-title">CHART</h2>
+          <div class="chart-sidebar-inner-container">
+            <button class="chart-sidebar-button hover-el" (click)="chartChangeTo('Sunburst Single')">Sunburst Single</button>
+            <button class="chart-sidebar-button hover-el" (click)="chartChangeTo('Sunburst Stacked')">Sunburst Stacked</button>
+            <button class="chart-sidebar-button hover-el" (click)="chartChangeTo('Single Bars')">Single Bars</button>
+            <button class="chart-sidebar-button hover-el" (click)="chartChangeTo('Stacked Bars')">Stacked Bars</button>
+            <button class="chart-sidebar-button hover-el" (click)="chartChangeTo('Marimekko')">Marimekko</button>
+          </div>
+        </div>
+        <div class="chart-sidebar-inner-container">
+          <button class="chart-sidebar-button reset-zoom hover-el" (click)="onResetZoomClicked()">Reset Zoom</button>
+        </div>
+      </section>
+  </div>
+  </div>
+
+  <!-- Data Table -->
+  <div class="data-table-main-container hidden">
+    <div class="data-table-header-container">
+      <span>Data table</span>
+      <div class="export-div">
+        <label>Click to export data in csv format</label>
+        <button class="export-button hover-el" (click)="saveAsCSV()">Export</button>
+      </div>
+    </div>
+    <div class="data-table-inner-container">
+      <div class="table-div">
+        <table id="data-table">
+          <thead>
+            <th *ngIf="useSyncFilter == null" style="color: white">Filter:</th>
+            <th *ngIf="useSyncFilter == true && filter != null" style="color: white">Sync: {{choosenSync}} - Filter: {{filter}}</th>
+            <th *ngIf="useSyncFilter == true && filter == null" style="color: white">Sync: {{choosenSync}} - Filter: All product types</th>
+            <th *ngIf="useSyncFilter == false" style="color: white">Filter: {{missionName}} {{platformNumber}} ({{productType}})</th>
+            <th *ngFor="let column of completenessDataList" style="padding: 0 0.5rem;">{{column.date}}</th>
+          </thead>
+          <tr *ngFor="let centre of serviceAllCentreList; let i=index">
+            <td *ngIf="useSyncFilter == false || (useSyncFilter == true && centre.isCSC == false)" >
+              <div [ngStyle]="{'color': centre.color }">{{centre.name}}</div>
+            </td>
+            <td *ngIf="useSyncFilter == true && centre.isCSC == true" >
+              <div class="na">{{centre.name}} - (N/A)</div>
+            </td>
+            <td *ngFor="let data of completenessDataList">
+              <div *ngIf="useSyncFilter == false || (useSyncFilter == true && centre.isCSC == false)" [ngStyle]="{'color': data.values[i].value === -99 ? '#ff5555' : data.values[i].value === -1 ? '#5f5f6f' : centre.color }">{{(data.values[i].value === -1 ? "NaN" : data.values[i].value === -99 ? "Error" : data.values[i].value)}}</div>
+              <div *ngIf="useSyncFilter == true && centre.isCSC == true" class="na">(N/A)</div>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div class="data-table-arrow-container data-table-up-arrow-container" (click)="onDataTableShow()">
+      <svg class="svg-icon data-table-up-arrow">
+        <use href="assets/icons/dafne_symbols.svg#icon-up-arrow" />
+      </svg>
+    </div>
+    <div class="data-table-arrow-container data-table-down-arrow-container hidden" (click)="onDataTableHide()">
+      <svg class="svg-icon data-table-down-arrow">
+        <use href="assets/icons/dafne_symbols.svg#icon-down-arrow" />
+      </svg>
+    </div>
+  </div>
+</div>

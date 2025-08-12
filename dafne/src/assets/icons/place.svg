@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="254"
+   height="254"
+   viewBox="0 0 67.204165 67.204169"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   sodipodi:docname="place_new.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#909090"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="px"
+     showgrid="false"
+     units="px"
+     width="254px"
+     inkscape:zoom="2.5620932"
+     inkscape:cx="136.21675"
+     inkscape:cy="126.84941"
+     inkscape:window-width="1920"
+     inkscape:window-height="1011"
+     inkscape:window-x="0"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Livello 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g4348"
+       transform="translate(0,1.9772411)">
+      <path
+         id="path870"
+         style="fill:none;stroke:#ffffff;stroke-width:5.29167;stroke-linejoin:round;stroke-dashoffset:1.99999"
+         d="m 54.271292,23.315042 c 0,11.415289 -16.256956,37.285637 -20.669209,37.288808 -4.649171,0.0033 -20.669208,-25.873519 -20.669208,-37.288808 1e-6,-11.415288 9.25392,-20.6692074 20.669208,-20.669208 11.415289,0 20.669208,9.253919 20.669209,20.669208 z"
+         sodipodi:nodetypes="sssss" />
+      <path
+         id="path3515"
+         style="fill:none;stroke:#ffffff;stroke-width:5.29167;stroke-linejoin:round;stroke-dashoffset:1.99999"
+         d="m 41.22775,23.273502 c 0,4.21154 -3.414128,7.625667 -7.625667,7.625667 -4.21154,0 -7.625667,-3.414128 -7.625666,-7.625667 0,-4.211539 3.414127,-7.625666 7.625666,-7.625666 4.211539,0 7.625666,3.414127 7.625667,7.625666 z"
+         sodipodi:nodetypes="sssss" />
+    </g>
+  </g>
+</svg>

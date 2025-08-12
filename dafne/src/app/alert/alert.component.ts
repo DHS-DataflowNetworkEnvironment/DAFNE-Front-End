@@ -1,23 +1,18 @@
-import { Component, Injectable, OnInit } from '@angular/core';
-
-declare var $: any;
+import { Component, Injectable } from '@angular/core';
 
 @Component({
   selector: 'app-alert',
+  imports: [],
   templateUrl: './alert.component.html',
-  styleUrls: ['./alert.component.scss']
+  styleUrl: './alert.component.scss'
 })
 @Injectable({
     providedIn: 'root'
 })
-export class AlertComponent implements OnInit {
-
+export class AlertComponent {
   public alertTitle: string = 'Generic Error'
   public alertMessage: string = 'Alert!';
   constructor() { }
-
-  ngOnInit() {
-  }
 
   showInfoAlert (message: string) {
     //this.showAlert(message);
@@ -34,8 +29,13 @@ export class AlertComponent implements OnInit {
   showErrorAlert (title: string, message: string) {
     this.alertTitle = title;
     this.alertMessage = message;
-    document.getElementById('title').innerHTML = this.alertTitle;
-    document.getElementById('message').innerHTML = this.alertMessage;
-    $("#portal-alert").modal('show');
+    document.querySelector('.alert-modal-title')!.innerHTML = this.alertTitle;
+    document.querySelector('.alert-modal-message')!.innerHTML = this.alertMessage;
+    document.querySelector("#alertModal")!.classList.remove('hidden');
+  }
+
+  alertConfirmed(event: Event) {
+    document.querySelector("#alertModal")!.classList.add('hidden');
+    event.preventDefault();
   }
 }
