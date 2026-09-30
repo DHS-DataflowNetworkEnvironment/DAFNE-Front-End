@@ -1239,9 +1239,9 @@ export class CompletenessComponent implements OnInit {
         'DAFNE-Completeness_'
         + tempCompleteCsvMissionName
         + '_From('
-        + table.children[0].children[1].innerHTML
+        + table.children[0].children[1].textContent
         + ')_To('
-        + table.children[0].children[table.children[0].childElementCount - 1].innerHTML
+        + table.children[0].children[table.children[0].childElementCount - 1].textContent
         + ').csv', csvContent
       );
     }
