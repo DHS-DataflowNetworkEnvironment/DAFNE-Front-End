@@ -1,12 +1,14 @@
 import { Component, OnInit, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule, Validators, FormGroup, FormControl } from '@angular/forms';
-import { AuthenticationService } from 'src/app/services/authentication.service';
-import { MessageService } from 'src/app/services/message.service';
-import { AlertComponent } from 'src/app/alert/alert.component';
-import { Availability, Centre } from 'src/app/models/models';
-import { CsvDataService } from 'src/app/services/csv-data.service';
-import { ConfigService } from 'src/app/services/config.service';
+import { AuthenticationService } from '@app/services/authentication.service';
+import { MessageService } from '@app/services/message.service';
+//import { AlertComponent } from '@app/alert/alert.component';
+import { AlertService } from '@app/services/alert.service';
+import { Availability, Centre } from '@app/models/models';
+import { CsvDataService } from '@app/services/csv-data.service';
+import { ConfigService } from '@app/services/config.service';
+import { DateService } from '@app/services/date.service';
 import p5 from 'p5';
 
 const updateValidationAction: any = 'change';
@@ -46,7 +48,7 @@ export class ServiceAvailabilityComponent implements OnInit {
 
   private startDateInput: any;
   private stopDateInput: any;
-  
+
   public localCentre: Centre = {
     id: -1,
     name: "",
@@ -128,10 +130,12 @@ export class ServiceAvailabilityComponent implements OnInit {
   constructor(
     private authenticationService: AuthenticationService,
     private messageService: MessageService,
-    private alert: AlertComponent,
+    //private alert: AlertComponent,
+    private alert: AlertService,
     private el: ElementRef,
     private csvService: CsvDataService,
-    public configService: ConfigService
+    public configService: ConfigService,
+    private dateService: DateService
   ) {
     this.availabilityColors = this.configService.getConfig().availabilityColors;
   }
@@ -182,7 +186,7 @@ export class ServiceAvailabilityComponent implements OnInit {
             icon: '',
             description: ''
           };
-          this.alert.showErrorAlert("No local Centre is set", "Please setup one Centre as local");
+          this.alert.showAlert("No local Centre has been set", "Please setup one Centre as local");
         }
       },
       error: (error) => {
@@ -230,6 +234,7 @@ export class ServiceAvailabilityComponent implements OnInit {
 
   init_P5() {
     let canvas = document.getElementById("p5ServiceAvailabilityCanvas")!;
+    if (!canvas) return;
     let canvasSpace;
     let canvasWidth = canvas.clientWidth;
     let canvasHeight = canvas.clientHeight;
@@ -639,7 +644,7 @@ export class ServiceAvailabilityComponent implements OnInit {
               let dates: string[] = this.getYearMonthWeekDatesString(new Date(this.startDate).getFullYear(), this.requestedStartMonth + i, k)!;
               if (dates != null) {
 
-                let isPartialWeek = false;                
+                let isPartialWeek = false;
                 if (this.getWeekNumber(dates[0]) == this.getWeekNumber(this.requestedServiceAvailabilityList[0].date)) {
                   firstRequestedWeek = counterRequestedWeek;
                 }
@@ -775,23 +780,23 @@ export class ServiceAvailabilityComponent implements OnInit {
     if (this.askForWeekly == true) {
       tempMillisDate = (Date.parse(this.startDate) + this.millisPerMaxWindow);
       if (Date.parse(this.stopDate) > tempMillisDate) {
-        this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 90 days");
+        this.alert.showAlert("Check Date Range", "Please select a maximum range of 90 days");
         let tempDate = new Date(tempMillisDate);
         this.stopDate = tempDate.toISOString().slice(0, 10);
       }
       if (Date.parse(this.startDate) > Date.parse(this.stopDate)) {
-        this.alert.showErrorAlert("Check Date Range", "Start date cannot be later than stop date");
+        this.alert.showAlert("Check Date Range", "Start date cannot be later than stop date");
         this.stopDate = this.startDate;
       }
     } else {
       tempMillisDate = (Date.parse(this.startDate) + this.millisPerMaxPeriod);
       if (Date.parse(this.stopDate) > tempMillisDate) {
-        this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 31 days");
+        this.alert.showAlert("Check Date Range", "Please select a maximum range of 31 days");
         let tempDate = new Date(tempMillisDate);
         this.stopDate = tempDate.toISOString().slice(0, 10);
       }
       if (Date.parse(this.startDate) > Date.parse(this.stopDate)) {
-        this.alert.showErrorAlert("Check Date Range", "Start date cannot be later than stop date");
+        this.alert.showAlert("Check Date Range", "Start date cannot be later than stop date");
         this.stopDate = this.startDate;
       }
     }
@@ -806,24 +811,24 @@ export class ServiceAvailabilityComponent implements OnInit {
     if (this.askForWeekly == true) {
       let tempMillisDate = (Date.parse(this.stopDate) - this.millisPerMaxWindow);
       if (Date.parse(this.startDate) < tempMillisDate) {
-        this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 90 days");
+        this.alert.showAlert("Check Date Range", "Please select a maximum range of 90 days");
         let tempDate = new Date(tempMillisDate);
         this.startDate = tempDate.toISOString().slice(0, 10);
       }
       if (Date.parse(this.stopDate) < Date.parse(this.startDate)) {
-        this.alert.showErrorAlert("Check Date Range", "Stop date cannot be earlier than start date");
+        this.alert.showAlert("Check Date Range", "Stop date cannot be earlier than start date");
         this.startDate = this.stopDate;
       }
-      
+
     } else {
       let tempMillisDate = (Date.parse(this.stopDate) - this.millisPerMaxPeriod);
       if (Date.parse(this.startDate) < tempMillisDate) {
-        this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 31 days");
+        this.alert.showAlert("Check Date Range", "Please select a maximum range of 31 days");
         let tempDate = new Date(tempMillisDate);
         this.startDate = tempDate.toISOString().slice(0, 10);
       }
       if (Date.parse(this.stopDate) < Date.parse(this.startDate)) {
-        this.alert.showErrorAlert("Check Date Range", "Stop date cannot be earlier than start date");
+        this.alert.showAlert("Check Date Range", "Stop date cannot be earlier than start date");
         this.startDate = this.stopDate;
       }
     }
@@ -866,7 +871,7 @@ export class ServiceAvailabilityComponent implements OnInit {
 
   onFilterSubmit(): void {
     if (this.localCentre.id == -1) {
-      this.alert.showErrorAlert("No Local Centre Found", "Please check if a local centre has been configured");
+      this.alert.showAlert("No Local Centre Found", "Please check if a local centre has been configured");
       return;
     }
     this.startDate = this.filterForm.value.filterStartDate;
@@ -1024,7 +1029,7 @@ export class ServiceAvailabilityComponent implements OnInit {
             this.precDaily_averageServiceAvailability = this.averageServiceAvailability;
           }
           this.firstDailySubmitted = true;
-          
+
           this.onDataTableShow();
           this.checkWindowHeight();
         }
@@ -1091,6 +1096,10 @@ export class ServiceAvailabilityComponent implements OnInit {
   chartChangeTo(type: string) {
     this.chartType = type;
     this.doResetZoom = true;
+  }
+
+  onChartSidebarClick(event: Event) {
+    event.stopPropagation();
   }
 
   saveAsCSV() {
@@ -1214,18 +1223,6 @@ export class ServiceAvailabilityComponent implements OnInit {
   }
 
   getWeekNumber(date: string) {
-    // Copy date to not modify original
-    let d: Date = new Date(date);
-    // Set to nearest Thursday: current date + 4 - current day number
-    // Make Sunday's day number 7
-    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
-    //console.log("Date: "+d);
-    // Get first day of year
-    var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
-    // Calculate full weeks to nearest Thursday
-    var weekNo = Math.ceil(( ( (d.getTime() - yearStart.getTime()) / 86400000) + 1)/7);
-    // Return array of year and week number
-    //return [weekNo, d.getUTCFullYear()];
-    return weekNo;
+    return this.dateService.getWeekNumber(date);
   }
 }

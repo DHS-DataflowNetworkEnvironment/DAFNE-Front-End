@@ -12,8 +12,8 @@ export class ConfigService {
     private http: HttpClient
   ) {}
 
-  loadConfig() {
-    return firstValueFrom(
+  async loadConfig() {
+    const data = await firstValueFrom(
       this.http
         .get("assets/config/config.json")
         .pipe(
@@ -22,8 +22,8 @@ export class ConfigService {
             return of({});
           })
         )
-    )
-    .then((data) => this.config = data);
+    );
+    return this.config = data;
   }
 
   getConfig() {

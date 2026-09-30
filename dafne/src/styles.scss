@@ -11,10 +11,10 @@ html, body {
   font-weight: 100;
   color: $main-text-color;
 }
-p, button, input, span, div, a, ul {
+p, button, input, span, div, a, ul, option, select, select option {
   margin: 0;
   padding: 0;
-  font-family: "NotesESA-Reg", Arial, Helvetica, sans-serif;
+  font-family: "NotesESA-Reg", Arial, Helvetica, sans-serif !important;
 }
 hr {
   border-color: $main-text-color;
@@ -43,14 +43,32 @@ hr {
   border: 3px solid $scrollbar-bg-color;
 }
 
+/* style input[type=number] arrows  */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button
+{
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number]
+{
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 /* General classes */
 .hover-el:hover {
-  opacity: 0.7 !important;
+  opacity: 0.7;
   transition: opacity 250ms ease-in-out;
   cursor: pointer;
 }
 .hover-el:active {
-  color: $button-active-color !important;
+  color: $button-active-color;
+}
+.hover-el:disabled {
+  opacity: 1.0;
+  color: $main-text-color;
 }
 .selected {
   color: $checked-color !important;
@@ -58,6 +76,11 @@ hr {
 .svg-icon{
   width: 2rem;
   height: 2rem;
+  color: $main-text-color;
+}
+.svg-icon.report{
+  width: 1.25rem;
+  height: 1.25rem;
   color: $main-text-color;
 }
 .icon-warning {
@@ -77,10 +100,10 @@ hr {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: 2rem 0;
+  padding: 1rem 0;
 }
 .edit-table-title {
-  font-size: 2rem;
+  font-size: $title-font-size;
 }
 .edit-add-button {
   display: flex;
@@ -98,6 +121,7 @@ hr {
 }
 table {
   width: 100%;
+  height: 100%;
   border-collapse: collapse;
 }
 th {
@@ -105,6 +129,7 @@ th {
   font-size: $main-font-size;
   padding: 0.25rem 0;
   height: 1.75rem;
+  max-height: 1.75rem;
   white-space: nowrap;
 }
 tr {
@@ -112,8 +137,19 @@ tr {
   font-size: $small-font-size;
   padding: 0.1rem 0;
   height: 1.5rem !important;
+  max-height: 1.5rem !important;
 }
-table, th, td {
+tr:hover {
+  background-color: $table-cell-color-hover;
+}
+
+th {
+  border-left: 1px solid $table-border-color;
+  border-right: 1px solid $table-border-color;
+  text-align: center;
+  font-family: "NotesESA-Reg", Arial, Helvetica, sans-serif;
+}
+td {
   border: 1px solid $table-border-color;
   text-align: center;
   font-family: "NotesESA-Reg", Arial, Helvetica, sans-serif;
@@ -130,12 +166,33 @@ table, th, td {
   margin-top: -0.5rem;
   margin-left: -0.5rem;
 }
+.default-elements-table-container {
+  width: 100%;
+  height: 100%;
+  max-height: calc(100dvh - (2 * $header-height) - $title-div-height - $tabs-height - 8rem);
+  border: 1px solid $table-border-color;
+  overflow-y: auto;
+}
+.default-elements-table-container.datastores-page {
+  max-height: calc((100dvh - (2 * $header-height) - $title-div-height - $tabs-height - 8rem)/4);
+ }
+.table-header-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
 
+.col-actions {
+  width: 14rem;
+}
 .cell-actions {
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-evenly;
+  justify-content: center;
+  gap: 1.0rem;
+
+  width: 100%;
 }
 .action-icon-container {
   display: flex;
@@ -143,15 +200,63 @@ table, th, td {
   align-items: center;
   justify-content: center;
 }
-.icon-edit, .icon-delete {
+.action-icon-container > .disabled {
+  cursor: not-allowed !important;
+}
+.icon-edit, .icon-delete, .icon-report-delete, .icon-download, .icon-start, .icon-stop {
   width: 1.0rem;
   height: 1.0rem;
-  cursor: pointer !important;
+  cursor: pointer;
+}
+.icon-download {
+  color: #6fb3ef;
 }
 .icon-edit {
   color: $warning-color;
 }
 .icon-delete {
+  color: $error-color;
+}
+.icon-start {
+  color: #3b2;
+}
+.icon-start.disabled {
+  color: #585;
+  pointer-events: none;
+}
+.icon-stop {
+  color: #f53;
+}
+.icon-stop.disabled {
+  color: #755;
+  pointer-events: none;
+}
+.icon-eye {
+  width: 1.2rem;
+  height: 1.2rem;
+  cursor: pointer !important;
+  color: #acc;
+}
+.icon-cancel {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+.report-file-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.icon-report-delete-container {
+  display: flex;
+  align-items: center;
+}
+.icon-report-delete {
+  margin-right: 3rem;
+  transition: color 250ms ease-in-out;
+  color: $main-buttons-text-color;
+}
+.icon-report-delete:hover {
   color: $error-color;
 }
 .plus-icon {
@@ -177,7 +282,7 @@ table, th, td {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   width: 100%;
   height: 100%;
 }
@@ -187,8 +292,8 @@ table, th, td {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  height: 2rem;
-  min-height: 2rem;
+  height: $title-div-height;
+  min-height: $title-div-height;
   background-color: $title-bg-color;
   align-items: center;
   padding: 0 0.5rem;
@@ -214,10 +319,43 @@ table, th, td {
   height: 100%;
   flex-grow: 1;
   background-color: $main-bg-color;
-  overflow-y: hidden;
+  opacity: 0.0;
+  overflow: hidden;
 }
+.main-page-content.limited-height {
+  max-height: calc(100dvh - 2 * $header-height - 16px - $title-div-height - $tabs-height - 2rem);
+}
+.main-page-content.active {
+  animation-name: fade-in;
+  animation-duration: 250ms;
+  animation-fill-mode: forwards;
+}
+.main-page-content.fade-out {
+  animation-name: fade-out;
+  animation-duration: 250ms;
+  animation-fill-mode: forwards;
+}
+
+@keyframes fade-out {
+  0% {
+    opacity: 1.0;
+  }
+  100% {
+    opacity: 0.0;
+  }
+}
+@keyframes fade-in {
+  0% {
+    opacity: 0.0;
+  }
+  100% {
+    opacity: 1.0;
+  }
+}
+
 .main-page-inner-container {
   padding: 0 2rem;
+  overflow-x: hidden;
 }
 
 /* Modal classes */
@@ -232,16 +370,16 @@ table, th, td {
   top: 0;
   left: 0;
   background-color: #0005;
-  transition: 
+  transition:
     background-color 250ms ease-in,
     visibility 0ms linear 0ms;
-  
+
   z-index: 999;
 }
 .modal.hidden {
   background-color: #0000;
   visibility: hidden;
-  transition: 
+  transition:
     background-color 250ms ease-in,
     visibility 10ms linear 250ms
 }
@@ -250,6 +388,7 @@ table, th, td {
   opacity: 0;
 }
 .modal-container {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -258,13 +397,19 @@ table, th, td {
   opacity: 1.0;
   min-width: 18rem;
   min-height: 12rem;
+  max-height: calc(100dvh - 2 * $header-height - 1rem - $title-div-height);
   border-radius: 0.5rem;
   background-color: $modal-bg-color;
   box-shadow: 0px 0px 100px 0px rgba(0, 0, 0, 1.0);
 
-  transition: 
+  overflow-y: auto;
+
+  transition:
     margin-bottom 250ms ease-in,
     opacity 250ms ease-in;
+}
+.modal-container.ingester {
+  flex: 1 1 12rem;
 }
 .modal-header {
   display: flex;
@@ -284,11 +429,16 @@ table, th, td {
 .modal-body {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   width: 100%;
+  height: 100%;
   padding: 2rem;
   gap: 1rem;
+}
+.modal-body.ingester{
+  flex: 1 2 12rem;
+  min-height: 0;
 }
 .modal-body form{
   display: flex;
@@ -297,6 +447,202 @@ table, th, td {
   justify-content: flex-start;
   width: 100%;
   gap: 1rem;
+}
+
+.tab-content {
+  background-color: $main-bg-color;
+  width: 100%;
+  height: 100%;
+}
+[data-tab-content] {
+  display: none;
+  width: 100%;
+  height: 100%;
+}
+.active[data-tab-content] {
+  display: block;
+}
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  list-style-type: none;
+  width: 100%;
+  height: $tabs-height;
+  background-color: $main-bg-color;
+
+  margin: 0;
+  padding: 0 2rem 2rem 2rem;
+}
+.tab {
+  cursor: pointer;
+  padding: 0.5rem 2rem;
+  border-bottom: 2px solid $main-text-color-darker;
+  color: $main-text-color-darker;
+  font-size: $title-font-size;
+  transition: all 250ms ease-in-out;
+}
+.tab.active {
+  border-bottom: 2px solid $main-text-color;
+  color: $main-text-color;
+}
+.tab:hover{
+  color: $main-text-color;
+}
+
+#selected-ingester-parent-container {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 1rem;
+  width: 100%;
+  height: calc(100dvh - (2 * $header-height) - $title-div-height - 12rem);
+  padding-bottom: 1rem;
+  overflow-x: auto;
+}
+
+.selected-ingester-item-container, .ingester-element-editor-item-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  height: 100%;
+  min-height: 0;
+
+  flex: 1 2 16rem;
+  min-width: 16rem;
+  max-width: 100%;
+
+  background-color: black;
+  border: 1px solid $table-border-color;
+}
+.selected-ingester-item-title, .ingester-element-editor-item-title {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  background-color: $main-bg-color;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid $table-border-color;
+}
+.selected-ingester-item-title-right-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
+}
+.selected-ingester-item-title-name, .ingester-element-editor-item-title-name {
+  background-color: #011;
+  padding: 0.25rem 1rem;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.selected-ingester-item-body-container {
+  width: 100%;
+  height: 100%;
+  padding: 0.25rem 0.5rem;
+  overflow: auto;
+}
+.selected-ingester-item-body {
+  height: 100%;
+  width: 100%;
+  min-width: 16rem;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: monospace;
+  font-size: 14px;
+}
+.select-producer-for-ingester-view-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+.select-producer-for-ingester-label {
+  font-size: $main-font-size;
+}
+
+.ingester-element-editor-item-body {
+  height: 100%;
+  min-height: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: monospace;
+  font-size: 14px;
+  flex: 1 2 12rem;
+}
+
+.ingester-element-editor-body-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.ingester-element-json-editor {
+  display: flex;
+  flex-direction: column;
+  flex: 1 2 12rem;
+  width: 40rem;
+  height: 100%;
+  min-height: 0;
+  border: 1px solid #444;
+}
+#edit-modal-validation-message, #add-modal-validation-message {
+  position: absolute;
+  display: flex;
+  justify-content: flex-end;
+  bottom: 0;
+  right: 0;
+  margin: 0 2rem 4rem 0;
+  text-align: end;
+  z-index: 9;
+}
+
+.producer-bg {
+  background-color: $producer-title-bg-color;
+}
+.consumer-bg {
+  background-color: $consumer-title-bg-color;
+}
+.datastore-bg {
+  background-color: $datastore-title-bg-color;
+}
+.credential-bg {
+  background-color: $credential-title-bg-color;
+}
+
+
+@media screen and (max-height: 900px) {
+  #selected-ingester-parent-container {
+    //height: 30rem;
+  }
+}
+@media screen and (max-height: 800px) {
+  #selected-ingester-parent-container {
+    //height: 25rem;
+  }
+}
+
+.json-key {
+  color: #4fc3f7;
+}
+
+.json-string {
+  color: #81c784;
+}
+
+.json-number {
+  color: #ffb74d;
 }
 
 
@@ -333,6 +679,10 @@ table, th, td {
   justify-content: flex-start;
   gap: 0.5rem;
 }
+.form-input-div.hidden {
+  display: none;
+}
+
 .password-input-container {
   display: flex;
   flex-direction: column;
@@ -352,6 +702,7 @@ table, th, td {
   cursor: text !important;
   padding: 0 0.5rem;
   text-align: left;
+  transition: color 250ms ease-in-out;
 }
 .form-text-input.right {
   text-align: right;
@@ -388,11 +739,154 @@ input[type="date"]::-webkit-datetime-edit-year-field {
   color: inherit;
 }
 
+.form-reports-files {
+  background-color: $text-input-bg-color !important;
+  border-color: $text-input-bg-color;
+  color: $main-text-color;
+  width: 100%;
+  height: 12rem;
+  max-height: 12rem;
+  border-radius: 0.25rem;
+  border-style: none;
+  font-size: $main-font-size !important;
+  padding: 0.5rem 0.5rem;
+  overflow-y: auto;
+}
+ /* Remove default bullets */
+#report-file-ul, .nested {
+  list-style-type: none;
+  padding-left: 2rem;
+}
+/* Remove margins and padding from the parent ul */
+#report-file-ul {
+  margin: 0;
+  padding: 0;
+}
+#report-file-ul a {
+  text-decoration: none;
+}
+#report-file-ul a:link {
+  color: $main-text-color;
+}
+#report-file-ul a:visited {
+  color: $main-text-color;
+}
+#report-file-ul a:hover {
+  color: white;
+}
+#report-file-ul a:active {
+  color: $main-text-color;
+}
+
+.report-generation-status {
+  display: block;
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  background-color: $text-input-bg-color;
+  color: #0f3;
+  font-size: $small-font-size;
+}
+.report-generation-status.hidden {
+  display: none;
+}
+.report-generation-status.error {
+  color: #f00;
+}
+.report-generation-status.warning, .report-warning {
+  color: #f90;
+}
+.report-filename {
+  padding-left: 0rem;
+  color: $main-text-color;
+}
+
+/* Style the caret/arrow */
+.caret {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.25rem;
+  cursor: pointer;
+  -webkit-user-select: none; /* Safari 3.1+ */
+  -moz-user-select: none; /* Firefox 2+ */
+  -ms-user-select: none; /* IE 10+ */
+  user-select: none; /* Prevent text selection */
+  color: color.adjust($main-text-color, $lightness: -15%);
+  transition: background-color 250ms ease-in-out;
+}
+
+/* Create the caret/arrow with a unicode, and style it */
+.caret::before {
+  content: "\203A";
+  color: $main-text-color;
+  display: inline-block;
+}
+
+/* Rotate the caret/arrow icon when clicked on (using JavaScript) */
+.caret-down::before {
+  -ms-transform: rotate(90deg); /* IE 9 */
+  -webkit-transform: rotate(90deg); /* Safari */
+  transform: rotate(90deg);
+}
+.caret:hover {
+  background-color: $title-bg-color;
+}
+
+.report-file {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem;
+  transition: background-color 250ms ease-in-out;
+  cursor: default;
+}
+.report-file:hover {
+  background-color: $title-bg-color;
+}
+.report-file.new-report {
+  animation-name: pulse;
+  animation-duration: 1000ms;
+  animation-iteration-count: 5;
+  animation-direction: forwards;
+  animation-fill-mode: forwards;
+}
+.report-file-name {
+  cursor: pointer;
+  transition: color 250ms ease-in-out;
+}
+
+/* Hide the nested list */
+.nested {
+  display: none;
+}
+
+/* Show the nested list when the user clicks on the caret/arrow */
+.active {
+  display: block;
+}
+
+@keyframes pulse {
+  0% {
+    background-color: #007bff20;
+  }
+  50% {
+    background-color: #007bffdd;
+  }
+  100% {
+    background-color: #007bff20;
+  }
+}
+
+
 select.form-text-input {
   cursor: pointer !important;
 }
 .form-text-input.date-input {
   width: auto;
+}
+.form-text-input.date-input.full-width {
+  width: 100%;
 }
 .form-color-div {
   position: relative;
@@ -426,6 +920,11 @@ select.form-text-input {
 .form-button.submit {
   background-color: $checked-color;
 }
+.form-button.submit:disabled {
+  color: $main-text-color;
+  background-color: $main-buttons-bg-color;
+  cursor: default !important;
+}
 .form-button.rect {
   height: 2.0rem;
   border-radius: 0.25rem;
@@ -455,7 +954,7 @@ select.form-text-input {
   height: 0;
   transition: opacity .4s ease-out;
 }
-.form-text-input.ng-invalid.ng-touched + small {
+.form-text-input.ng-invalid.ng-touched + small, .form-text-input.ng-invalid.ng-dirty + small {
   opacity: 1;
   height: auto;
   margin: 0.25rem 0 0 0.5rem;
@@ -509,6 +1008,19 @@ select.form-text-input {
 .filter-inner-div.disabled {
   opacity: 0.5;
   pointer-events: none;
+}
+.filter-title {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  gap: 0.5rem;
+  height: 2rem;
+  background-color: #111111 !important;
+  border-radius: 0.25rem;
+  border-style: none;  
+  padding: 0 0.5rem;
 }
 .main-chart-container {
   display: flex;
@@ -596,6 +1108,7 @@ select.form-text-input {
   justify-content: flex-start;
   border: 1px solid $table-border-color;
   width: 100%;
+  min-height: 0px;
   padding: 0.25rem;
   border-radius: 5px;
   gap: 0.5rem;
@@ -653,8 +1166,8 @@ select.form-text-input {
   justify-content: space-between;
   background-color: $title-bg-color;
   width: 100%;
-  height: 2rem;
-  min-height: 2rem;
+  height: $title-div-height;
+  min-height: $title-div-height;
   padding: 0 0.5rem;
   font-size: $secondary-title-font-size;
 }
@@ -698,8 +1211,13 @@ select.form-text-input {
 
   transition: height 250ms ease-in-out, min-height 250ms ease-in-out, max-height 250ms ease-in-out;
 }
+.data-table-inner-container.timeliness {
+  min-height: 5.5rem;
+  height: 5.5rem;
+}
 .table-div {
   width: 100%;
+  height: 100%;
   overflow-x: auto;
 }
 .table-div th {

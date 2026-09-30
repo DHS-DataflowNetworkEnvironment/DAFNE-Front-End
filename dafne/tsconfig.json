@@ -1,10 +1,13 @@
-/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
-/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": ".",
-    "outDir": "./dist/out-tsc",
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "paths": {
+      "@app/*": ["./src/app/*"],
+      "@assets/*": ["./src/assets/*"]
+    },
+    "types": ["jest"],
     "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,

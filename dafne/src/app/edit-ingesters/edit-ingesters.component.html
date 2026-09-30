@@ -1,0 +1,516 @@
+<div class="main-parent-view-content">
+  <div class="main-page-title">
+    <p>Ingesters</p>
+  </div>
+
+  <ul class="tabs">
+    <li data-tab-target="#datastores" class="tab">Datastores</li>
+    <li data-tab-target="#producers" class="tab active">Producers</li>
+    <li data-tab-target="#consumers" class="tab">Consumers</li>
+    <li data-tab-target="#ingesters" class="tab">View Ingesters</li>
+  </ul>
+
+  <div class="tab-content">
+    <!-- Datastores page -->
+    <div class="main-page-content limited-height" id="datastores" data-tab-content>
+      <div class="main-page-inner-container">
+        <!-- Datastores -->
+        <div class="edit-title-container">
+          <p class="edit-table-title">Datastores List</p>
+          @if (isAdmin()) {
+          <button class="edit-add-button hover-el" (click)="openIngesterElementEditor('datastore', 'datastore-name', 'add')" title="Add Datastore">Add Datastore
+            <svg class="svg-icon plus-icon">
+              <use href="assets/icons/dafne_symbols.svg#icon-plus" />
+            </svg>
+          </button>
+          }
+        </div>
+        <div class="default-elements-table-container datastores-page">
+          <table>
+            <thead>
+              <tr>
+                <th class="table-header-sticky">Name</th>
+                <th class="table-header-sticky">Parent group</th>
+                <th class="table-header-sticky">Type</th>
+                <th class="table-header-sticky">Permission</th>
+                @if (isAdmin()) {
+                <th class="col-actions table-header-sticky">Actions</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (datastore of datastoresList; track datastore.name;) {
+              <tr class="table-row">
+                <td class="cell-name">{{datastore.name}}</td>
+                <td class="cell-parent-group" [ngClass]="datastore.parentGroup ? '' : 'nd-cell'">{{datastore.parentGroup ??
+                  "N/D"}}</td>
+                <td class="cell-type">{{datastore.type}}</td>
+                <td class="cell-permission">
+                  <div class="datastore-permissions-container">
+                    @for (permissionItem of checkPermissionArrayTest; track $index;) {
+                    <div class="datastore-permission-item"
+                      [ngClass]="{'datastore-permission-present': datastore.permission.includes(permissionItem)}"
+                      title="{{permissionItem}}">{{permissionItem.slice(0, 1)}}</div>
+                    }
+                  </div>
+                </td>
+                @if (isAdmin()) {
+                <td class="col-actions">
+                  <div class="cell-actions">
+                    <div class="action-icon-container" title="Edit Datastore">
+                      <svg class="icon-edit hover-el" (click)="openIngesterElementEditor('datastore', datastore.name, 'edit')">
+                        <use href="assets/icons/dafne_symbols.svg#icon-edit" />
+                      </svg>
+                    </div>
+                    <div class="action-icon-container" title="Download Datastore">
+                      <svg class="icon-download hover-el" (click)="downloadIngesterElement('datastore', datastore.name)">
+                        <use href="assets/icons/dafne_symbols.svg#icon-download" />
+                      </svg>
+                    </div>
+                    <div class="action-icon-container" title="Delete Datastore">
+                      <svg class="icon-delete hover-el" (click)="deleteDatastore(datastore)">
+                        <use href="assets/icons/dafne_symbols.svg#icon-delete" />
+                      </svg>
+                    </div>
+                  </div>
+                </td>
+                }
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Metadatastores -->
+        <div class="edit-title-container">
+          <p class="edit-table-title">Metadatastores List</p>
+          @if (isAdmin()) {
+          <button class="edit-add-button hover-el" (click)="openIngesterElementEditor('metadatastore', 'metadatastore-name', 'add')" title="Add Metadatastore">Add Metadatastore
+            <svg class="svg-icon plus-icon">
+              <use href="assets/icons/dafne_symbols.svg#icon-plus" />
+            </svg>
+          </button>
+          }
+        </div>
+        <div class="default-elements-table-container datastores-page">
+          <table>
+            <thead>
+              <tr>
+                <th class="table-header-sticky">Name</th>
+                <th class="table-header-sticky">Collection</th>
+                <th class="table-header-sticky">Hosts</th>
+                <th class="table-header-sticky">Permission</th>
+                @if (isAdmin()) {
+                <th class="col-actions table-header-sticky">Actions</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (metadatastore of metadatastoresList; track metadatastore.name;) {
+              <tr class="table-row">
+                <td class="cell-name">{{metadatastore.name}}</td>
+                <td class="cell-collection">{{metadatastore.collection}}</td>
+                <td class="cell-hosts">{{metadatastore.hosts}}</td>
+                <td class="cell-permission">
+                  <div class="datastore-permissions-container">
+                    @for (permissionItem of checkPermissionArrayTest; track $index;) {
+                    <div class="datastore-permission-item"
+                      [ngClass]="{'datastore-permission-present': metadatastore.permission.includes(permissionItem)}"
+                      title="{{permissionItem}}">{{permissionItem.slice(0, 1)}}</div>
+                    }
+                  </div>
+                </td>
+                
+                @if (isAdmin()) {
+                <td class="col-actions">
+                  <div class="cell-actions">
+                    <div class="action-icon-container" title="Edit Metadatastore">
+                      <svg class="icon-edit hover-el" (click)="openIngesterElementEditor('metadatastore', metadatastore.name, 'edit')">
+                        <use href="assets/icons/dafne_symbols.svg#icon-edit" />
+                      </svg>
+                    </div>
+                    <div class="action-icon-container" title="Download Metadatastore">
+                      <svg class="icon-download hover-el" (click)="downloadIngesterElement('metadatastore', metadatastore.name)">
+                        <use href="assets/icons/dafne_symbols.svg#icon-download" />
+                      </svg>
+                    </div>
+                    <div class="action-icon-container" title="Delete Metadatastore">
+                      <svg class="icon-delete hover-el" (click)="deleteMetadatastore(metadatastore)">
+                        <use href="assets/icons/dafne_symbols.svg#icon-delete" />
+                      </svg>
+                    </div>
+                  </div>
+                </td>
+                }
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Credentials -->
+        <div class="edit-title-container">
+          <p class="edit-table-title">Credentials List</p>
+          @if (isAdmin()) {
+          <button class="edit-add-button hover-el" (click)="openIngesterElementEditor('credential', 'credential-name', 'add')" title="Add Credential">Add Credential
+            <svg class="svg-icon plus-icon">
+              <use href="assets/icons/dafne_symbols.svg#icon-plus" />
+            </svg>
+          </button>
+          }
+        </div>
+        <div class="default-elements-table-container datastores-page">
+          <table>
+            <thead>
+              <tr>
+                <th class="table-header-sticky">Name</th>
+                <th class="table-header-sticky">URL</th>
+                <th class="table-header-sticky">Tenant</th>
+                <th class="table-header-sticky">Domain</th>
+                <th class="table-header-sticky">Endpoint</th>
+                <th class="table-header-sticky">Region</th>
+                @if (isAdmin()) {
+                <th class="col-actions table-header-sticky">Actions</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (credential of credentialsList; track credential.name;) {
+              <tr class="table-row">
+                <td class="cell-name">{{credential.name}}</td>
+                <td class="cell-url" [ngClass]="credential.url ? '' : 'nd-cell'">{{credential.url ??
+                  "N/D"}}</td>
+                <td class="cell-tenant" [ngClass]="credential.tenant ? '' : 'nd-cell'">{{credential.tenant ??
+                  "N/D"}}</td>
+                <td class="cell-domain" [ngClass]="credential.domain ? '' : 'nd-cell'">{{credential.domain ??
+                  "N/D"}}</td>
+                <td class="cell-tenant" [ngClass]="credential.endpoint ? '' : 'nd-cell'">{{credential.endpoint ??
+                  "N/D"}}</td>
+                <td class="cell-region" [ngClass]="credential.region ? '' : 'nd-cell'">{{credential.region ??
+                  "N/D"}}</td>
+                @if (isAdmin()) {
+                <td class="col-actions">
+                  <div class="cell-actions">
+                    <div class="action-icon-container" title="Edit Credential">
+                      <svg class="icon-edit hover-el" (click)="openIngesterElementEditor('credential', credential.name, 'edit')">
+                        <use href="assets/icons/dafne_symbols.svg#icon-edit" />
+                      </svg>
+                    </div>
+                    <div class="action-icon-container" title="Download Credential">
+                      <svg class="icon-download hover-el" (click)="downloadIngesterElement('credential', credential.name)">
+                        <use href="assets/icons/dafne_symbols.svg#icon-download" />
+                      </svg>
+                    </div>
+                    <div class="action-icon-container" title="Delete Credential">
+                      <svg class="icon-delete hover-el" (click)="deleteCredential(credential.name)">
+                        <use href="assets/icons/dafne_symbols.svg#icon-delete" />
+                      </svg>
+                    </div>
+                  </div>
+                </td>
+                }
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Producers -->
+    <div class="main-page-content limited-height active" id="producers" data-tab-content>
+      <div class="main-page-inner-container">
+        <div class="edit-title-container">
+          <p class="edit-table-title">Producers List</p>
+          @if (isAdmin()) {
+          <button class="edit-add-button hover-el" (click)="openIngesterElementEditor('producer', 'producer-name', 'add')" title="Add Producer">Add Producer
+            <svg class="svg-icon plus-icon">
+              <use href="assets/icons/dafne_symbols.svg#icon-plus" />
+            </svg>
+          </button>
+          }
+        </div>
+        <div class="default-elements-table-container">
+          <table>
+            <thead>
+              <tr>
+                <th class="table-header-sticky">Name</th>
+                <th class="table-header-sticky">Topic</th>
+                <th class="table-header-sticky">Hosts</th>
+                <th class="table-header-sticky">Datasource</th>
+                <th class="table-header-sticky">Push Interval</th>
+                <th class="table-header-sticky">Filter</th>
+                <th class="table-header-sticky">Status</th>
+                <th class="col-actions table-header-sticky">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (producer of producersList; track producer.name;) {
+              <tr class="table-row">
+                <td class="cell-name">{{producer.name}}</td>
+                <td class="cell-name">{{producer.topic}}</td>
+                <td class="cell-name">{{producer.hosts}}</td>
+                <td class="cell-name">{{producer.dataSource}}</td>
+                <td class="cell-name">{{producer.pushInterval}}</td>
+                <td class="cell-name">{{producer.filter}}</td>
+                <td class="cell-name">{{getIngesterStatus(producer.name)}}</td>
+
+                
+                <td class="col-actions">
+                  <div class="cell-actions">
+                    <div class="action-icon-container" title="View Ingester">
+                      <svg class="icon-eye hover-el" (click)="showProducer(producer.name)">
+                        <use href="assets/icons/dafne_symbols.svg#icon-eye-show" />
+                      </svg>
+                    </div>
+                    @if (isAdmin()) {
+                    <div class="action-icon-container" title="Start Producer">
+                      <svg class="icon-start hover-el" [class.disabled]="ingestersRunning()[producer.name] === true" (click)="startProducer(producer.name)">
+                        <use href="assets/icons/dafne_symbols.svg#icon-start" />
+                      </svg>
+                    </div>
+                    <div class="action-icon-container" title="Stop Producer">
+                      <svg class="icon-stop hover-el" [class.disabled]="ingestersRunning()[producer.name] === false" (click)="stopProducer(producer.name)">
+                        <use href="assets/icons/dafne_symbols.svg#icon-stop" />
+                      </svg>
+                    </div>
+                    <div class="action-icon-container" title="Edit Producer">
+                      <svg class="icon-edit hover-el" (click)="openIngesterElementEditor('producer', producer.name, 'edit')">
+                        <use href="assets/icons/dafne_symbols.svg#icon-edit" />
+                      </svg>
+                    </div>
+                    <div class="action-icon-container" title="Download Producer">
+                      <svg class="icon-download hover-el" (click)="downloadIngesterElement('producer', producer.name)">
+                        <use href="assets/icons/dafne_symbols.svg#icon-download" />
+                      </svg>
+                    </div>
+                    <div class="action-icon-container" title="Delete Producer">
+                      <svg class="icon-delete hover-el" (click)="deleteProducer(producer.name)">
+                        <use href="assets/icons/dafne_symbols.svg#icon-delete" />
+                      </svg>
+                    </div>
+                    }
+                  </div>
+                </td>
+                
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Consumers -->
+    <div class="main-page-content limited-height" id="consumers" data-tab-content>
+      <div class="main-page-inner-container">
+        <div class="edit-title-container">
+          <p class="edit-table-title">Consumers List</p>
+          @if (isAdmin()) {
+          <button class="edit-add-button hover-el" (click)="openIngesterElementEditor('consumer', 'consumer-name', 'add')" title="Add Consumer">Add Consumer
+            <svg class="svg-icon plus-icon">
+              <use href="assets/icons/dafne_symbols.svg#icon-plus" />
+            </svg>
+          </button>
+          }
+        </div>
+        <div class="default-elements-table-container">
+          <table>
+            <thead>
+              <tr>
+                <th class="table-header-sticky">Name</th>
+                <th class="table-header-sticky">Topics</th>
+                <th class="table-header-sticky">Hosts</th>
+                <th class="table-header-sticky">Group ID</th>
+                <th class="table-header-sticky">Parallel Ingests</th>
+                <th class="table-header-sticky">Temp Path</th>
+                <th class="table-header-sticky">Status</th>
+                @if (isAdmin()) {
+                <th class="col-actions table-header-sticky">Actions</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (consumer of consumersList; track consumer.name;) {
+              <tr class="table-row">
+                <td class="cell-name">{{consumer.name}}</td>
+                <td class="cell-name">{{consumer.topics}}</td>
+                <td class="cell-name">{{consumer.hosts}}</td>
+                <td class="cell-name">{{consumer.groupId}}</td>
+                <td class="cell-name">{{consumer.parallelIngests}}</td>
+                <td class="cell-name">{{consumer.tmpPath}}</td>
+                <td class="cell-name">{{getIngesterStatus(consumer.name)}}</td>
+
+                @if (isAdmin()) {
+                <td class="col-actions">
+                  <div class="cell-actions">
+                    <div class="action-icon-container" title="Start Consumer">
+                      <svg class="icon-start hover-el" [class.disabled]="ingestersRunning()[consumer.name] === true" (click)="startConsumer(consumer.name)">
+                        <use href="assets/icons/dafne_symbols.svg#icon-start" />
+                      </svg>
+                    </div>
+                    <div class="action-icon-container" title="Stop Consumer">
+                      <svg class="icon-stop hover-el" [class.disabled]="ingestersRunning()[consumer.name] === false" (click)="stopConsumer(consumer.name)">
+                        <use href="assets/icons/dafne_symbols.svg#icon-stop" />
+                      </svg>
+                    </div>
+                    <div class="action-icon-container" title="Edit Consumer">
+                      <svg class="icon-edit hover-el" (click)="openIngesterElementEditor('consumer', consumer.name, 'edit')">
+                        <use href="assets/icons/dafne_symbols.svg#icon-edit" />
+                      </svg>
+                    </div>
+                    <div class="action-icon-container" title="Download Consumer">
+                      <svg class="icon-download hover-el" (click)="downloadIngesterElement('consumer', consumer.name)">
+                        <use href="assets/icons/dafne_symbols.svg#icon-download" />
+                      </svg>
+                    </div>
+                    <div class="action-icon-container" title="Delete Consumer">
+                      <svg class="icon-delete hover-el" (click)="deleteConsumer(consumer.name)">
+                        <use href="assets/icons/dafne_symbols.svg#icon-delete" />
+                      </svg>
+                    </div>
+                  </div>
+                </td>
+                }
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ingesters -->
+    <div class="main-page-content limited-height" id="ingesters" data-tab-content>
+      <div class="main-page-inner-container">
+        <div class="edit-title-container">
+          <p class="edit-table-title">Ingester Elements</p>
+          <div class="select-producer-for-ingester-view-container">
+            <p class="select-producer-for-ingester-label">Select Producer to view the relative Ingester:</p>
+            <select id="select-producer-for-ingester-select" class="form-text-input"
+              (change)="onSelectProducerForIngesterView($event)">
+              @for (producer of producersList; track producer.name;) {
+              <option>{{producer.name}}</option>
+              }
+            </select>
+            @if (isAdmin()) {
+            <p class="select-producer-for-ingester-label">Download Ingester as a zip file</p>
+            <div class="action-icon-container" title="Download Ingester">
+              <svg class="icon-download hover-el" (click)="downloadIngester()">
+                <use href="assets/icons/dafne_symbols.svg#icon-download" />
+              </svg>
+            </div>
+            }
+          </div>
+        </div>
+        <div id="selected-ingester-parent-container">
+          <!-- HERE SELECTED INGESTOR ELEMENTS WILL BE DYNAMICALLY GENERATED -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Ingester element Editor Modal -->
+<div class="modal hidden" id="ingester-element-editor-modal" tabindex="-1">
+  <div class="modal-container ingester">
+    <div class="modal-header">
+      <h4 class="modal-title">{{ingesterElementInEditorAction?.toUpperCase()}} {{ingesterElementInEditorType?.toUpperCase()}}</h4>
+    </div>
+    <hr class="modal-hr">
+
+    <div class="modal-body ingester">
+      <div class="ingester-element-editor-body-container">
+        <div class="producer-source-type-selector form-input-div row editor-selector hidden">
+          <label for="add-producer-source-type" class="form-label">Select producer sourcetype:</label>
+          <select class="form-text-input" id="add-producer-source-type" (change)="onProducerSourceTypeChange($event)">
+          @for(typeEl of producerSourceTypeList; track typeEl.label;) {
+            <option>{{typeEl.label}}</option>
+          }
+          </select>
+        </div>
+        <div class="ingester-element-restart-selector form-input-div row editor-selector hidden">
+          <label for="add-ingester-element-restart" class="form-label">Select whether to restart ingester:</label>
+          <select class="form-text-input" id="add-ingester-element-restart" (change)="onProducerRestartChange($event)">
+            <option>false</option>
+            <option>true</option>
+          </select>
+        </div>
+        <div class="consumer-source-type-selector form-input-div row editor-selector hidden">
+          <label for="add-consumer-source-type" class="form-label">Select consumer sourcetype:</label>
+          <select class="form-text-input" id="add-consumer-source-type" (change)="onConsumerSourceTypeChange($event)">
+          @for(typeEl of consumerSourceTypeList; track typeEl.label;) {
+            <option>{{typeEl.label}}</option>
+          }
+          </select>
+        </div>
+        <div class="consumer-error-manager-type-selector form-input-div row editor-selector hidden">
+          <label for="add-consumer-error-manager-type" class="form-label">Select consumer error manager type:</label>
+          <select class="form-text-input" id="add-consumer-error-manager-type" (change)="onConsumerErrorManagerTypeChange($event)">
+          @for(typeEl of consumerErrorManagerList; track typeEl;) {
+            <option>{{typeEl}}</option>
+          }
+          </select>
+        </div>
+        <div class="ingestor-element-odata-type-selector form-input-div row editor-selector hidden">
+          <label for="ingestor-element-odata-type" class="form-label">Select OData type:</label>
+          <select class="form-text-input" id="ingestor-element-odata-type" (change)="onIngestorElementODataTypeChange($event)">
+          @for(typeEl of ODataTypeList; track $index;) {
+            <option>{{typeEl}}</option>
+          }
+          </select>
+        </div>
+        <div class="ingestor-element-odata-auth-type-selector form-input-div row editor-selector hidden">
+          <label for="ingestor-element-odata-auth-type" class="form-label">Select OData auth type:</label>
+          <select class="form-text-input" id="ingestor-element-odata-auth-type" (change)="onIngestorElementODataAuthTypeChange($event)">
+          @for(typeEl of ODataAuthTypeList; track $index;) {
+            <option>{{typeEl}}</option>
+          }
+          </select>
+        </div>
+        <div class="datastore-type-selector form-input-div row editor-selector hidden">
+          <label for="add-datastore-type" class="form-label">Select datastore type:</label>
+          <select class="form-text-input" id="add-datastore-type" (change)="onDatastoreTypeChange($event)">
+          @for(typeEl of datastoresTypesList; track typeEl.type;) {
+            <option>{{typeEl.type}}</option>
+          }
+          </select>
+        </div>
+        <div class="metadatastore-client-type-selector form-input-div row editor-selector hidden">
+          <label for="add-metadatastore-client-type" class="form-label">Select metadatastore client type:</label>
+          <select class="form-text-input" id="add-metadatastore-client-type" (change)="onMetadatastoreClientTypeChange($event)">
+          @for(typeEl of metadatastoreClientTypeList; track typeEl;) {
+            <option>{{typeEl}}</option>
+          }
+          </select>
+        </div>
+        <div class="credentials-name-selector form-input-div row editor-selector hidden">
+          <label for="ingestor-element-credentials-type" class="form-label">Select credentials name:</label>
+          <select class="form-text-input" id="ingestor-element-credentials-type" (change)="onCredentialChange($event)">
+          @for(credentialsEl of credentialsList; track credentialsEl.name;) {
+            <option>{{credentialsEl.name}}</option>
+          }
+          </select>
+        </div>
+        <div class="credentials-type-selector form-input-div row editor-selector hidden">
+          <label for="add-credentials-type" class="form-label">Select credentials type:</label>
+          <select class="form-text-input" id="add-credentials-type" (change)="onCredentialTypeChange($event)">
+          @for(typeEl of credentialsTypeList; track typeEl;) {
+            <option>{{typeEl.type}}</option>
+          }
+          </select>
+        </div>
+        <div class="ingester-element-json-editor" id="ingester-element-editor-container">
+          <!-- HERE THE MONACO JSON EDITOR WILL BE CREATED -->
+        </div>
+        <div class="form-input-div row validation-message" id="add-modal-validation-message">ERROR!</div>
+        <div class="form-input-div row">
+          <button type="button" class="form-button close rect hover-el" (click)="onClosePressed()">CANCEL</button>
+          <button type="submit" class="form-button submit rect hover-el" id="add-element-submit-button"
+            (click)="onIngesterElementEditorSubmit(ingesterElementToAdd)">SUBMIT</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

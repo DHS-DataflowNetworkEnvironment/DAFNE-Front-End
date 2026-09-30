@@ -1,0 +1,25 @@
+{
+  "name": "Apache HTTPD (Alpine) Devcontainer DAFNE",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "."
+  },
+  "remoteUser": "vscode",
+  "forwardPorts": [80],
+  "portsAttributes": {
+    "80": {
+      "label": "Apache HTTPD",
+      "onAutoForward": "notify"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ritwickdey.LiveServer",
+        "ecmel.vscode-html-css",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  },
+  "postCreateCommand": "httpd -v"
+}

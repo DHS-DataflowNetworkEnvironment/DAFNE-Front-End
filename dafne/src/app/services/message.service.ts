@@ -21,6 +21,15 @@ export class MessageService {
   private refreshLocalMessageSource = new BehaviorSubject(null);
   refreshLocalMessage = this.refreshLocalMessageSource.asObservable();
 
+  private reportMessageSource = new BehaviorSubject(false);
+  reportCurrentMessage = this.reportMessageSource.asObservable();
+
+  private loginMessageSource = new BehaviorSubject(false);
+  loginMessage = this.loginMessageSource.asObservable();
+
+  private showIngestersMessageSource = new BehaviorSubject(false);
+  showIngestersMessage = this.showIngestersMessageSource.asObservable();
+
   invokeAutoRefresh = new EventEmitter();
 
   constructor() { }
@@ -48,5 +57,17 @@ export class MessageService {
 
   refreshLocalCentre() {
     this.refreshLocalMessageSource.next(null);
+  }
+
+  showReport(show: boolean) {
+    this.reportMessageSource.next(show);
+  }
+
+  changeLogin(login: boolean) {
+    this.loginMessageSource.next(login);
+  }
+
+  showIngesters(show: boolean) {
+    this.showIngestersMessageSource.next(show);
   }
 }

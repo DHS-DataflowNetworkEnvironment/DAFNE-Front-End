@@ -16,27 +16,51 @@
         <div class="sidebar-element-title">Archive info</div>
         <div class="sidebar-element-body">
           <p class="sidebar-element-placeholder-text">Rolling policy</p>
+          <ul id="archive-info-list">
+            @for (item of archiveList(); track item) {
+            <li class="archive-info-element" (click)="onArchiveItemClicked($event)" title='{{localCentre.name}} - {{item.evictionPolicy.storeGroupName}}&#10;Click to show/hide filters'>{{item.evictionPolicy.storeGroupName}} - <span class="sidebar-element-placeholder-text">keeping period:</span> {{item.evictionPolicy.keepPeriodSeconds}}s
+                <ul class="archive-info-element-filters-div hidden">
+                  @for (filter of item.filters; track filter) {
+                    <li title="{{filter}}">{{filter}}</li>
+                  }
+                </ul>   
+            </li>
+            }
+          </ul>
         </div>
       </div>
     </section>
-    <section class="sidebar-element-container disabled">
+    <section class="sidebar-element-container">
       <svg class="svg-icon"><use href="assets/icons/dafne_symbols.svg#icon-data-source-info"/></svg>
       <div class="sidebar-element">
         <div class="sidebar-element-title-container">
           <div class="sidebar-element-title">Data sources info</div>
-          <button class="sidebar-element-button hover-el">Show</button>
+          <button class="sidebar-element-button hover-el" [routerLink]="['/home', { outlets: { centralBodyRouter: ['network-view', 'dataSourcesInfo']}}]" [skipLocationChange]="true">Show</button>
         </div>
         <div class="sidebar-element-body">
           <p class="sidebar-element-placeholder-text">Active data sources</p>
+          <ul id="data-sources-info-list">
+            @for (item of dataSourcesList(); track item;) {
+            <li>
+                @if (item.centre) {
+                <div rel="tooltip" data-bs-placement="right" data-bs-toggle="tooltip" data-bs-html="true" 
+                  title='{{item.centre.name}}&#10;Filter: {{item.filter}}' 
+                  [ngStyle]='{color: item.centre.color}'>
+                    {{item.centre.name}} <span style="color: #aaadb6">&nbsp;&nbsp;{{item.info}} {{item.lastCreationDate}}</span>
+                </div>
+                }
+            </li>
+            }
+        </ul>
         </div>
       </div>
     </section>
-    <section class="sidebar-element-container disabled">
+    <section class="sidebar-element-container">
       <svg class="svg-icon"><use href="assets/icons/dafne_symbols.svg#icon-dhs-connected"/></svg>
       <div class="sidebar-element">
         <div class="sidebar-element-title-container">
-          <div class="sidebar-element-title">DHS connected:<div class="sidebar-element-title-inset">0</div></div>
-          <button class="sidebar-element-button hover-el">Show</button>
+          <div class="sidebar-element-title">DHS connected:<div class="sidebar-element-title-inset">{{ dhsConnectedNum() }}</div></div>
+          <button class="sidebar-element-button hover-el" [routerLink]="['/home', { outlets: { centralBodyRouter: ['network-view', 'dhsConnected']}}]" [skipLocationChange]="true">Show</button>
         </div>
       </div>
     </section>
@@ -45,7 +69,7 @@
       <div class="sidebar-element">
         <div class="sidebar-element-title-container">
           <div class="sidebar-element-title">DHS completeness</div>
-          <button class="sidebar-element-button hover-el" [routerLink]="['/gui', { outlets: { centralBodyRouter: ['completeness']}}]" [skipLocationChange]="true">Launch</button>
+          <button class="sidebar-element-button hover-el" [routerLink]="['/home', { outlets: { centralBodyRouter: ['completeness']}}]" [skipLocationChange]="true">Launch</button>
         </div>
       </div>
     </section>
@@ -54,19 +78,30 @@
       <div class="sidebar-element">
         <div class="sidebar-element-title-container">
           <div class="sidebar-element-title">Service availability</div>
-          <button class="sidebar-element-button hover-el" [routerLink]="['/gui', { outlets: { centralBodyRouter: ['service-availability']}}]" [skipLocationChange]="true">Launch</button>
+          <button class="sidebar-element-button hover-el" [routerLink]="['/home', { outlets: { centralBodyRouter: ['service-availability']}}]" [skipLocationChange]="true">Launch</button>
         </div>
       </div>
     </section>
-    <section class="sidebar-element-container disabled">
+    <section class="sidebar-element-container">
       <svg class="svg-icon"><use href="assets/icons/dafne_symbols.svg#icon-publication-timeliness"/></svg>
       <div class="sidebar-element">
         <div class="sidebar-element-title-container">
           <div class="sidebar-element-title">Publication timeliness</div>
-          <button class="sidebar-element-button hover-el">Launch</button>
+          <button class="sidebar-element-button hover-el" [routerLink]="['/home', { outlets: { centralBodyRouter: ['publication-timeliness']}}]" [skipLocationChange]="true">Launch</button>
         </div>
       </div>
     </section>
+    @if (isAdmin()) {
+    <section class="sidebar-element-container">
+      <svg class="svg-icon"><use href="assets/icons/dafne_symbols.svg#icon-reports"/></svg>
+      <div class="sidebar-element">
+        <div class="sidebar-element-title-container">
+          <div class="sidebar-element-title">Generate report</div>
+          <button class="sidebar-element-button hover-el" (click)="onGenerateReportClicked()">Show</button>
+        </div>
+      </div>
+    </section>
+    }
   </div>
   <div id="sidebar-left-arrow-container" class="sidebar-arrow-container" (click)="onSidebarHide()">
     <svg class="svg-icon" id="sidebar-left-arrow"><use href="assets/icons/dafne_symbols.svg#icon-left-arrow"/></svg>

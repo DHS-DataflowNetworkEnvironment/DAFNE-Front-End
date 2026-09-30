@@ -1,16 +1,16 @@
 import { HttpHandlerFn, HttpInterceptorFn, HttpRequest, HttpEvent, HttpEventType } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { catchError, Observable, tap, throwError } from 'rxjs';
-import { AuthenticationService } from 'src/app/services/authentication.service';
+import { catchError, finalize, Observable, tap, throwError } from 'rxjs';
+import { AuthenticationService } from '@app/services/authentication.service';
 import { Router } from '@angular/router';
-import { AlertComponent } from 'src/app/alert/alert.component';
+import { AlertService } from '../services/alert.service';
 import { SpinnerComponent } from '../spinner/spinner.component';
 import * as moment from 'moment';
 
 export const errorInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> => {
 
   const authenticationService = inject(AuthenticationService);
-  const alert = inject(AlertComponent);
+  const alert = inject(AlertService);
   const router = inject(Router);
   const spinner = inject(SpinnerComponent);
 
@@ -19,43 +19,63 @@ export const errorInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, n
   spinner.setOn(now);
 
   return next(req).pipe(
-    tap((event: any) => {
-      if (event.type === HttpEventType.Response) {
-        /* Spinner Service Off */
-        spinner.setOff(now);
-      }
-      
-    }),
     catchError((error: any) => {
-      /* Spinner Service Off */
-      spinner.setOff(now);
-
+      let message = "";
+      let details = "";
+      console.debug("Error occurred:", error);
+      if (error.hasOwnProperty('error') && error.error) {
+        message = error.error.hasOwnProperty('message') ? error.error.message : error.error.hasOwnProperty('error') ? error.error.error : "";
+        details = error.error.hasOwnProperty('details') ? error.error.details : error.error.hasOwnProperty('error_description') ? error.error.error_description : (typeof error.error == "string") ? error.error : "";
+      } else if (error.hasOwnProperty('errors')) {
+        message = error.hasOwnProperty('statusText') ? error.statusText : "";
+        details = error.errors.length() > 0 ? error.error.errors[0].hasOwnProperty('message') ? error.error.errors[0].message : "" : "";
+      }
+      console.debug("Error details:", { message, details });
       if (error.status === 401) {
+        if (error.hasOwnProperty('statusText') && error.statusText === "Unauthorized") {
+          console.error("No valid token available.");
+        } else {
+          alert.showAlert("ERROR " + error.status + ": " + error.statusText, error.message + 
+            (message != "" ? "<br><br>Message: " + message : "") + 
+            (details != "" ? "<br>Details: " + details : ""));
+        }
         authenticationService.logout();
       } else if (error.status === 403) {
-        /* Cannot login if 403 response returned from api */          
-        console.log("ERROR 403: Invalid role.");
-        alert.showErrorAlert("ERROR " + error.status + ": " + error.statusText + " - Invalid role.", error.message);
+        /* Cannot login if 403 response returned from api */
+        console.log("ERROR 403: Forbidden. Invalid origin url set in report back-end config or invalid role");
+        alert.showAlert("ERROR " + error.status + ": " + error.statusText, error.message + 
+          (message != "" ? "<br><br>Message: " + message : "") + 
+          (details != "" ? "<br>Details: " + details : ""));
         reloadCurrentRoute();
       } else if (error.status === 404) {
         /* show alert with message if error is 404: Not found */
         console.log("ERROR 404: Not Found.");
-        alert.showErrorAlert("ERROR " + error.status + ": " + error.statusText, error.message);
+        alert.showAlert("ERROR " + error.status + ": " + error.statusText, error.message + 
+          (message != "" ? "<br><br>Message: " + message : "") + 
+          (details != "" ? "<br>Details: " + details : ""));
         reloadCurrentRoute();
       } else if (error.status === 400) {
         /* Don't show alert if error is 400: Token not valid */
-        console.log("ERROR 400: Token not valid.");
-        alert.showErrorAlert("ERROR " + error.status + ": " + error.statusText, error.message);
-        reloadCurrentRoute();
+        console.log("ERROR 400: " + error.status + " error obj: " , error.error);
+        alert.showAlert("ERROR " + error.status + ": " + error.statusText, error.message + 
+          (message != "" ? "<br><br>Message: " + message : "") + 
+          (details != "" ? "<br>Details: " + details : ""));
+        //reloadCurrentRoute();
       } else {
+        console.log("UNKNOWN ERROR: ", error);
         /* Show alert on any other error */
-        if (error.error.hasOwnProperty('errors')) {
-          alert.showErrorAlert("ERROR " + error.status + ": " + error.statusText, error.error.errors[0].message);
+        if (error.error.hasOwnProperty('code') && error.error.code === "ECONNREFUSED") {
+          alert.showAlert("ERROR " + error.status + ": " + error.error.message, "Report Back End cannot be reached. Please check and try again." );
         } else {
-          alert.showErrorAlert("ERROR " + error.status + ": " + error.statusText, error.message);
+          alert.showAlert("ERROR " + error.status + ": " + error.statusText, error.message + 
+          (message != "" ? "<br><br>Message: " + message : "") + 
+          (details != "" ? "<br>Details: " + details : ""));
         }
       }
       return throwError(() => error);
+    }),
+    finalize(() => {
+      spinner.setOff(now);
     })
   );
 

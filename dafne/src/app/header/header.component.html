@@ -9,15 +9,18 @@
     </div>
     <div class="header-icon-container" title="Menu">
       <svg class="svg-icon hover-el" id="header-menu-button" (click)="onMenuClicked()" (mouseover)="onMenuHover()" (mouseleave)="setHideMenuTimeout()"><use href="assets/icons/dafne_symbols.svg#icon-menu"/></svg>
-    </div>    
+    </div>
   </div>
 </div>
 <div class="dropdown-menu hidden" (mouseover)="onMenuHover()" (mouseleave)="setHideMenuTimeout()">
-  <button class="menu-item hover-el" (click)="hideDropdown()" [routerLink]="['/gui', { outlets: { centralBodyRouter: ['edit-centres']}}]" [skipLocationChange]="true">Centres</button>
-  <button class="menu-item hover-el" (click)="hideDropdown()" [routerLink]="['/gui', { outlets: { centralBodyRouter: ['edit-services']}}]" [skipLocationChange]="true">Services</button>
-  <button class="menu-item" (click)="hideDropdown()" [routerLink]="['/gui', { outlets: { centralBodyRouter: ['edit-synchronizers']}}]" [skipLocationChange]="true" disabled>Synchronizers</button>
-  <button class="menu-item hover-el" (click)="hideDropdown()" [routerLink]="['/gui', { outlets: { centralBodyRouter: ['completeness']}}]" [skipLocationChange]="true">Completeness</button>
-  <button class="menu-item hover-el" (click)="hideDropdown()" [routerLink]="['/gui', { outlets: { centralBodyRouter: ['service-availability']}}]" [skipLocationChange]="true">Service availability</button>
-  <button class="menu-item" (click)="hideDropdown()" [routerLink]="['/gui', { outlets: { centralBodyRouter: ['publication-timeliness']}}]" [skipLocationChange]="true" disabled>Publication timeliness</button>
+  <button class="menu-item hover-el" (click)="hideDropdown()" [routerLink]="['/home', { outlets: { centralBodyRouter: ['edit-centres']}}]" [skipLocationChange]="true">Centres</button>
+  <button class="menu-item hover-el" (click)="hideDropdown()" [routerLink]="['/home', { outlets: { centralBodyRouter: ['edit-services']}}]" [skipLocationChange]="true">Services</button>
+  <button class="menu-item hover-el" id="ingesters-menu-button" (click)="hideDropdown()" [routerLink]="['/home', { outlets: { centralBodyRouter: ['edit-ingesters']}}]" [skipLocationChange]="true">Ingesters</button>
+  <button class="menu-item hover-el" (click)="hideDropdown()" [routerLink]="['/home', { outlets: { centralBodyRouter: ['completeness']}}]" [skipLocationChange]="true">Completeness</button>
+  <button class="menu-item hover-el" (click)="hideDropdown()" [routerLink]="['/home', { outlets: { centralBodyRouter: ['service-availability']}}]" [skipLocationChange]="true">Service availability</button>
+  <button class="menu-item hover-el" (click)="hideDropdown()" [routerLink]="['/home', { outlets: { centralBodyRouter: ['publication-timeliness']}}]" [skipLocationChange]="true">Publication timeliness</button>
+  @if (isAdmin()) {
+  <button class="menu-item hover-el" (click)="onGenerateReportClicked()">Generate report</button>
+  }
   <button class="menu-item hover-el" (click)="logout()">Logout</button>
 </div>

@@ -26,11 +26,16 @@
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
+              "src/assets",
               {
                 "glob": "**/*",
                 "input": "public"
               },
-              "src/assets"
+              {
+                "glob": "**/*",
+                "input": "node_modules/monaco-editor/min",
+                "output": "assets/monaco/"
+              }
             ],
             "styles": [
               "src/styles.scss"
@@ -52,13 +57,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "3MB",
-                  "maximumError": "4MB"
+                  "maximumWarning": "5MB",
+                  "maximumError": "8MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "3MB",
-                  "maximumError": "4MB"
+                  "maximumWarning": "5MB",
+                  "maximumError": "8MB"
                 }
               ],
               "outputHashing": "all"
@@ -115,5 +120,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": false
   }
 }

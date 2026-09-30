@@ -16,8 +16,8 @@
   align-items: center;
   justify-content: flex-start;
   width: 100%;
-  height: 2rem;
-  min-height: 2rem;
+  height: $title-div-height;
+  min-height: $title-div-height;
   background-color: $title-bg-color;
   align-items: center;
   padding-left: 0.5rem;
@@ -66,7 +66,7 @@
   justify-content: flex-start;
   white-space: nowrap;
   gap: 0.5rem;
-  height: 2rem;
+  height: $title-div-height;
   font-size: $main-font-size;
 }
 .sidebar-element-title-inset {
@@ -100,6 +100,7 @@
 .sidebar-element-placeholder-text {
   color: $windows-title-color;
   font-style: italic;
+  pointer-events: none;
 }
 .sidebar-element-button {
   border: none;
@@ -147,4 +148,66 @@
 }
 .sidebar-arrow-container.hidden {
   display: none;
+}
+
+#archive-info-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  max-width: calc($sidebar-width - 4rem);
+  max-height: 9rem;
+  overflow: auto;
+}
+#archive-info-list li div {
+  margin-bottom: 0.5rem;
+}
+.archive-info-element-filters-div {
+  list-style: none;
+  background-color: $windows-bg-color;
+  padding-left: 1rem;
+  color: #8a8d96;
+  white-space: nowrap;
+  overflow: hidden;
+  height: 5rem;
+  max-height: 0rem;
+  margin-bottom: 0.25rem;
+  
+  transition: height 250ms ease-in-out;
+}
+.archive-info-element-filters-div.hidden {
+  height: 0;
+  transition: height 250ms ease-in-out;
+}
+.archive-info-element {
+  cursor: pointer;
+}
+.archive-info-element:hover {
+  background-color: $text-input-bg-color;
+}
+.archive-info-element-filters-div li {
+  white-space: nowrap;
+
+}
+.archive-info-element-filters-div li:hover {
+  background-color: $text-input-bg-color;
+  cursor: default;
+}
+
+#data-sources-info-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  max-width: calc($sidebar-width - 4rem);
+  max-height: 9rem;
+  overflow: auto;
+}
+
+#data-sources-info-list li div {
+  margin-bottom: 0.25rem;
+}
+
+#data-sources-info-list span {
+  text-wrap: nowrap;
 }

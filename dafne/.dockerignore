@@ -1,13 +1,8 @@
 # compiled output
-/dist
 /dafne/dist
-/tmp
-/out-tsc
 
 # dependencies
-/dafne/node_modules
 /dafne/package-lock.json
-/.devcontainer
 
 # IDE - VSCode
 /dafne/.vscode
@@ -22,7 +17,3 @@ npm-debug.log
 yarn-error.log
 testem.log
 /typings
-
-# System Files
-.DS_Store
-Thumbs.db

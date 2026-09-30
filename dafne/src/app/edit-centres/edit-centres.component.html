@@ -2,7 +2,7 @@
     <div class="main-page-title">
       <p>Edit Centres</p>
     </div>
-    <div class="main-page-content">
+    <div class="main-page-content active">
       <div class="main-page-inner-container">
         <div class="edit-title-container">
             <p class="edit-table-title">Centres List</p>
@@ -10,41 +10,43 @@
             <button class="edit-add-button hover-el" (click)="addNewCentre()" title="Add Centre">Add Centre<svg class="svg-icon plus-icon"><use href="assets/icons/dafne_symbols.svg#icon-plus"/></svg></button>
             }
         </div>
-        <table>
-            <tr>
-                <th>Name</th>
-                <th>Latitude</th>
-                <th>Longitude</th>
-                <th>Color</th>
-                <th>Local</th>
-                <th>Description</th>
-                @if (isAdmin()) {
-                <th>Actions</th>
-                }
-            </tr>
-            <tr *ngFor="let centre of centreList">
-                <td class="cell-name" [ngStyle]="{'color': centre.color }">{{centre.name}}</td>
-                <td class="cell-latitude" [ngStyle]="{'color': centre.color }">{{centre.latitude}}</td>
-                <td class="cell-longitude" [ngStyle]="{'color': centre.color }">{{centre.longitude}}</td>
-                <td class="cell-color"><div class="color-rect" [ngStyle]="{'background-color': centre.color }" [title]="centre.color"></div></td>
-                <td class="cell-local" [ngStyle]="{'color': centre.local == true ? centre.color : 'lightgrey' }">
-                    {{centre.local == true ? "local" : "remote"}}
-                </td>
-                <td class="cell-description" [ngStyle]="{'color': centre.color }">{{centre.description}}</td>
-                @if (isAdmin()) {
-                <td>
-                    <div class="cell-actions">
-                        <div class="action-icon-container" title="Edit Centre">
-                            <svg class="icon-edit hover-el" (click)="editCentre(centre.id)"><use href="assets/icons/dafne_symbols.svg#icon-edit"/></svg>
-                        </div>
-                        <div class="action-icon-container" title="Delete Centre">
-                            <svg class="icon-delete hover-el" (click)="deleteCentre(centre.id)"><use href="assets/icons/dafne_symbols.svg#icon-delete"/></svg>
-                        </div>
-                    </div>
-                </td>
-                }
-            </tr>
-        </table>
+        <div class="default-elements-table-container">
+          <table>
+              <tr>
+                  <th>Name</th>
+                  <th>Latitude</th>
+                  <th>Longitude</th>
+                  <th>Color</th>
+                  <th>Local</th>
+                  <th>Description</th>
+                  @if (isAdmin()) {
+                  <th class="col-actions">Actions</th>
+                  }
+              </tr>
+              <tr *ngFor="let centre of centreList">
+                  <td class="cell-name" [ngStyle]="{'color': centre.color }">{{centre.name}}</td>
+                  <td class="cell-latitude" [ngStyle]="{'color': centre.color }">{{centre.latitude}}</td>
+                  <td class="cell-longitude" [ngStyle]="{'color': centre.color }">{{centre.longitude}}</td>
+                  <td class="cell-color"><div class="color-rect" [ngStyle]="{'background-color': centre.color }" [title]="centre.color"></div></td>
+                  <td class="cell-local" [ngStyle]="{'color': centre.local == true ? centre.color : 'lightgrey' }">
+                      {{centre.local == true ? "local" : "remote"}}
+                  </td>
+                  <td class="cell-description" [ngStyle]="{'color': centre.color }">{{centre.description}}</td>
+                  @if (isAdmin()) {
+                  <td class="col-actions">
+                      <div class="cell-actions">
+                          <div class="action-icon-container" title="Edit Centre">
+                              <svg class="icon-edit hover-el" (click)="editCentre(centre.id)"><use href="assets/icons/dafne_symbols.svg#icon-edit"/></svg>
+                          </div>
+                          <div class="action-icon-container" title="Delete Centre">
+                              <svg class="icon-delete hover-el" (click)="deleteCentre(centre.id)"><use href="assets/icons/dafne_symbols.svg#icon-delete"/></svg>
+                          </div>
+                      </div>
+                  </td>
+                  }
+              </tr>
+          </table>
+        </div>
       </div>
     </div>
 </div>
@@ -151,29 +153,6 @@
                 <div class="form-input-div row">
                     <button type="button" class="form-button close rect hover-el" (click)="onClosePressed()">CANCEL</button>
                     <button type="submit" class="form-button submit rect hover-el">SUBMIT</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
- 
-
-<!-- Delete Alert! -->
-<div class="modal hidden" id="deleteCentreModal" tabindex="-1">
-    <div class="modal-container">
-        <div class="modal-header">
-            <h4 class="modal-title">Deleting Centre: <span [ngStyle]="{'color': tempCentreColorToDelete}">{{tempCentreNameToDelete}}</span></h4>
-            <svg class="icon-warning"><use href="assets/icons/dafne_symbols.svg#icon-warning"/></svg>
-        </div>
-        <hr class="modal-hr">
-        <div class="modal-body">
-            <form id="deleteCentreForm" (ngSubmit)="deleteCentreConfirmed()">
-                <div class="form-input-div row-left">
-                    <label>Are you sure?</label>
-                </div>
-                <div class="form-input-div row" >
-                    <button type="button" class="form-button close rect hover-el" (click)="onClosePressed()">CANCEL</button>
-                    <button type="submit" class="form-button submit rect hover-el">YES</button>
                 </div>
             </form>
         </div>
