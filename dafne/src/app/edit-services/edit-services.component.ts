@@ -1,24 +1,26 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthenticationService } from 'src/app/services/authentication.service';
-import { MessageService } from 'src/app/services/message.service';
-import { Service, Centre, ServiceType } from 'src/app/models/models';
+import { AuthenticationService } from '@app/services/authentication.service';
+import { MessageService } from '@app/services/message.service';
+import { Service, Centre, ServiceType } from '@app/models/models';
 import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormsModule, Validators, FormGroup, FormControl, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Functions } from 'src/app/util/functions';
-import { AlertComponent } from 'src/app/alert/alert.component';
-import { AppComponent } from 'src/app/app.component';
+import { Functions } from '@app/util/functions';
+import { AlertService } from '../services/alert.service';
+import { AppComponent } from '@app/app.component';
 
 const regexPatterns: {[key:string]: string} = {
   "add-service_username": "^.{1,60}$",
   "add-service_password": "^.{1,60}$",
   "add-service_url": "^(https?:\\/\\/)?([a-zA-Z0-9\\-\\.]+\\.[a-zA-Z0-9]{2,})(\\/[^\\s]*)?$",
+  "add-service_admin_url": "^(https?:\\/\\/)?([a-zA-Z0-9\\-\\.]+\\.[a-zA-Z0-9]{2,})(\\/[^\\s]*)?$",
   "add-service_token_url": "^(https?:\\/\\/)?([a-zA-Z0-9\\-\\.]+\\.[a-zA-Z0-9]{2,})(\\/[^\\s]*)?$",
   "add-service_client_id": "^[^\\ \\,\\;]{1,256}$",
 
   "edit-service_username": "^.{1,60}$",
   "edit-service_password": "^.{0,60}$",
   "edit-service_url": "^(https?:\\/\\/)?([a-zA-Z0-9\\-\\.]+\\.[a-zA-Z0-9]{2,})(\\/[^\\s]*)?$",
+  "edit-service_admin_url": "^(https?:\\/\\/)?([a-zA-Z0-9\\-\\.]+\\.[a-zA-Z0-9]{2,})(\\/[^\\s]*)?$",
   "edit-service_token_url": "^(https?:\\/\\/)?([a-zA-Z0-9\\-\\.]+\\.[a-zA-Z0-9]{2,})(\\/[^\\s]*)?$",
   "edit-service_client_id": "^[^\\ \\,\\;]{1,256}$"
 };
@@ -78,6 +80,12 @@ export class EditServicesComponent implements OnInit{
       ],
       updateOn: updateValidationAction
     }),
+    addServiceAdminUrl: new FormControl(null, {
+      validators: [
+        Validators.pattern(regexPatterns['add-service_admin_url'])
+      ],
+      updateOn: updateValidationAction
+    }),
     addServiceCentre: new FormControl(null, {
       validators: [
         Validators.required
@@ -126,6 +134,12 @@ export class EditServicesComponent implements OnInit{
       ],
       updateOn: updateValidationAction
     }),
+    editServiceAdminUrl: new FormControl(null, {
+      validators: [
+        Validators.pattern(regexPatterns['edit-service_admin_url'])
+      ],
+      updateOn: updateValidationAction
+    }),
     editServiceCentre: new FormControl(null, {
       validators: [
         Validators.required
@@ -164,7 +178,7 @@ export class EditServicesComponent implements OnInit{
     private messageService: MessageService,
     private router: Router,
     private functions: Functions,
-    private alert: AlertComponent,
+    private alert: AlertService,
     private appComponent: AppComponent
   ) {
 
@@ -228,7 +242,7 @@ export class EditServicesComponent implements OnInit{
         );
         this.addServiceForm.get('addServiceCentre')?.updateValueAndValidity();
         if (reload) {
-          this.router.navigate(['/gui', { outlets: { centralBodyRouter: ['edit-services']}}], { skipLocationChange: true });
+          this.router.navigate(['/home', { outlets: { centralBodyRouter: ['edit-services']}}], { skipLocationChange: true });
         }
       }
     });
@@ -241,11 +255,11 @@ export class EditServicesComponent implements OnInit{
       this.serviceList.forEach((service: Service) => {
         if ([4, 5].includes(service.service_type)) {
           if (service.service_type == tempServiceTypeId) {
-            this.alert.showErrorAlert("Service of service_type " + this.addServiceForm.value.addServiceType + " is already present.", "Please choose another service_type.");
+            this.alert.showAlert("Service of service_type " + this.addServiceForm.value.addServiceType + " is already present.", "Please choose another service_type.");
             this.addServiceForm.get('addServiceType')?.setErrors({incorrect: true});
             this.addServiceForm.get('addServiceType')?.markAsTouched();
           } else {
-            this.alert.showErrorAlert("A service of service_type " + this.serviceTypesList.filter((serviceType: ServiceType) => serviceType.id === service.service_type)[0].service_type + " is present.", "Please be aware that this will setup two different services pointing to CDSE, with possibly repeated results.");
+            this.alert.showAlert("A service of service_type " + this.serviceTypesList.filter((serviceType: ServiceType) => serviceType.id === service.service_type)[0].service_type + " is present.", "Please be aware that this will setup two different services pointing to CDSE, with possibly repeated results.");
           }
         }
       });
@@ -282,6 +296,15 @@ export class EditServicesComponent implements OnInit{
         addServicePassword: 'N/D'
       })
     }
+    if (tempServiceTypeId != 8) {
+      this.addServiceForm.get('addServiceAdminUrl')?.setValidators(null);
+      this.addServiceForm.get('addServiceAdminUrl')?.clearValidators();
+      this.addServiceForm.get('addServiceAdminUrl')?.setErrors(null);
+      this.addServiceForm.get('addServiceAdminUrl')?.updateValueAndValidity();
+      this.addServiceForm.patchValue({
+        addServiceAdminUrl: 'N/D'
+      })
+    }
   }
   onEditServiceTypeChange() {
     let tempServiceTypeId = this.serviceTypesList.filter((serviceType: ServiceType) => serviceType.service_type === this.editServiceForm.value.editServiceType)[0].id;
@@ -290,11 +313,11 @@ export class EditServicesComponent implements OnInit{
       this.serviceList.forEach((service: Service) => {
         if ([4, 5].includes(service.service_type)) {
           if (service.service_type == tempServiceTypeId) {
-            this.alert.showErrorAlert("Service of service_type " + this.editServiceForm.value.editServiceType + " is already present.", "Please choose another service_type.");
+            this.alert.showAlert("Service of service_type " + this.editServiceForm.value.editServiceType + " is already present.", "Please choose another service_type.");
             this.editServiceForm.get('addServiceType')?.setErrors({incorrect: true});
             this.editServiceForm.get('addServiceType')?.markAsTouched();
           } else {
-            this.alert.showErrorAlert("A service of service_type " + this.serviceTypesList.filter((serviceType: ServiceType) => serviceType.id === service.service_type)[0].service_type + " is present.", "Please be aware that this will setup two different services pointing to CDSE, with possibly repeated results.");
+            this.alert.showAlert("A service of service_type " + this.serviceTypesList.filter((serviceType: ServiceType) => serviceType.id === service.service_type)[0].service_type + " is present.", "Please be aware that this will setup two different services pointing to CDSE, with possibly repeated results.");
           }
         }
       });
@@ -331,6 +354,15 @@ export class EditServicesComponent implements OnInit{
         editServicePassword: 'N/D'
       })
     }
+    if (tempServiceTypeId != 8) {
+      this.addServiceForm.get('addServiceAdminUrl')?.setValidators(null);
+      this.addServiceForm.get('addServiceAdminUrl')?.clearValidators();
+      this.addServiceForm.get('addServiceAdminUrl')?.setErrors(null);
+      this.addServiceForm.get('addServiceAdminUrl')?.updateValueAndValidity();
+      this.addServiceForm.patchValue({
+        addServiceAdminUrl: 'N/D'
+      })
+    }
   }
   onAddServiceUrlChange() {
     // Remove eventual trailing /:
@@ -342,7 +374,7 @@ export class EditServicesComponent implements OnInit{
     // Check if service_url was already used:
     this.serviceList.forEach((service: Service) => {
       if (service.service_url === this.addServiceForm.value.addServiceUrl) {
-        this.alert.showErrorAlert("There’s already a service with the same Service URL: " + this.addServiceForm.value.addServiceUrl, "Please be aware that this will give repeated results.");
+        this.alert.showAlert("There’s already a service with the same Service URL: " + this.addServiceForm.value.addServiceUrl, "Please be aware that this will give repeated results.");
       }
     });
   }
@@ -356,9 +388,37 @@ export class EditServicesComponent implements OnInit{
     // Check if service_url was already used:
     this.serviceList.forEach((service: Service) => {
       if (service.service_url === this.editServiceForm.value.editServiceUrl) {
-        this.alert.showErrorAlert("There’s already a service with the same Service URL: " + this.editServiceForm.value.editServiceUrl, "Please be aware that this will give repeated results.");
+        this.alert.showAlert("There’s already a service with the same Service URL: " + this.editServiceForm.value.editServiceUrl, "Please be aware that this will give repeated results.");
       }
-    });    
+    });
+  }
+  onAddServiceAdminUrlChange() {
+    // Remove eventual trailing /:
+    if (this.addServiceForm.value.addServiceAdminUrl.endsWith('/')) {
+      this.addServiceForm.patchValue({
+        addServiceAdminUrl: this.addServiceForm.value.addServiceAdminUrl.slice(0, -1)
+      });
+    }
+    // Check if service_url was already used:
+    this.serviceList.forEach((service: Service) => {
+      if (this.addServiceForm.value.addServiceAdminUrl && service.service_admin_url === this.addServiceForm.value.addServiceAdminUrl) {
+        this.alert.showAlert("There’s already a service with the same Service Admin URL: " + this.addServiceForm.value.addServiceAdminUrl, "Please be aware that this will give repeated results.");
+      }
+    });
+  }
+  onEditServiceAdminUrlChange() {
+    // Remove eventual trailing /:
+    if (this.editServiceForm.value.editServiceAdminUrl.endsWith('/')) {
+      this.editServiceForm.patchValue({
+        editServiceAdminUrl: this.editServiceForm.value.editServiceAdminUrl.slice(0, -1)
+      });
+    }
+    // Check if service_url was already used:
+    this.serviceList.forEach((service: Service) => {
+      if (this.editServiceForm.value.editServiceAdminUrl && service.service_admin_url === this.editServiceForm.value.editServiceAdminUrl) {
+        this.alert.showAlert("There’s already a service with the same Service Admin URL: " + this.editServiceForm.value.editServiceAdminUrl, "Please be aware that this will give repeated results.");
+      }
+    });
   }
   onAddTokenUrlChange() {
     // Remove eventual trailing /:
@@ -384,8 +444,22 @@ export class EditServicesComponent implements OnInit{
     this.addServiceForm.reset();
   }
 
+  getInvalidControls(): string[] {
+    const invalid: string[] = [];
+    const controls = this.addServiceForm.controls;
+
+    for (const name in controls) {
+      if (controls[name].invalid) {
+        invalid.push(name);
+      }
+    }
+
+    return invalid;
+  }
+
   onAddSubmit() {
     if (this.addServiceForm.invalid) {
+      //console.log('Not valid fields:', this.getInvalidControls());
       let controls = this.addServiceForm.controls;
       for (const [key, value] of Object.entries(controls)) {
         this.addServiceForm.controls[key].markAsTouched();
@@ -397,12 +471,13 @@ export class EditServicesComponent implements OnInit{
       username: this.addServiceForm.value.addServiceUsername,
       password: this.addServiceForm.value.addServicePassword,
       service_url: this.addServiceForm.value.addServiceUrl,
+      service_admin_url: this.addServiceForm.value.addServiceType === "GSS" ? this.addServiceForm.value.addServiceAdminUrl : "",
       service_type: this.serviceTypesList.filter((serviceType: ServiceType) => serviceType.service_type === this.addServiceForm.value.addServiceType)[0].id,
       centre: this.centreList.filter((centre: Centre) => centre.name === this.addServiceForm.value.addServiceCentre)[0].id,
       token_url: this.serviceTypesList.filter((a: ServiceType) => a.service_type == this.addServiceForm.value.addServiceType)[0].supports_oauth2 ? this.addServiceForm.value.addServiceTokenUrl : '',
       client_id: this.serviceTypesList.filter((a: ServiceType) => a.service_type == this.addServiceForm.value.addServiceType)[0].supports_oauth2 ? this.addServiceForm.value.addServiceClientId : ''
     };
-    
+
     this.authenticationService.addNewService(body).subscribe({
       complete: () => {
         this.onClosePressed();
@@ -434,7 +509,7 @@ export class EditServicesComponent implements OnInit{
     this.editServiceForm.get('editServicePassword')?.updateValueAndValidity();
   }
 
-  onEditServiceCentreChange(event: any) { 
+  onEditServiceCentreChange(event: any) {
     let editedServiceCentre = event.target.value;
     if (this.tempPrecServiceCentre === editedServiceCentre) {
       this.editServiceForm.get('editServiceCentre')?.setValidators(
@@ -453,7 +528,7 @@ export class EditServicesComponent implements OnInit{
       this.editServiceForm.get('editServiceCentre')?.updateValueAndValidity();
     }
   }
-  
+
   editService(id: number) {
     this.appComponent.checkAdminCount();
     this.passwordIsVisible = false;
@@ -472,6 +547,7 @@ export class EditServicesComponent implements OnInit{
         editServiceCentre: this.centreList.filter((a: Centre) => a.id == serviceToEdit.centre)[0].name,
         editServiceType: this.serviceTypesList.filter((a: ServiceType) => a.id == serviceToEdit.service_type)[0].service_type,
         editServiceUrl: serviceToEdit.service_url,
+        editServiceAdminUrl: serviceToEdit.service_admin_url,
         editServiceClientId: serviceToEdit.client_id,
         editServiceTokenUrl: serviceToEdit.token_url
       });
@@ -489,27 +565,11 @@ export class EditServicesComponent implements OnInit{
       }
       return;
     }
-    let tempCentreId = this.centreList.filter(a => a.name == this.editServiceForm.value.editServiceCentre)[0].id;    
-    let tempServiceTypeId = this.serviceTypesList.filter((serviceType: ServiceType) => serviceType.service_type === this.editServiceForm.value.editServiceType)[0].id;
-    let tempServiceId = id;
-    
-    if (tempServiceTypeId != this.serviceTypesList.filter(a => a.service_type == 'DHuS Back-End')[0].id) {
-      for (var i = 0; i < this.serviceList.length; i++) {
-        if (tempCentreId == this.serviceList[i].centre 
-          && this.serviceList[i].id != tempServiceId
-        ) {
-          if (
-            this.serviceList[i].service_type == this.serviceTypesList.filter(a => a.service_type == 'DHuS Front-End')[0].id ||
-            this.serviceList[i].service_type == this.serviceTypesList.filter(a => a.service_type == 'DHuS Single Instance')[0].id
-          ) {
-            return;
-          }
-        }
-      }
-    }
+
     let body = {
       username: this.editServiceForm.value.editServiceUsername,
       service_url: this.editServiceForm.value.editServiceUrl,
+      service_admin_url: this.editServiceForm.value.editServiceType === "GSS" ? this.editServiceForm.value.editServiceAdminUrl : "",
       service_type: this.serviceTypesList.filter((serviceType: ServiceType) => serviceType.service_type === this.editServiceForm.value.editServiceType)[0].id,
       centre: this.centreList.filter((centre: Centre) => centre.name === this.editServiceForm.value.editServiceCentre)[0].id,
       token_url: this.serviceTypesList.filter((a: ServiceType) => a.service_type == this.editServiceForm.value.editServiceType)[0].supports_oauth2 ? this.editServiceForm.value.editServiceTokenUrl : '',
@@ -539,25 +599,25 @@ export class EditServicesComponent implements OnInit{
     })
   }
 
-  deleteService(id: number) {
+  async deleteService(id: number) {
     this.appComponent.checkAdminCount();
     this.tempServiceIdToDelete = id;
     this.tempServiceUrlToDelete = this.serviceList.filter(a => a.id == id)[0].service_url;
-    document.querySelector("#deleteServiceModal")!.classList.remove('hidden');
-  }
-
-  deleteServiceConfirmed() {
-    this.authenticationService.deleteService(this.tempServiceIdToDelete).subscribe({
-      complete: () => {
-        this.tempServiceIdToDelete = -1;
-        this.onClosePressed();
-        this.refreshPage();
-      },
-      error: (error) => {
-        console.error(error);
-        console.error(error.status);
-      }
-    });
+    const ret = await this.alert.showConfirm("Deleting Centre: "+this.tempServiceUrlToDelete, "Are you sure?");
+    if (ret) {
+      this.authenticationService.deleteService(this.tempServiceIdToDelete).subscribe({
+        complete: () => {
+          this.tempServiceIdToDelete = -1;
+          this.refreshPage();
+        },
+        error: (error) => {
+          console.error(error);
+          console.error(error.status);
+        }
+      });
+    } else {
+      this.tempServiceIdToDelete = -1;
+    }
   }
 
   togglePasswordVisibility() {

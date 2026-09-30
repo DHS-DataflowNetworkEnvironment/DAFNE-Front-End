@@ -1,6 +1,7 @@
 /* Custom properties */
 $scrollbar-bg-color: #29333c;
 $main-text-color: #aaadb6;
+$main-text-color-darker: #5a5d66;
 $main-buttons-bg-color: #6a6d76;
 $main-buttons-text-color: white;
 $main-bg-color: #12222f;
@@ -14,6 +15,7 @@ $brighter-text-color: #aaaaaa;
 $table-header-bg-color: #000;
 $table-border-color: #6A6D76;
 $table-cell-color: #29333c;
+$table-cell-color-hover: #39434c;
 $list-bg-color: #222a35a0;
 $checked-color: #007bff;
 $chart-timing-bg-color: #ccff00;
@@ -22,16 +24,23 @@ $nd-color: #5f5f6f;
 $warning-color: #ffa039;
 $error-color: #ff001e;
 $spinner-color: #007bff;
+$producer-title-bg-color: #203020;
+$consumer-title-bg-color: #251515;
+$datastore-title-bg-color: #171530;
+$credential-title-bg-color: #153030;
 
 $title-font-size: 1.5rem;
 $secondary-title-font-size: 1.25rem;
 $main-font-size: 1.0rem;
-$small-font-size: 0.8rem;
-$extra-small-font-size: 0.7rem;
+$small-font-size: 0.75rem;
+$extra-small-font-size: 0.625rem;
 $icon-size: 2rem;
 
-$sidebar-width: 17rem;
-$sidebar-width-pad: -17.5rem;
+$header-height: 3rem;
+$title-div-height: 2rem;
+$tabs-height: 5rem;
+$sidebar-width: 23rem;
+$sidebar-width-pad: calc((#{$sidebar-width} * -1) - 0.5rem);
 $chart-table-height: 9.5rem;
 $chart-table-height-pad: -10.0rem;
 
@@ -44,6 +53,7 @@ $spinner-dot-radius: calc($spinner-radius / 2);
 :export {
   scrollbarBgColor: $scrollbar-bg-color;
   mainTextColor: $main-text-color;
+  mainTextColorDarker: $main-text-color-darker;
   mainButtons-bgColor: $main-buttons-bg-color;
   mainButtons-textColor: $main-buttons-text-color;
   mainBgColor: $main-bg-color;

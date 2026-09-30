@@ -1,12 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { AuthenticationService } from 'src/app/services/authentication.service';
-import { MessageService } from 'src/app/services/message.service';
+import { Component, OnInit, input, effect, signal } from '@angular/core';
+import { AuthenticationService } from '@app/services/authentication.service';
+import { MessageService } from '@app/services/message.service';
+import { AlertService } from '@app/services/alert.service';
 import { Deck, MapView} from '@deck.gl/core';
 import { GeoJsonLayer, ArcLayer, TextLayer, IconLayer } from '@deck.gl/layers';
-import { Centre } from 'src/app/models/models';
-import { Functions } from 'src/app/util/functions';
-import { ConfigService } from 'src/app/services/config.service';
+import { Centre } from '@app/models/models';
+import { Functions } from '@app/util/functions';
+import { ConfigService } from '@app/services/config.service';
 
 @Component({
   selector: 'app-network-view',
@@ -15,24 +16,25 @@ import { ConfigService } from 'src/app/services/config.service';
   styleUrl: './network-view.component.scss'
 })
 export class NetworkViewComponent implements OnInit {
-  public mapTitle: string = 'Network View';
+  public mapTitle = signal('Network View');
   private showArcs: boolean = false;
 
-  private mapType: string = 'homeView';
-  private mapTypePrec: string = 'homeView';
+  public mapType = input.required<string>();
+  private mapTypePrec: string | undefined = 'homeView';
   public dataSource: any = {};
   private allCentreList: any;
   public remoteCentreList: any;
-  public localCentre: Centre = {
-    id: 0,
-    name: '',
-    local: false,
-    color: '#555',
-    latitude: '0.0',
-    longitude: '0.0',
-    icon: 'home',
+  public ndLocalCentre: Centre = {
+    id: -1,
+    name: "N/D",
+    latitude: "0.0",
+    longitude: "0.0",
+    local: true,
+    icon: "home",
+    color: "#555",
     description: ''
   };
+  public localCentre: Centre = this.ndLocalCentre;
   private localId: number = -1;
 
   HOME_INITIAL_VIEW_STATE = {
@@ -47,7 +49,7 @@ export class NetworkViewComponent implements OnInit {
     longitude: 13.0,
     zoom: 4.0, // Values from 0 to 15
     bearing: 0, // POV rotation. Positive -> turn CW
-    pitch: 55 // Degrees angles from 0 to 60, with 0 = Zenith
+    pitch: 35 // Degrees angles from 0 to 60, with 0 = Zenith
   }
   public INITIAL_VIEW_STATE = this.HOME_INITIAL_VIEW_STATE;
 
@@ -60,21 +62,44 @@ export class NetworkViewComponent implements OnInit {
     private authenticationService: AuthenticationService,
     private messageService: MessageService,
     private functions: Functions,
-    public configService: ConfigService
+    public configService: ConfigService,
+    private alert: AlertService
   ) {
-
+    effect(() => {
+      //console.log('Got Map Type: ', this.mapType());
+      this.mapTypePrec = this.mapType();
+      if (this.mapType() == 'homeView') {
+        this.mapTitle.set('Network View');
+        this.INITIAL_VIEW_STATE = this.HOME_INITIAL_VIEW_STATE;
+        this.showArcs = false;
+        this.getAllCentres();
+      } else if (this.mapType() == 'dhsConnected') {
+        this.mapTitle.set('Network View - Connected Data Sources');
+        this.INITIAL_VIEW_STATE = this.ACTIVE_INITIAL_VIEW_STATE;
+        this.showArcs = true;
+        this.getDHSConnected();
+      } else if (this.mapType() == 'dataSourcesInfo') {
+        this.mapTitle.set('Network View - Active Data Sources');
+        this.INITIAL_VIEW_STATE = this.ACTIVE_INITIAL_VIEW_STATE;
+        this.showArcs = true;
+        this.getActiveDataSources();
+      }
+    });
   }
 
-  ngOnInit(): any {
-    this.getAllCentres();
+  async ngOnInit() {
+    if (await this.authenticationService.isUserAuthenticated()) {
+      this.getAllCentres();
+    }
     this.messageService.hideSidebar(false);
+    this.messageService.showSpinner(true);
   }
 
   getAllCentres(): any {
     this.authenticationService.getAllCentres().subscribe(
       (res: object) => {
         var resultForLocal = Object.values(res).filter((x) => x.local === true);
-        if (resultForLocal[0] == undefined) {
+        if (!resultForLocal || resultForLocal[0] == undefined) {
           this.localId = -1;
         } else {
           this.localId = resultForLocal[0].id;
@@ -107,7 +132,108 @@ export class NetworkViewComponent implements OnInit {
     );
   }
 
+  getDHSConnected() {
+    this.authenticationService.getAllCentres().subscribe(
+      (res: Centre[]) => {
+        var result = Object.values(res).filter((x) => x.local === true);
+        if (result[0] == undefined) {
+          this.messageService.setLocalPresent(false);
+          this.localCentre = this.ndLocalCentre;
+          this.localId = -1;
+          this.remoteCentreList = Object.values(res).filter((x) => x.local === null);
+          this.remoteCentreList.sort(this.getSortOrder("id"));
+          this.allCentreList = res;
+          this.allCentreList.sort(this.getSortOrder("id"));
+          this.checkLatLonPos(this.allCentreList);
+          this.initDeck();
+          this.alert.showAlert("No local Centre has been set", "Please setup one Centre as local");
+        } else {
+          this.localId = result[0].id;
+          this.authenticationService.getDHSConnected(this.localId).subscribe({
+            next: (resDHS) => {
+              this.localCentre = Object.values(res).filter((x) => x.local === true)[0];              
+              const dhsCentreIdsArray = [...new Set(resDHS.map((dhs: any) => dhs.centre))];
+              this.dataSource = res.filter(centre => dhsCentreIdsArray.includes(centre.id));
+              this.remoteCentreList = Object.values(res).filter((x) => x.local === null);
+              this.remoteCentreList.sort(this.getSortOrder("id"));
+              this.allCentreList = res;
+              this.allCentreList.sort(this.getSortOrder("id"));
+              this.checkLatLonPos(this.allCentreList);
+              this.initDeck();
+            },
+            error: (error) => {
+              console.log("Error occurred while fetching DHS connected info:");
+              console.error(error);
+              console.error(error.status);
+            }
+          })
+        }         
+      }
+    );
+  }
+
+  getActiveDataSources() {
+    this.authenticationService.getAllCentres().subscribe(
+      (res: object) => {
+        var result = Object.values(res).filter((x) => x.local === true);
+        if (result[0] == undefined) {
+          this.messageService.setLocalPresent(false);
+          this.localCentre = this.ndLocalCentre;
+          this.localId = -1;
+          this.remoteCentreList = Object.values(res).filter((x) => x.local === null);
+          this.remoteCentreList.sort(this.getSortOrder("id"));
+          this.allCentreList = res;
+          this.allCentreList.sort(this.getSortOrder("id"));
+          this.checkLatLonPos(this.allCentreList);
+          this.initDeck();
+          this.alert.showAlert("No local Centre has been set", "Please setup one Centre as local");
+        } else {
+          this.localId = result[0].id;
+          this.authenticationService.getMapDataSourcesInfo(this.localId).subscribe(
+            (resMPS: object) => {
+              this.dataSource = resMPS;
+              this.localCentre = Object.values(res).filter((x) => x.local === true)[0];
+              
+              this.remoteCentreList = Object.values(res).filter((x) => x.local === null);
+              this.remoteCentreList.sort(this.getSortOrder("id"));
+              this.allCentreList = res;
+              this.allCentreList.sort(this.getSortOrder("id"));
+              this.checkLatLonPos(this.allCentreList);
+              this.initDeck();
+            }
+          );
+        }
+      }
+    );
+  }
+
+    /* Function to sort arrays of object: */
+  getSortOrder(prop: string) {
+    return function (a: any, b: any) {
+      if (a[prop] > b[prop]) {
+        return 1;
+      } else if (a[prop] < b[prop]) {
+        return -1;
+      }
+      return 0;
+    }
+  }
+
+  /* Function to put local first */
+  setLocalFirst(arr: any[]) {
+    let tempLocalId = arr.filter((a: any) => a.local == true)[0].id;
+    for (var i = 0; i < arr.length; ++i) {
+      if (arr[i].id == tempLocalId) {
+        let tempObj = arr[i];
+        arr.splice(i, 1);
+        arr.unshift(tempObj);
+        break;
+      }
+    }
+  }
+
   initDeck() {
+    document.getElementById('network-view-content')!.innerHTML = "";
     const bounds = [[-170, -80], [170, 80]];
 
     function applyViewStateConstraints(viewState: any) {
@@ -127,7 +253,7 @@ export class NetworkViewComponent implements OnInit {
       stroked: true,
       filled: true,
       pickable: true,
-      getFillColor: [0, 0, 0], 
+      getFillColor: [0, 0, 0],
       getLineColor: [60, 60, 60],
       lineWidthUnits: 'pixels',
       getLineWidth: 1
@@ -139,7 +265,7 @@ export class NetworkViewComponent implements OnInit {
       pickable: true,
       billboard: true, // false = flat on terrain, true = vertical
       getIcon: (d:any) => {
-        const tempKey: string = d.icon; 
+        const tempKey: string = d.icon;
         return {
           url: this.ICON_MAPPING[tempKey],
           width: 96,
@@ -153,6 +279,8 @@ export class NetworkViewComponent implements OnInit {
       },
       getPosition: (d:any) => [d.longitude, d.latitude, 0],
       getSize: this.configService.getConfig().mapSettings.iconSize,
+      sizeUnits: 'pixels',
+      sizeScale: 1,
       getColor: (d:any) => this.rgbConvertToArray(d.color)
     });
 
@@ -160,6 +288,7 @@ export class NetworkViewComponent implements OnInit {
       id: 'text-layer',
       data: this.allCentreList,
       fontFamily: '"NotesESA-Reg", Arial, Helvetica, sans-serif',
+      billboard: true,
       pickable: true,
       parameters: {
         depthTest: false
@@ -168,6 +297,7 @@ export class NetworkViewComponent implements OnInit {
       getText: (d:any) => d.name,
       getSize: this.configService.getConfig().mapSettings.textSize,
       sizeUnits: 'pixels',
+      sizeScale: 1,
       getPixelOffset: (d:any) => (d.textAnchor == 'end' ? [-20, -4] : [20, -4]),
       getAngle: 0,
       getColor: [255, 255, 255],
@@ -180,8 +310,8 @@ export class NetworkViewComponent implements OnInit {
       data: this.dataSource,
       getSourcePosition: (d:any) => [<any>this.localCentre.longitude, <any>this.localCentre.latitude],
       getTargetPosition: (d:any) => [d.longitude, d.latitude],
-      getSourceColor: this.mapType == 'dhsConnected' ? this.rgbConvertToArray(this.localCentre.color) : d => this.rgbConvertToArray(d.color),
-      getTargetColor: this.mapType == 'dhsConnected' ? this.rgbConvertToArray(this.localCentre.color) : d => this.rgbConvertToArray(d.color),
+      getSourceColor: d => (this.mapType() == 'dhsConnected' ? this.rgbConvertToArray(this.localCentre.color) : this.rgbConvertToArray(d.color)),
+      getTargetColor: d => (this.mapType() == 'dhsConnected' ? this.rgbConvertToArray(this.localCentre.color) : this.rgbConvertToArray(d.color)),
       getWidth: 1
     });
 

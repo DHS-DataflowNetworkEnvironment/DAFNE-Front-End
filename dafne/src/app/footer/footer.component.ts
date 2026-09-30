@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ConfigService } from 'src/app/services/config.service';
-import { AuthenticationService } from 'src/app/services/authentication.service';
+import { ConfigService } from '@app/services/config.service';
+import { AuthenticationService } from '@app/services/authentication.service';
 
 @Component({
   selector: 'app-footer',
@@ -11,7 +11,7 @@ import { AuthenticationService } from 'src/app/services/authentication.service';
 export class FooterComponent implements OnInit {
   public centreLogoPath: string = "";
   public softwareVersion: string = "";
-  
+
   constructor(
     public authenticationService: AuthenticationService,
     public configService: ConfigService

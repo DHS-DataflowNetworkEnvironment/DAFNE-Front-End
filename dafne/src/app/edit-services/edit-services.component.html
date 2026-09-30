@@ -1,258 +1,299 @@
 <div class="main-parent-view-content">
-    <div class="main-page-title">
-      <p>Edit Services</p>
-    </div>
-    <div class="main-page-content">
-      <div class="main-page-inner-container">
-        <div class="edit-title-container">
-            <p class="edit-table-title">Services List</p>
-            @if (isAdmin()) {
-            <button class="edit-add-button hover-el" (click)="addNewService()" title="Add Service">Add Service<svg class="svg-icon plus-icon"><use href="assets/icons/dafne_symbols.svg#icon-plus"/></svg></button>
-            }
-        </div>
+  <div class="main-page-title">
+    <p>Edit Services</p>
+  </div>
+  <div class="main-page-content active">
+    <div class="main-page-inner-container">
+      <div class="edit-title-container">
+        <p class="edit-table-title">Services List</p>
+        @if (isAdmin()) {
+        <button class="edit-add-button hover-el" (click)="addNewService()" title="Add Service">Add Service<svg
+            class="svg-icon plus-icon">
+            <use href="assets/icons/dafne_symbols.svg#icon-plus" />
+          </svg></button>
+        }
+      </div>
+      <div class="default-elements-table-container">
         <table>
-            <tr>
-                <th>Username</th>
-                <th>Service URL</th>
-                <th>Oauth2 token URL</th>
-                <th>Oauth2 client ID</th>
-                <th>Service type</th>
-                <th>Centre</th>
-                @if (isAdmin()) {
-                <th>Actions</th>
-                }
-            </tr>
-            <tr *ngFor="let service of serviceList">
-                @if (service.username === 'N/D') {
-                <td class="cell-username nd-cell">{{service.username}}</td>
-                }
-                @else {
-                <td class="cell-username">{{service.username}}</td>
-                }
-                <td class="cell-service_url">{{service.service_url}}</td>
-                @if (service.token_url === '') {
-                  <td class="cell-token_url nd-cell">N/D</td>
-                }
-                @else {
-                  <td class="cell-token_url">{{service.token_url}}</td>
-                }
-                @if (service.client_id === '') {
-                  <td class="cell-client_id nd-cell">N/D</td>
-                }
-                @else {
-                  <td class="cell-client_id">{{service.client_id}}</td>
-                }
-                <td class="cell-service_type">{{getServiceTypeName(service.service_type)}}</td>
-                <td class="cell-centre">{{getCentreName(service.centre)}}</td>
-                @if (isAdmin()) {
-                <td>
-                    <div class="cell-actions">
-                        <div class="action-icon-container" title="Edit Service">
-                            <svg class="icon-edit hover-el" (click)="editService(service.id)"><use href="assets/icons/dafne_symbols.svg#icon-edit"/></svg>
-                        </div>
-                        <div class="action-icon-container" title="Delete Service">
-                            <svg class="icon-delete hover-el" (click)="deleteService(service.id)"><use href="assets/icons/dafne_symbols.svg#icon-delete"/></svg>
-                        </div>
-                    </div>
-                </td>
-                }
-            </tr>
+          <tr>
+            <th>Username</th>
+            <th>Service URL</th>
+            <th>Service Admin URL</th>
+            <th>Oauth2 token URL</th>
+            <th>Oauth2 client ID</th>
+            <th>Service type</th>
+            <th>Centre</th>
+            @if (isAdmin()) {
+            <th class="col-actions">Actions</th>
+            }
+          </tr>
+          <tr *ngFor="let service of serviceList">
+            @if (service.username === 'N/D') {
+            <td class="cell-username nd-cell">{{service.username}}</td>
+            }
+            @else {
+            <td class="cell-username">{{service.username}}</td>
+            }
+            <td class="cell-service_url">{{service.service_url}}</td>
+            @if (!service.service_admin_url || service.service_admin_url === '') {
+            <td class="cell-username nd-cell">N/D</td>
+            }
+            @else {
+            <td class="cell-service_admin_url">{{service.service_admin_url}}</td>
+            }
+            @if (service.token_url === '') {
+            <td class="cell-token_url nd-cell">N/D</td>
+            }
+            @else {
+            <td class="cell-token_url">{{service.token_url}}</td>
+            }
+            @if (service.client_id === '') {
+            <td class="cell-client_id nd-cell">N/D</td>
+            }
+            @else {
+            <td class="cell-client_id">{{service.client_id}}</td>
+            }
+            <td class="cell-service_type">{{getServiceTypeName(service.service_type)}}</td>
+            <td class="cell-centre">{{getCentreName(service.centre)}}</td>
+            @if (isAdmin()) {
+            <td class="col-actions">
+              <div class="cell-actions">
+                <div class="action-icon-container" title="Edit Service">
+                  <svg class="icon-edit hover-el" (click)="editService(service.id)">
+                    <use href="assets/icons/dafne_symbols.svg#icon-edit" />
+                  </svg>
+                </div>
+                <div class="action-icon-container" title="Delete Service">
+                  <svg class="icon-delete hover-el" (click)="deleteService(service.id)">
+                    <use href="assets/icons/dafne_symbols.svg#icon-delete" />
+                  </svg>
+                </div>
+              </div>
+            </td>
+            }
+          </tr>
         </table>
-        </div>
+      </div>
     </div>
+  </div>
 </div>
 
 <!-- Add Modal -->
 <div class="modal hidden" id="addServiceModal" tabindex="-1">
-    <div class="modal-container">
-        <div class="modal-header">
-            <h4 class="modal-title">ADD SERVICE</h4>
-        </div>
-        <hr class="modal-hr">
-        <div class="modal-body">
-            <form id="addServiceForm" [formGroup]="addServiceForm" (ngSubmit)="onAddSubmit()">
-                <div class="form-input-div column"> 
-                    <label for="add-service_type" class="form-label">Service type</label>
-                    <select class="form-text-input full-width" id="add-service_type" (change)="onAddServiceTypeChange()" formControlName="addServiceType" required>
-                        <option *ngFor="let serviceType of serviceTypesList; let k = index">{{serviceType.service_type}}</option>
-                    </select>
-                    <small id="service-type-help" class="validation-message">Please select a service type</small>
-                </div>
-                <div class="form-input-group-div">
-                  @if (showUsernameAndPassword) {
-                    <div class="form-input-div column">
-                        <label for="add-service_username" class="form-label">Username</label>
-                        <input type="text" class="form-text-input" id="add-service_username" formControlName="addServiceUsername" required>
-                        <small id="usernameHelp" class="validation-message">Length: 1 - 60 characters</small>
-                    </div>
-                    <div class="form-input-div column">
-                        <label for="add-service_password" class="form-label">Password</label>
-                        @if (passwordIsVisible) {
-                            <div class="password-input-container">
-                                <input type="text" class="form-text-input" id="add-service_password" autocomplete="current-password" formControlName="addServicePassword" required>
-                                <small id="passwordHelp" class="validation-message">Length: 1 - 60 characters</small>
-                                <div class="eye-icon-container" title="Hide password">
-                                    <svg class="eye-icon hover-el" (click)="togglePasswordVisibility()"><use href="assets/icons/dafne_symbols.svg#icon-eye-hide"/></svg>
-                                </div>
-                            </div>
-                        }
-                        @else {
-                            <div class="password-input-container">
-                                <input type="password" class="form-text-input" id="add-service_password" autocomplete="current-password" formControlName="addServicePassword" required>
-                                <small id="passwordHelp" class="validation-message">Length: 1 - 60 characters</small>
-                                <div class="eye-icon-container" title="Show password">
-                                    <svg class="eye-icon hover-el" (click)="togglePasswordVisibility()"><use href="assets/icons/dafne_symbols.svg#icon-eye-show"/></svg>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                  }
-                </div>
-                <div class="form-input-group-div">
-                    <div class="form-input-div column">
-                        <label for="add-service_url" class="form-label">Service URL</label>
-                        <input type="text" class="form-text-input" id="add-service_url" formControlName="addServiceUrl" (change)="onAddServiceUrlChange()" required>
-                        <small id="serviceUrlHelp" class="validation-message">Length: 1 - 256 characters.<br>Invalid characters: , ; and SPACE</small>
-                    </div>
-                    <div class="form-input-div column">
-                        <label for="add-centre" class="form-label">Centre</label>
-                        <select class="form-text-input" id="add-centre" formControlName="addServiceCentre" required>
-                          <option *ngFor="let centre of centreList">{{centre.name}}</option>
-                        </select>
-                        <small id="centreHelp" class="validation-message">Please select a not-associated centre</small>
-                    </div>
-                </div>
-              @if (showOauth2Fields) {
-                <div class="form-input-group-div">
-                    <div class="form-input-div column">
-                        <label for="add-token_url" class="form-label">Service token URL</label>
-                        <input type="text" class="form-text-input" id="add-token_url" formControlName="addServiceTokenUrl" (change)="onAddTokenUrlChange()">
-                        <small id="tokenUrlHelp" class="validation-message">Length: 1 - 256 characters.<br>Invalid characters: , ; and SPACE</small>
-                    </div>
-                    <div class="form-input-div column">
-                        <label for="add-client_id" class="form-label">Service clientId</label>
-                        <input type="text" class="form-text-input" id="add-client_id"  formControlName="addServiceClientId">
-                        <small id="clientIdHelp" class="validation-message">Length: 1 - 256 characters.<br>Invalid characters: , ; and SPACE</small>
-                    </div>
-                </div>
-              }
-                <div class="form-input-div row">
-                  <button type="button" class="form-button close rect hover-el" (click)="onClosePressed()">CANCEL</button>
-                  <button type="submit" class="form-button submit rect hover-el">SUBMIT</button>
-                </div>
-            </form>
-        </div>
+  <div class="modal-container">
+    <div class="modal-header">
+      <h4 class="modal-title">ADD SERVICE</h4>
     </div>
+    <hr class="modal-hr">
+    <div class="modal-body">
+      <form id="addServiceForm" [formGroup]="addServiceForm" (ngSubmit)="onAddSubmit()">
+        <div class="form-input-div column">
+          <label for="add-service_type" class="form-label">Service type</label>
+          <select class="form-text-input full-width" id="add-service_type" (change)="onAddServiceTypeChange()"
+            formControlName="addServiceType" required>
+            <option *ngFor="let serviceType of serviceTypesList; let k = index">{{serviceType.service_type}}</option>
+          </select>
+          <small id="service-type-help" class="validation-message">Please select a service type</small>
+        </div>
+        <div class="form-input-group-div">
+          @if (showUsernameAndPassword) {
+          <div class="form-input-div column">
+            <label for="add-service_username" class="form-label">Username</label>
+            <input type="text" class="form-text-input" id="add-service_username" formControlName="addServiceUsername"
+              required>
+            <small id="usernameHelp" class="validation-message">Length: 1 - 60 characters</small>
+          </div>
+          <div class="form-input-div column">
+            <label for="add-service_password" class="form-label">Password</label>
+            @if (passwordIsVisible) {
+            <div class="password-input-container">
+              <input type="text" class="form-text-input" id="add-service_password" autocomplete="current-password"
+                formControlName="addServicePassword" required>
+              <small id="passwordHelp" class="validation-message">Length: 1 - 60 characters</small>
+              <div class="eye-icon-container" title="Hide password">
+                <svg class="eye-icon hover-el" (click)="togglePasswordVisibility()">
+                  <use href="assets/icons/dafne_symbols.svg#icon-eye-hide" />
+                </svg>
+              </div>
+            </div>
+            }
+            @else {
+            <div class="password-input-container">
+              <input type="password" class="form-text-input" id="add-service_password" autocomplete="current-password"
+                formControlName="addServicePassword" required>
+              <small id="passwordHelp" class="validation-message">Length: 1 - 60 characters</small>
+              <div class="eye-icon-container" title="Show password">
+                <svg class="eye-icon hover-el" (click)="togglePasswordVisibility()">
+                  <use href="assets/icons/dafne_symbols.svg#icon-eye-show" />
+                </svg>
+              </div>
+            </div>
+            }
+          </div>
+          }
+        </div>
+        <div class="form-input-group-div">
+          <div class="form-input-div column">
+            <label for="add-service_url" class="form-label">Service URL</label>
+            <input type="text" class="form-text-input" id="add-service_url" formControlName="addServiceUrl"
+              (change)="onAddServiceUrlChange()" required>
+            <small id="serviceUrlHelp" class="validation-message">Length: 1 - 256 characters.<br>Invalid characters: , ;
+              and SPACE</small>
+          </div>
+          <div class="form-input-div column">
+            <label for="add-centre" class="form-label">Centre</label>
+            <select class="form-text-input" id="add-centre" formControlName="addServiceCentre" required>
+              <option *ngFor="let centre of centreList">{{centre.name}}</option>
+            </select>
+            <small id="centreHelp" class="validation-message">Please select a not-associated centre</small>
+          </div>
+        </div>
+        @if (addServiceForm.value.addServiceType === "GSS") {
+        <div class="form-input-div column">
+          <label for="add-service_admin_url" class="form-label">Service Admin URL</label>
+          <input type="text" class="form-text-input full-width" id="add-service_admin_url" formControlName="addServiceAdminUrl"
+              (change)="onAddServiceAdminUrlChange()">
+          <small id="serviceAdminUrlhelp" class="validation-message">Length: 1 - 256 characters.<br>Invalid characters: , ;
+              and SPACE</small>
+        </div>
+        }
+        @if (showOauth2Fields) {
+        <div class="form-input-group-div">
+          <div class="form-input-div column">
+            <label for="add-token_url" class="form-label">Service token URL</label>
+            <input type="text" class="form-text-input" id="add-token_url" formControlName="addServiceTokenUrl"
+              (change)="onAddTokenUrlChange()">
+            <small id="tokenUrlHelp" class="validation-message">Length: 1 - 256 characters.<br>Invalid characters: , ;
+              and SPACE</small>
+          </div>
+          <div class="form-input-div column">
+            <label for="add-client_id" class="form-label">Service clientId</label>
+            <input type="text" class="form-text-input" id="add-client_id" formControlName="addServiceClientId">
+            <small id="clientIdHelp" class="validation-message">Length: 1 - 256 characters.<br>Invalid characters: , ;
+              and SPACE</small>
+          </div>
+        </div>
+        }
+        <div class="form-input-div row">
+          <button type="button" class="form-button close rect hover-el" (click)="onClosePressed()">CANCEL</button>
+          <button type="submit" class="form-button submit rect hover-el">SUBMIT</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 
 <!-- Edit Modal -->
 <div class="modal hidden" id="editServiceModal" tabindex="-1">
-    <div class="modal-container">
-        <div class="modal-header">
-            <h4 class="modal-title">EDIT SERVICE</h4>
-        </div>
-        <hr class="modal-hr">
-        <div class="modal-body">
-            <form id="editServiceForm" [formGroup]="editServiceForm" (ngSubmit)="onEditSubmit(tempServiceIdToEdit)">
-                <div class="form-input-group-div">
-                    <div class="form-input-div column">
-                        <label for="edit-id" class="form-label">Id</label>
-                        <input type="text" class="form-text-input" id="edit-id" disabled value="{{tempServiceIdToEdit}}">
-                    </div>
-                    <div class="form-input-div column">
-                        <label for="edit-service_type" class="form-label">Service type</label>
-                        <select class="form-text-input" id="edit-service_type" (change)="onEditServiceTypeChange()" formControlName="editServiceType" required>
-                          <option *ngFor="let serviceType of serviceTypesList; let k = index">{{serviceType.service_type}}</option>
-                        </select>
-                        <small id="serviceTypeHelp" class="validation-message">Please select a service type</small>
-                    </div>
-                </div>
-                <div class="form-input-group-div">
-                  @if (showUsernameAndPassword) {
-                    <div class="form-input-div column">
-                        <label for="edit-service_username" class="form-label">Username</label>
-                        <input type="text" class="form-text-input" id="edit-service_username" formControlName="editServiceUsername" required>
-                        <small id="usernameHelp" class="validation-message">Length: 1 - 60 characters</small>
-                    </div>
-                    <div class="form-input-div column">
-                        <label for="edit-service_password" class="form-label">Password</label>
-
-                        @if (passwordIsVisible) {
-                            <div class="password-input-container">
-                                <input type="text" class="form-text-input" id="edit-service_password" autocomplete="current-password" (change)="onEditPasswordChanged()" formControlName="editServicePassword" placeholder="unchanged" required>
-                                <small id="passwordHelp" class="validation-message">Length: 1 - 60 characters</small>
-                                <div class="eye-icon-container" title="Hide password">
-                                    <svg class="eye-icon hover-el" (click)="togglePasswordVisibility()"><use href="assets/icons/dafne_symbols.svg#icon-eye-hide"/></svg>
-                                </div>
-                            </div>
-                        }
-                        @else {
-                            <div class="password-input-container">
-                                <input type="password" class="form-text-input" id="edit-service_password" autocomplete="current-password" (change)="onEditPasswordChanged()" formControlName="editServicePassword" placeholder="unchanged" required>
-                                <small id="passwordHelp" class="validation-message">Length: 1 - 60 characters</small>
-                                <div class="eye-icon-container" title="Show password">
-                                    <svg class="eye-icon hover-el" (click)="togglePasswordVisibility()"><use href="assets/icons/dafne_symbols.svg#icon-eye-show"/></svg>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                  }
-                </div>
-                <div class="form-input-group-div">
-                    <div class="form-input-div column">
-                        <label for="edit-service_url" class="form-label">Service URL</label>
-                        <input type="text" class="form-text-input" id="edit-service_url" formControlName="editServiceUrl" (change)="onEditServiceUrlChange()" required>
-                        <small id="serviceUrlHelp" class="validation-message">Length: 1 - 256 characters.<br>Invalid characters: , ; and SPACE</small>
-                    </div>
-                    <div class="form-input-div column">
-                        <label for="edit-centre" class="form-label">Centre</label>
-                        <select class="form-text-input" id="edit-centre" formControlName="editServiceCentre" (change)="onEditServiceCentreChange($event)" required>
-                          <option *ngFor="let centre of centreList">{{centre.name}}</option>
-                        </select>
-                        <small id="centreHelp" class="validation-message">Please select a not-associated centre</small>
-                    </div>
-                </div>
-              @if (showOauth2Fields) {
-                <div class="form-input-group-div">
-                    <div class="form-input-div column">
-                        <label for="edit-token_url" class="form-label">Service token URL</label>
-                        <input type="text" class="form-text-input" id="edit-token_url" formControlName="editServiceTokenUrl" (change)="onEditTokenUrlChange()">
-                        <small id="tokenUrlHelp" class="validation-message">Length: 1 - 256 characters.<br>Invalid characters: , ; and SPACE</small>
-                    </div>
-                    <div class="form-input-div column">
-                        <label for="edit-client_id" class="form-label">Service clientId</label>
-                        <input type="text" class="form-text-input" id="edit-client_id" formControlName="editServiceClientId">
-                        <small id="clientIdHelp" class="validation-message">Length: 1 - 256 characters.<br>Invalid characters: , ; and SPACE</small>
-                    </div>
-                </div>
-              }
-                <div class="form-input-div row">
-                  <button type="button" class="form-button close rect hover-el" (click)="onClosePressed()">CANCEL</button>
-                  <button type="submit" class="form-button submit rect hover-el">SUBMIT</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Delete Alert! -->
-<div class="modal hidden" id="deleteServiceModal" tabindex="-1">
   <div class="modal-container">
-      <div class="modal-header">
-          <h4 class="modal-title">Deleting Service: {{tempServiceUrlToDelete}}</h4>
-          <svg class="icon-warning"><use href="assets/icons/dafne_symbols.svg#icon-warning"/></svg>
-      </div>
-      <hr class="modal-hr">
-      <div class="modal-body">
-          <form id="deleteServiceForm" (ngSubmit)="deleteServiceConfirmed()">
-              <div class="form-input-div row-left">
-                  <label>Are you sure?</label>
+    <div class="modal-header">
+      <h4 class="modal-title">EDIT SERVICE</h4>
+    </div>
+    <hr class="modal-hr">
+    <div class="modal-body">
+      <form id="editServiceForm" [formGroup]="editServiceForm" (ngSubmit)="onEditSubmit(tempServiceIdToEdit)">
+        <div class="form-input-group-div">
+          <div class="form-input-div column">
+            <label for="edit-id" class="form-label">Id</label>
+            <input type="text" class="form-text-input" id="edit-id" disabled value="{{tempServiceIdToEdit}}">
+          </div>
+          <div class="form-input-div column">
+            <label for="edit-service_type" class="form-label">Service type</label>
+            <select class="form-text-input" id="edit-service_type" (change)="onEditServiceTypeChange()"
+              formControlName="editServiceType" required>
+              <option *ngFor="let serviceType of serviceTypesList; let k = index">{{serviceType.service_type}}</option>
+            </select>
+            <small id="serviceTypeHelp" class="validation-message">Please select a service type</small>
+          </div>
+        </div>
+        <div class="form-input-group-div">
+          @if (showUsernameAndPassword) {
+          <div class="form-input-div column">
+            <label for="edit-service_username" class="form-label">Username</label>
+            <input type="text" class="form-text-input" id="edit-service_username" formControlName="editServiceUsername"
+              required>
+            <small id="usernameHelp" class="validation-message">Length: 1 - 60 characters</small>
+          </div>
+          <div class="form-input-div column">
+            <label for="edit-service_password" class="form-label">Password</label>
+
+            @if (passwordIsVisible) {
+            <div class="password-input-container">
+              <input type="text" class="form-text-input" id="edit-service_password" autocomplete="current-password"
+                (change)="onEditPasswordChanged()" formControlName="editServicePassword" placeholder="unchanged"
+                required>
+              <small id="passwordHelp" class="validation-message">Length: 1 - 60 characters</small>
+              <div class="eye-icon-container" title="Hide password">
+                <svg class="eye-icon hover-el" (click)="togglePasswordVisibility()">
+                  <use href="assets/icons/dafne_symbols.svg#icon-eye-hide" />
+                </svg>
               </div>
-              <div class="form-input-div row">
-                  <button type="button" class="form-button close rect hover-el" (click)="onClosePressed()">CANCEL</button>
-                  <button type="submit" class="form-button submit rect hover-el">YES</button>
+            </div>
+            }
+            @else {
+            <div class="password-input-container">
+              <input type="password" class="form-text-input" id="edit-service_password" autocomplete="current-password"
+                (change)="onEditPasswordChanged()" formControlName="editServicePassword" placeholder="unchanged"
+                required>
+              <small id="passwordHelp" class="validation-message">Length: 1 - 60 characters</small>
+              <div class="eye-icon-container" title="Show password">
+                <svg class="eye-icon hover-el" (click)="togglePasswordVisibility()">
+                  <use href="assets/icons/dafne_symbols.svg#icon-eye-show" />
+                </svg>
               </div>
-          </form>
-      </div>
+            </div>
+            }
+          </div>
+          }
+        </div>
+        <div class="form-input-group-div">
+          <div class="form-input-div column">
+            <label for="edit-service_url" class="form-label">Service URL</label>
+            <input type="text" class="form-text-input" id="edit-service_url" formControlName="editServiceUrl"
+              (change)="onEditServiceUrlChange()" required>
+            <small id="serviceUrlHelp" class="validation-message">Length: 1 - 256 characters.<br>Invalid characters: , ;
+              and SPACE</small>
+          </div>
+          <div class="form-input-div column">
+            <label for="edit-centre" class="form-label">Centre</label>
+            <select class="form-text-input" id="edit-centre" formControlName="editServiceCentre"
+              (change)="onEditServiceCentreChange($event)" required>
+              <option *ngFor="let centre of centreList">{{centre.name}}</option>
+            </select>
+            <small id="centreHelp" class="validation-message">Please select a not-associated centre</small>
+          </div>
+        </div>
+        @if (editServiceForm.value.editServiceType === "GSS") {
+        <div class="form-input-div column">
+          <label for="edit-service_admin_url" class="form-label">Service Admin URL</label>
+          <input type="text" class="form-text-input full-width" id="edit-service_admin_url" formControlName="editServiceAdminUrl"
+              (change)="onEditServiceAdminUrlChange()">
+          <small id="serviceAdminUrlhelp" class="validation-message">Length: 1 - 256 characters.<br>Invalid characters: , ;
+              and SPACE</small>
+        </div>
+        }
+        @if (showOauth2Fields) {
+        <div class="form-input-group-div">
+          <div class="form-input-div column">
+            <label for="edit-token_url" class="form-label">Service token URL</label>
+            <input type="text" class="form-text-input" id="edit-token_url" formControlName="editServiceTokenUrl"
+              (change)="onEditTokenUrlChange()">
+            <small id="tokenUrlHelp" class="validation-message">Length: 1 - 256 characters.<br>Invalid characters: , ;
+              and SPACE</small>
+          </div>
+          <div class="form-input-div column">
+            <label for="edit-client_id" class="form-label">Service clientId</label>
+            <input type="text" class="form-text-input" id="edit-client_id" formControlName="editServiceClientId">
+            <small id="clientIdHelp" class="validation-message">Length: 1 - 256 characters.<br>Invalid characters: , ;
+              and SPACE</small>
+          </div>
+        </div>
+        }
+        <div class="form-input-div row">
+          <button type="button" class="form-button close rect hover-el" (click)="onClosePressed()">CANCEL</button>
+          <button type="submit" class="form-button submit rect hover-el">SUBMIT</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>

@@ -1,6 +1,6 @@
 <div class="main-parent-view-content">
   <div class="main-page-title">Service availability</div>
-  <div class="main-page-content">
+  <div class="main-page-content active">
     <div class="filters-form-container">
       <form id="sa-filters-form" class="filters-form" (ngSubmit)="onFilterButtonSubmit()"
           [formGroup]="filterForm">
@@ -20,12 +20,14 @@
       </form>
     </div>
 
+    <!-- Main Chart Container -->
     <div class="main-chart-container">
+    <!-- Charts -->
       <div class="p5Canvas-column-div">
           <div id="p5ServiceAvailabilityCanvas" class="p5Canvas-div"></div>
       </div>
       <!-- Chart-sidebar -->
-      <section class="chart-sidebar-container">
+      <section class="chart-sidebar-container" (click)="onChartSidebarClick($event)">
         <!-- Date Title -->
         @if (isWeekly) {
         <h5 class="chart-sidebar-title">WEEKLY</h5>
@@ -105,6 +107,7 @@
       </div>
       <div class="data-table-inner-container">
           <div class="table-div">
+            <div class="default-elements-table-container">
               <table id="data-table">
                   <!-- Weekly Availability -->
                   <thead *ngIf="isWeekly == true">
@@ -161,6 +164,7 @@
                       </ng-template>
                   </tr>
               </table>
+            </div>
           </div>
       </div>
       <div class="data-table-arrow-container data-table-up-arrow-container" (click)="onDataTableShow()">

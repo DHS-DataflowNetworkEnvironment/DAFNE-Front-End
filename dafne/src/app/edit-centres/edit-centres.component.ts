@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthenticationService } from 'src/app/services/authentication.service';
-import { MessageService } from 'src/app/services/message.service';
-import { Centre } from 'src/app/models/models';
+import { AuthenticationService } from '@app/services/authentication.service';
+import { AlertService } from '../services/alert.service';
+import { MessageService } from '@app/services/message.service';
+import { Centre } from '@app/models/models';
 import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormsModule, Validators, FormGroup, FormControl } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { AppComponent } from 'src/app/app.component';
+import { AppComponent } from '@app/app.component';
 
 const regexPatterns: {[key:string]: string} = {
   "add-name": "^.{1,60}$",
@@ -113,6 +114,7 @@ export class EditCentresComponent implements OnInit {
 
   constructor(
     private authenticationService: AuthenticationService,
+    private alert: AlertService,
     private messageService: MessageService,
     private router: Router,
     private appComponent: AppComponent
@@ -141,7 +143,7 @@ export class EditCentresComponent implements OnInit {
   isAdmin() {
     return this.authenticationService.currentUser.isAdmin;
   }
-  
+
   getCentresData(reload: boolean) {
     this.authenticationService.getAllCentres().subscribe({
       next: (res) => {
@@ -158,7 +160,7 @@ export class EditCentresComponent implements OnInit {
       },
       complete: () => {
         if (reload) {
-          this.router.navigate(['/gui', { outlets: { centralBodyRouter: ['edit-centres']}}], { skipLocationChange: true });
+          this.router.navigate(['/home', { outlets: { centralBodyRouter: ['edit-centres']}}], { skipLocationChange: true });
         }
       }
     });
@@ -301,29 +303,28 @@ export class EditCentresComponent implements OnInit {
     });
   }
 
-  deleteCentre(id: number) {
+  async deleteCentre(id: number) {
     this.appComponent.checkAdminCount();
     this.tempCentreIdToDelete = id;
     this.tempCentreNameToDelete = this.centreList.filter((a: Centre) => a.id == id)[0].name;
     this.tempCentreColorToDelete = this.centreList.filter((a: Centre) => a.id == id)[0].color;
-    document.querySelector("#deleteCentreModal")!.classList.remove('hidden');
+    const ret = await this.alert.showConfirm("Deleting Centre: <span style='color:"+this.tempCentreColorToDelete+"'>"+this.tempCentreNameToDelete+"</span>", "Are you sure?");
+    if (ret) {
+      this.authenticationService.deleteCentre(this.tempCentreIdToDelete).subscribe({
+        complete: () => {
+          this.tempCentreIdToDelete = -1;
+          this.refreshPage();
+        },
+        error: (error) => {
+          console.error(error);
+          console.error(error.status);
+        }
+      });
+    } else {
+      this.tempCentreIdToDelete = -1;
+    }
   }
 
-  deleteCentreConfirmed() {
-    this.authenticationService.deleteCentre(this.tempCentreIdToDelete).subscribe({
-      complete: () => {
-        this.tempCentreIdToDelete = -1;
-        this.onClosePressed();
-        this.refreshPage();
-      },
-      error: (error) => {
-        console.error(error);
-        console.error(error.status);
-      }
-    }
-    )
-  }
-  
   onClosePressed() {
     this.tempCentreIdToDelete = -1;
     let modals = document.querySelectorAll('.modal');

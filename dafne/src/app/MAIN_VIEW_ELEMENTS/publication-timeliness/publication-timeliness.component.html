@@ -1,4 +1,186 @@
-<div id="publication-timeliness-view-inner-container">
-  <div id="publication-timeliness-view-title">Network View - Publication timeliness</div>
-  <div id="publication-timeliness-view-content"></div>
+<div class="main-parent-view-content">
+  <div class="main-page-title">Publication timeliness</div>
+  <div class="main-page-content active">
+    <div class="filters-form-container">
+      <form id="sa-filters-form" class="filters-form" (ngSubmit)="onFilterButtonSubmit()"
+          [formGroup]="filterForm">
+        <div class="form-input-div row filter-outer-div">
+          <div class="filter-inner-div">
+            <label for="timeliness-title" class="form-label extra-small-font-size">Timeliness:</label>
+            <div class="filter-title" id="timeliness-title" name="timeliness-title">
+              <span [ngStyle]="{'color': localCentre.color }">{{localCentre.name}}</span> Vs <span [ngStyle]="{'color': calculatedTimelinessCentre.color }">{{calculatedTimelinessCentre.name}}</span>
+            </div>
+          </div>
+          <div class="filter-inner-div">
+            <label for="weekly-checkbox" class="form-label extra-small-font-size">Weekly Aggregation:</label>
+            <input type="checkbox" class="form-checkbox" id="weekly-checkbox" name="weekly-checkbox"
+                  (change)="onWeeklyCheckboxChange()" formControlName="filterWeekly">
+          </div>
+          <div class="filter-inner-div">
+            <label for="filter-select" class="form-label extra-small-font-size">Filter:</label>
+            <select class="form-text-input right shrink extra-small-font-size" id="filter-select" name="filter-select" (change)="onFilterChange()" formControlName="timelinessFilter">
+              <option *ngFor="let filter of filtersList(); let i = index;" [ngValue]="filter.label" title="{{filter.filter}}">{{filter.label}}</option>
+            </select>
+          </div>
+          <div class="filter-inner-div">
+            <label class="form-label extra-small-font-size">Start/Stop Date:</label>
+            <input type="date" class="form-text-input date-input extra-small-font-size" id="start-date" (change)="onStartDateChanged()" formControlName="filterStartDate" />
+            <input type="date" class="form-text-input date-input extra-small-font-size" id="stop-date" (change)="onStopDateChanged()" formControlName="filterStopDate" />
+          </div>
+          <button type="submit" class="form-button submit rect hover-el">Filter</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Main Chart Container -->
+    <div class="main-chart-container">
+      <!-- Charts -->
+      <div class="p5Canvas-column-div">
+        <div id="p5PublicationTimelinessCanvas" class="p5Canvas-div"></div>
+      </div>
+      <!-- Chart-sidebar -->
+      <section class="chart-sidebar-container" (click)="onChartSidebarClick($event)">
+        <!-- Date Title -->
+        @if (showDetailTimeliness == false && isWeekly == true) {
+        <h5 class="chart-sidebar-title">WEEKLY</h5>
+        }
+        @else if (showDetailTimeliness == false && isWeekly == false) {
+        <h5 class="chart-sidebar-title">DAILY</h5>
+        }
+        @if (showDetailTimeliness == true) {
+        <h5 class="chart-sidebar-title">{{timelinessDetailDate}} DETAIL</h5>
+        }
+
+        <!-- Chart Buttons -->
+        <div>
+          <h2 class="chart-buttons-title">CHART</h2>
+          <div class="chart-sidebar-inner-container">
+            <button class="chart-sidebar-button hover-el" (click)="chartChangeTo('Bar Chart')">Bar Chart</button>
+            <button class="chart-sidebar-button hover-el" (click)="chartChangeTo('Line Chart')">Line Chart</button>
+          </div>
+        </div>
+        <div class="chart-sidebar-inner-container">
+          <button class="chart-sidebar-button reset-zoom hover-el" (click)="onResetZoomClicked()">Reset Zoom</button>
+        </div>
+        
+        <!-- Legend -->
+        <div id="legend-container">
+          <h2 class="legend-buttons-title">LEGEND</h2>
+          <div class="chart-sidebar-inner-container">
+            <div class="chart-sidebar-legend-container">
+              <div class="color-threshold-div" [ngStyle]="{'background-color': timelinessColors[0].color, 'color': '#000000'}">&gt;{{millisToHHMM(timelinessColors[0].threshold)}}</div>
+              <div class="color-threshold-div" [ngStyle]="{'background-color': timelinessColors[1].color, 'color': '#000000'}">&gt;{{millisToHHMM(timelinessColors[1].threshold)}} to {{millisToHHMM(timelinessColors[0].threshold)}}</div>
+              <div class="color-threshold-div" [ngStyle]="{'background-color': timelinessColors[2].color, 'color': '#000000'}">&gt;{{millisToHHMM(timelinessColors[2].threshold)}} to {{millisToHHMM(timelinessColors[1].threshold)}}</div>
+              <div class="color-threshold-div" [ngStyle]="{'background-color': timelinessColors[3].color, 'color': '#000000'}">&gt;{{millisToHHMM(timelinessColors[3].threshold)}} to {{millisToHHMM(timelinessColors[2].threshold)}}</div>
+              <div class="color-threshold-div" [ngStyle]="{'background-color': timelinessColors[4].color, 'color': '#000000'}">&lt;{{millisToHHMM(timelinessColors[3].threshold)}}</div>
+            </div>
+          </div>
+        </div>
+        <!-- Buttons and info -->
+        <h6 *ngIf="showDetailTimeliness == false && isWeekly == true && firstWeeklySubmitted" class="chart-hint" style="text-align: center;">Click on a bar to show the days of that week</h6>
+        <h6 *ngIf="showDetailTimeliness == false && isWeekly == false && firstDailySubmitted" class="chart-hint" style="text-align: center;">Click on a bar to show the details of that day</h6>
+        <button *ngIf="showDetailTimeliness == true" class="chart-back-button-info" id="back-to-period-button" (click)="onBackToPeriodClicked()">Back to daily</button>
+        <button *ngIf="showDetailTimeliness == false && isWeekly == true && firstDailySubmitted" class="chart-back-button-info" id="back-to-daily-button" (click)="onBackToDailyClicked()">Back to daily</button>
+        <button *ngIf="showDetailTimeliness == false && isWeekly == false && firstWeeklySubmitted" class="chart-back-button-info" id="back-to-weekly-button" (click)="onBackToWeeklyClicked()">Back to weekly</button>
+      </section>
+    </div>
+  </div>
+
+  <!-- Data Table -->
+  <div class="data-table-main-container hidden">
+      <div class="data-table-header-container">
+          <span>Data table</span>
+          <div class="export-div">
+              <label>Click to export data in csv format</label>
+              <button class="export-button hover-el" (click)="saveAsCSV()">Export</button>
+          </div>
+      </div>
+      <div class="data-table-inner-container timeliness">
+          <div class="table-div">
+            <div class="default-elements-table-container">
+              <table id="data-table">
+                  <!-- Weekly Timeliness -->
+                  @if (isWeekly == true) {
+                  <thead>
+                      <th style="color: white">{{localCentre.name}} Vs {{calculatedTimelinessCentre.name}}</th>
+                      <ng-template ngFor let-timeliness [ngForOf]="requestedPublicationTimelinessList" let-i="index">
+                          <th style="padding: 0 0.5rem; white-space: pre;">
+                              <div *ngIf="timeliness.day < startDate || getWeekEndDateText(timeliness.day) > stopDate">
+                                  Partial Week ({{getWeekNumber(timeliness.day)}}) </div>
+                              <div *ngIf="timeliness.day >= startDate && getWeekEndDateText(timeliness.day) <= stopDate">
+                                  Week ({{getWeekNumber(timeliness.day)}}) </div>
+                              <div>from: {{timeliness.day < startDate ? startDate : timeliness.day}} </div>
+                                      <div>to: {{getWeekEndDateText(timeliness.day) > stopDate ? stopDate :
+                                          getWeekEndDateText(timeliness.day)}}</div>
+                          </th>
+                      </ng-template>
+                  </thead>
+                  @if (showDetailTimeliness == false) {
+                  <!-- Weekly Data -->
+                  <tr>
+                      <td>Timeliness: {{selectedFilterLabel}}</td>
+                      <ng-template ngFor let-timeliness [ngForOf]="requestedPublicationTimelinessList" let-i="index">
+                          <td *ngIf="timeliness.average_timeliness != null && timeliness.average_timeliness != -1 && timeliness.average_timeliness < this.millisPer72Hours" [ngStyle]="{'background-color': getTimelinessHexColorFromSeconds(timeliness.average_timeliness), 'color': '#000000'}">{{millisToHHMMSS(timeliness.average_timeliness)}}</td>
+                          <td *ngIf="timeliness.average_timeliness != null && timeliness.average_timeliness != -1 && timeliness.average_timeliness >= this.millisPer72Hours" [ngStyle]="{'background-color': getTimelinessHexColorFromSeconds(timeliness.average_timeliness), 'color': '#000000'}">>72h</td>
+                          <td *ngIf="timeliness.average_timeliness == null" class="nan">NaN</td>
+                          <td *ngIf="timeliness.average_timeliness == -1" class="nan">NaN</td>
+                      </ng-template>
+                  </tr>
+                  }
+
+                  <!-- Daily Timeliness - details == false -->
+                  }
+                  @else {
+                  @if (showDetailTimeliness == false) {
+                  <thead>
+                      <th style="color: white">{{localCentre.name}} Vs {{calculatedTimelinessCentre.name}}</th>
+                      <ng-template ngFor let-timeliness [ngForOf]="requestedPublicationTimelinessList" let-i="index">
+                          <th style="padding: 0 0.5rem;">{{timeliness.day}}</th>
+                      </ng-template>
+                  </thead>
+                  <!-- Daily Data -->
+                  <tr>
+                      <td>Timeliness: {{selectedFilterLabel}}</td>
+                      <ng-template ngFor let-timeliness [ngForOf]="requestedPublicationTimelinessList" let-i="index">
+                          <td *ngIf="timeliness.average_timeliness != null && timeliness.average_timeliness != -1 && timeliness.average_timeliness < this.millisPer72Hours" [ngStyle]="{'background-color': getTimelinessHexColorFromSeconds(timeliness.average_timeliness), 'color': '#000000'}">{{millisToHHMMSS(timeliness.average_timeliness)}}</td>
+                          <td *ngIf="timeliness.average_timeliness != null && timeliness.average_timeliness != -1 && timeliness.average_timeliness >= this.millisPer72Hours" [ngStyle]="{'background-color': getTimelinessHexColorFromSeconds(timeliness.average_timeliness), 'color': '#000000'}">>72h</td>
+                          <td *ngIf="timeliness.average_timeliness == null" class="nan">NaN</td>
+                          <td *ngIf="timeliness.average_timeliness == -1" class="nan">NaN</td>
+                      </ng-template>
+                  </tr>
+                  }
+                  @else {
+                  <!-- Daily Timeliness - details == true -->
+                  <thead>
+                      <th style="color: white">{{localCentre.name}} Vs {{calculatedTimelinessCentre.name}}</th>
+                      <ng-template ngFor let-timeliness [ngForOf]="publicationDetailTimelinessList" let-i="index">
+                          <th style="padding: 0 0.5rem;">{{timeliness.timezone.slice(11, 16)}}</th>
+                      </ng-template>
+                  </thead>
+                  <!-- Weekly and Daily Data -->
+                  <tr>
+                      <td>{{timelinessDetailDate}} Timeliness: {{selectedFilterLabel}}</td>
+                      <ng-template ngFor let-timeliness [ngForOf]="publicationDetailTimelinessList" let-i="index">
+                          <td *ngIf="timeliness.timeliness != null && timeliness.timeliness < this.millisPer72Hours" [ngStyle]="{'background-color': getTimelinessHexColorFromSeconds(timeliness.timeliness), 'color': '#000000'}">{{millisToHHMMSS(timeliness.timeliness)}}</td>
+                          <td *ngIf="timeliness.timeliness != null && timeliness.timeliness >= this.millisPer72Hours" [ngStyle]="{'background-color': getTimelinessHexColorFromSeconds(timeliness.timeliness), 'color': '#000000'}">>72h</td>
+                          <td *ngIf="timeliness.timeliness == null" class="nan">NaN</td>
+                      </ng-template>
+                  </tr>
+                  }
+                  }
+              </table>
+            </div>
+          </div>
+      </div>
+      <div class="data-table-arrow-container data-table-up-arrow-container" (click)="onDataTableShow()">
+        <svg class="svg-icon data-table-up-arrow">
+          <use href="assets/icons/dafne_symbols.svg#icon-up-arrow" />
+        </svg>
+      </div>
+      <div class="data-table-arrow-container data-table-down-arrow-container hidden" (click)="onDataTableHide()">
+        <svg class="svg-icon data-table-down-arrow">
+          <use href="assets/icons/dafne_symbols.svg#icon-down-arrow" />
+        </svg>
+      </div>
+  </div>
 </div>

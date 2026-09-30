@@ -27,24 +27,16 @@ export class Availability {
 export class Timeliness {
   day: string = "";
   centre_id: number = -1;
-  synch_id: number = -1;
-  synch_label: string = "";
-  average_fe?: number;
-  average_be?: number;
-  average_Timeliness?: number;
+  filter_label: string = "";
+  average_timeliness?: number;
   number_of_measurements: number = 0;
-  source: string = "";
 }
 
 export class DayTimeliness {
   timezone: string = "";
   centre_id: number = -1;
-  synch_id: number = -1;
-  synch_label: string = "";
-  Timeliness_fe?: number;
-  Timeliness_be?: number;
-  Timeliness?: number;
-  source: string = "";
+  filter_label: string = "";
+  timeliness?: number;
 }
 
 export class Service {
@@ -52,6 +44,7 @@ export class Service {
   username!: string;
   password!: string;
   service_url!: string;
+  service_admin_url!: string;
   token_url?: string;
   client_id?: string;
   service_type!: number;
@@ -65,23 +58,192 @@ export class ServiceType {
   supports_oauth2: boolean = false;
 }
 
-export class Synchronizer {
-  id!: number;
-  label!: string;
-  serviceUrlBackend!: string;
-  serviceUrl!: string;
-  serviceLogin!: string;
-  servicePassword!: string;
-  copyProduct?: string;
-  schedule?: string;
-  pageSize?: number;
-  request?: string;
-  targetCollection: any;
-  remoteIncoming?: string;
-  sourceCollection?: string;
-  lastCreationDate?: string;
-  filterParam?: string;
-  geoFilter?: string;
-  status?: string;
-  skipOnError?: string;
+export interface DataSourcesInfo {
+  centre?: Centre;
+  info: string;
+  filter: string;
+  lastCreationDate: string;
+}
+
+/* Ingesters */
+export interface Datastore {
+  name: string;
+  parentGroup?: string | null;
+  type: string;
+  permission: string[];
+  properties: {
+    property?: {
+      name: string;
+      value: string;
+    }[];
+  } | null;
+  path?: string;
+  depth?: number;
+  granularity?: number;
+  credentials?: string | null;
+  prefixLocation?: string | null;
+  container?: string | null;
+  containerPattern?: {
+    type: string | null;
+    patternMapper: string | null;
+  }
+  filter?: string | null;
+  bucket?: string | null;
+  policy?: string | null;
+  children?: Datastore[];
+}
+
+export interface Metadatastore {
+  name: string;
+  hosts: string | null;
+  clientType: string;
+  permission: string[];
+  properties: {
+    property: {
+      name: string;
+      value: string;
+    }[];
+  } | null;
+  strategies: {
+    strategy: {
+      name: string;
+      value: string | number | null;
+    }[]
+  } | null;
+  user: string | null;
+  password: string | null;
+  collection: string | null;
+  defaultSort: string | null;
+  defaultTop: number;
+  maxSkip: number;
+  storage?: string | null;
+  visitorBuilder?: string | null;
+  transformer?: string | null;
+}
+
+export interface Credential {
+  name: string;
+  region: string | null;
+  tenant?: string | null;
+  password?: string | null;
+  user?: string | null;
+  url?: string | null;
+  endpoint?: string | null;
+  domain?: string | null;
+  accessKey?: string | null;
+  secretKey?: string | null;
+}
+
+export interface Producer {
+  name: string;
+  hosts: string | null;
+  user: string | null;
+  password: string | null;
+  topic: string;
+  pushInterval: number;
+  processQueuedProductSeconds?: number;
+  filter: string | null;
+  processError: {
+    active: boolean;
+    retries: number;
+  };
+  reprocess: boolean;
+  dataSource?: string | null;
+  productionType?: string | null;
+  source: {
+    sourceType: string | null;
+    serviceRootUrl?: string | null;
+    auth?: string | {
+        user: string; 
+        password: string; 
+        clientId?: string | null; 
+        tokenEndpoint?: string | null; 
+        type: string
+      } | null;
+    top?: number;
+    lastPublicationDate?: string | null;
+    filter?: string | {param?: {name?: string; value?: string}[]} | null;
+    type?: string | null;
+    assumedFormat?: string | null;
+    fetchAttributes?: boolean;
+    fetchQuicklook?: boolean;
+    useDateFromDb?: boolean;
+    geoPostFilter?: string | null;
+    csvFile?: string | null;
+    path?: string | null;
+    buckets?: string | null;
+    infiniteLoop?: boolean;
+    productDirectories?: boolean;
+    suffix?: string | null;
+    credentials?: string | null;
+    containers?: string | null;
+    pivotDate?: string | null;
+    pivotDateValue?: string | null;
+  }
+}
+
+export interface Consumer {
+  name: string;
+  parallelIngests: number;
+  hosts: string | null;
+  user: string | null;
+  password: string | null;
+  groupId: string | null;
+  topics: string | null;
+  reprocess: boolean;
+  pollIntervalMs: number;
+  tmpPath: string | null;
+  source: {
+    sourceType: string | null;
+    path?: string | null;
+    containers?: string | null;
+    buckets?: string | null;
+    credentials?: string | null;
+    serviceRootUrl?: string | null;
+    productDirectories?: boolean;
+    suffix?: string | null;
+    type?: string | null;
+    retriesOn429?: number;
+    retryWaitOn429Ms?: number;
+    auth?: {
+      type: string | null;
+      user: string;
+      password: string;
+      clientId?: string;
+      clientSecret?: string | null;
+      tokenEndpoint?: string;
+    };
+  };
+  taskList: {
+    type: string | null;
+    pattern: string | null;
+    stopOnFailure: boolean;
+    tryLimit: number;
+    active: boolean;
+    forceOnline?: boolean;
+    onlyUseProvidedQL?: boolean;
+    height?: number;
+    width?: number;
+    targetStores?: string | null;
+  }[];
+  errorManager: {
+    errorLocation?: string | null;
+    type: string | null;
+    container?: string | null;
+    bucket?: string | null;
+    kafkaHosts?: string | null;
+    kafkaTopic?: string | null;
+    kafkaUser?: string | null;
+    kafkaPassword?: string | null;
+    credentials?: string | null;
+  }
+  topicPattern?: string | null;
+  ingestThreads?: number;
+  sourceDeleteValue?: boolean;
+  sourceDeletePattern?: string | null;
+  sourceDelete?: {
+    value: boolean;
+    pattern: string | null;
+    type?: string | null;
+  };
 }

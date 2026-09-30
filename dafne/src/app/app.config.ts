@@ -1,10 +1,10 @@
 import { ApplicationConfig, inject, provideAppInitializer, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
-import { routes } from 'src/app/app.routes';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
+import { routes } from '@app/app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { jwtInterceptor } from 'src/app/util/jwt.interceptor';
-import { errorInterceptor } from 'src/app//util/error.interceptor';
-import { ConfigService } from 'src/app/services/config.service';
+import { jwtInterceptor } from '@app/util/jwt.interceptor';
+import { errorInterceptor } from '@app//util/error.interceptor';
+import { ConfigService } from '@app/services/config.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -13,7 +13,7 @@ export const appConfig: ApplicationConfig = {
       const configService = inject(ConfigService);
       return configService.loadConfig();
     }),
-    provideRouter(routes), 
+    provideRouter(routes, withComponentInputBinding()),
     provideHttpClient(withInterceptors([jwtInterceptor, errorInterceptor]))
   ]
 };

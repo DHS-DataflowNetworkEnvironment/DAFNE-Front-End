@@ -1,20 +1,23 @@
-<!-- Delete Alert! -->
-<div class="modal hidden" id="alertModal" tabindex="-1">
+<div class="modal" [class.hidden]="!alert.visible" id="alertModal" tabindex="-1">
   <div class="modal-container">
       <div class="modal-header">
-          <h4 class="modal-title alert-modal-title">{{alertTitle}}</h4>
+          <h4 class="modal-title alert-modal-title" [innerHTML]="alert.title"></h4>
           <svg class="icon-warning"><use href="assets/icons/dafne_symbols.svg#icon-warning"/></svg>
       </div>
       <hr class="modal-hr">
       <div class="modal-body">
           <form id="alertForm">
               <div class="form-input-div row-left">
-                  <label class="modal-message alert-modal-message">{{alertMessage}}</label>
+                  <label class="modal-message alert-modal-message" [innerHTML]="alert.message"></label>
               </div>
               <div class="form-input-div row" >
+                  @if (alert.showCancelButton) {
+                  <button type="button" class="form-button close rect hover-el" (click)="alertCancelled($event)">Cancel</button>
+                  }
                   <button type="button" class="form-button submit rect hover-el" (click)="alertConfirmed($event)">OK</button>
               </div>
           </form>
       </div>
   </div>
 </div>
+

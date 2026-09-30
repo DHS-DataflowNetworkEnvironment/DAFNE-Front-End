@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { AuthenticationService } from 'src/app/services/authentication.service';
+import { AuthenticationService } from '@app/services/authentication.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -20,19 +20,24 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private authenticationService: AuthenticationService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private location: Location
+  ) {}  
 
   async ngOnInit() {
-    console.log("LOGIN PAGE!");
     if (await this.authenticationService.isUserAuthenticated()) {
-      this.router.navigate(['/gui'], { skipLocationChange: false });
+      this.router.navigate(['/home', { outlets: { centralBodyRouter: ['network-view', 'homeView']}}], { skipLocationChange: true })
+        .then(success => {
+          if (success) {
+            this.location.replaceState('/home');
+          }
+        });
     } else {
       let headerContainer = document.querySelector('#header-container')!;
       headerContainer.classList.add('disabled');
-      setTimeout(() => {
+      /* setTimeout(() => {
         console.clear();
-      }, 200);
+      }, 200); */
     }
   }
 
@@ -43,14 +48,20 @@ export class LoginComponent implements OnInit {
   onLoginSubmit() {
 		this.authenticationService.login(this.login_form.value.login_username!, this.login_form.value.login_password!)
     .subscribe({
-      next: (data) => {	
+      next: (data) => {
         //this.toast.showSuccessToast('Login','Login successful with role: ' + this.authenticationService.currentUser.role);
-        console.log("Login successful with role: " + this.authenticationService.currentUser.role);
-        this.router.navigate(['/'], { skipLocationChange: false });
+        //console.log("Login successful with role: " + this.authenticationService.currentUser.role);
+        //this.router.navigate(['/'], { skipLocationChange: false });
+        this.router.navigate(['/home', { outlets: { centralBodyRouter: ['network-view', 'homeView']}}], { skipLocationChange: false })
+          .then(success => {
+            if (success) {
+              this.location.replaceState('/home');
+            }
+          });
       },
       error: (error) => {
         console.error(error);
-        console.error(error.status); 
+        console.error(error.status);
         if (error.status === 403) {
           //this.toast.showErrorToast('Check User Roles', 'Access denied. Invalid user role.');
           console.error("Access denied. Invalid user role.");

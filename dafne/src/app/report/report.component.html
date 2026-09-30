@@ -1,0 +1,158 @@
+<!-- Generate Report Modal -->
+<div class="modal hidden" id="generateReportModal" tabindex="-1">
+  <div class="modal-container">
+    <div class="modal-header">
+      <h4 class="modal-title">GENERATE REPORT</h4>
+    </div>
+    <hr class="modal-hr">
+    <div class="modal-body">
+      <form id="generateReportForm" [formGroup]="generateReportForm" (ngSubmit)="onGenerateReportSubmit()">
+        <!-- Report creation form -->
+        <div class="form-input-div column">
+          <label for="choose-report-period" class="form-label">Report period</label>
+          <select class="form-text-input full-width" id="choose-report-period" (change)="onChooseReportPeriodChange()" formControlName="chooseReportPeriod">
+            <option *ngFor="let reportPeriod of reportPeriodList; let k = index">{{reportPeriod}}</option>
+          </select>
+          <small id="reportPeriodhelp" class="validation-message">Please select a report period</small>
+        </div>
+        <div class="form-input-group-div">
+          <div class="form-input-div column" id="select-week-container">
+            <label for="choose-report-week" class="form-label">Choose week number</label>
+            <select class="form-text-input full-width" id="choose-report-week" (change)="onReportWeekChange()" formControlName="selectWeekNumber" required>
+              <option *ngFor="let reportWeek of reportWeekList; let k = index">{{rewritePeriodNumber(reportWeek)}}</option>
+            </select>
+            <small id="weekNumberHelp" class="validation-message">Please select a number between 1 and {{maxWeekNumber}}</small>
+          </div>
+          <div class="form-input-div column hidden" id="select-month-container">
+            <label for="choose-report-month" class="form-label">Choose month number</label>
+            <select class="form-text-input full-width" id="choose-report-month" (change)="onReportMonthChange()" formControlName="selectMonthNumber" required>
+              <option *ngFor="let reportMonth of reportMonthList; let k = index">{{rewritePeriodNumber(reportMonth)}}</option>
+            </select>
+            <small id="monthNumberHelp" class="validation-message">Please select a number between 1 and {{maxMonthNumber}}</small>
+          </div>
+          <div class="form-input-div column" id="select-year-container">
+            <label for="choose-report-year" class="form-label">Choose year</label>
+            <select class="form-text-input full-width" id="choose-report-year" (change)="onReportYearChange()" formControlName="selectYearNumber" required>
+              <option *ngFor="let reportYear of reportYearList; let k = index" [disabled]="reportYear.disabled">{{reportYear.year}}</option>
+            </select>
+            <small id="yearNumberHelp" class="validation-message">Please select current or last year</small>
+          </div>
+        </div>
+        <div class="form-input-group-div">
+          <div class="form-input-div column">
+            <label class="form-label">Start Date:</label>
+            <input type="date" class="form-text-input date-input full-width" min="{{minDateStr}}" max="{{todayDate}}" id="start-date" (change)="onStartDateChanged($event)" formControlName="reportStartDate" />
+            <small id="startDateHelp" class="validation-message">Please select a start date earlier than the stop date</small>
+          </div>
+          <div class="form-input-div column">
+            <label class="form-label">Stop Date:</label>
+            <input type="date" class="form-text-input date-input full-width" min="{{minDateStr}}" max="{{todayDate}}" id="stop-date" (change)="onStopDateChanged($event)" formControlName="reportStopDate" />
+            <small id="stopDateHelp" class="validation-message">Please select a stop date later than the start date</small>
+          </div>
+        </div>
+        <div class="form-input-div row">
+          <button type="button" class="form-button close rect hover-el" (click)="onClosePressed()">CANCEL</button>
+          <button type="submit" class="form-button submit rect hover-el">SUBMIT</button>
+        </div>
+        <!-- Generation status -->
+        <div class="report-generation-status hidden" [innerHTML]="reportGenerationResultMessage"></div>
+      </form>
+    </div>
+
+
+
+    <!-- File structure -->
+    <div class="modal-header">
+      <h4 class="modal-title">DOWNLOAD REPORTS</h4>
+    </div>
+    <hr class="modal-hr">
+    <div class="modal-body">
+      <!-- Report download container -->
+      <div class="form-input-div column">
+        <label for="available-reports" class="form-label">Available reports - click to download</label>
+        <div class="form-reports-files" id="available-reports">
+          @if (reportsFolderName !== "") {
+          <ul id="report-file-ul">
+
+              @if (reportList && reportList.type && reportList.type == 'folder') {
+                <li>
+                  <span class="caret"><svg class="svg-icon report"><use href="assets/icons/dafne_symbols.svg#icon-folder"/></svg>{{reportList.name}}</span>
+                  <ul class="nested">
+                    @for (item_a of reportList.contents; track item_a.name;) {
+                      @if (item_a.type == 'folder') {
+                        <li>
+                          <span class="caret"><svg class="svg-icon report"><use href="assets/icons/dafne_symbols.svg#icon-folder"/></svg>{{rewriteFolderName(item_a.name)}}</span>
+                          <ul class="nested">
+                            @for (item_b of item_a.contents; track item_b.name;) {
+                              @if (item_b.type == 'folder') {
+                                <li>
+                                  <span class="caret"><svg class="svg-icon report"><use href="assets/icons/dafne_symbols.svg#icon-folder"/></svg>{{item_b.name}}</span>
+                                  <ul class="nested">
+                                    @for (item_c of item_b.contents; track item_c.name;) {
+                                      @if (item_c.type == 'file') {
+                                        <li class="report-file" [ngClass]="{'new-report': item_c.isNew}">
+                                          <div class="report-file-container">
+                                            <svg class="svg-icon report"><use href="assets/icons/dafne_symbols.svg#icon-xlsx"/></svg>
+                                            <a class="report-file-name" title="Download" (click)="downloadReport(item_c.url)">{{item_c.name}}</a>
+                                          </div>
+                                          <div class="icon-report-delete-container" title="Delete">
+                                            <svg class="icon-report-delete" (click)="deleteGeneratedReport(item_a.name+'/'+item_b.name+'/'+item_c.name)"><use href="assets/icons/dafne_symbols.svg#icon-delete"/></svg>
+                                          </div>
+                                        </li>
+                                      }
+                                      @else {
+                                        <li class="report-file">{{item_c.name}}</li>
+                                      }
+                                    }
+                                  </ul>
+                                </li>
+                              }
+                              @else {
+                                <li class="report-file" [ngClass]="{'new-report': item_b.isNew}">
+                                  <div class="report-file-container">
+                                    <svg class="svg-icon report"><use href="assets/icons/dafne_symbols.svg#icon-xlsx"/></svg>
+                                    <a class="report-file-name" title="Download" (click)="downloadReport(item_b.url)">{{item_b.name}}</a>
+                                  </div>
+                                  <div class="icon-report-delete-container" title="Delete">
+                                    <svg class="icon-report-delete" (click)="deleteGeneratedReport(item_a.name+'/'+item_b.name)"><use href="assets/icons/dafne_symbols.svg#icon-delete"/></svg>
+                                  </div>
+                                </li>
+                              }
+                            }
+                          </ul>
+                        </li>
+                      }
+                      @else {
+                        <li class="report-file" [ngClass]="{'new-report': item_a.isNew}">
+                          <div class="report-file-container">
+                            <svg class="svg-icon report"><use href="assets/icons/dafne_symbols.svg#icon-xlsx"/></svg>
+                            <a class="report-file-name" title="Download" (click)="downloadReport(item_a.url)">{{item_a.name}}</a>
+                          </div>
+                          <div class="icon-report-delete-container" title="Delete">
+                            <svg class="icon-report-delete" (click)="deleteGeneratedReport(item_a.name)"><use href="assets/icons/dafne_symbols.svg#icon-delete"/></svg>
+                          </div>
+                        </li>
+                      }
+                    }
+                  </ul>
+                </li>
+              }
+              @else {
+                <li class="report-file" [ngClass]="{'new-report': reportList.isNew}">
+                  <div class="report-file-container">
+                    <svg class="svg-icon report"><use href="assets/icons/dafne_symbols.svg#icon-xlsx"/></svg>
+                    <a class="report-file-name" title="Download" (click)="downloadReport(reportList.url)">{{reportList.name}}</a>
+                  </div>
+                  <div class="icon-report-delete-container" title="Delete">
+                    <svg class="icon-report-delete" (click)="deleteGeneratedReport(reportList.name)"><use href="assets/icons/dafne_symbols.svg#icon-delete"/></svg>
+                  </div>
+                </li>
+              }
+
+          </ul>
+        }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

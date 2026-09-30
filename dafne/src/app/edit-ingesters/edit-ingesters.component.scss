@@ -1,0 +1,27 @@
+@use 'vars' as *;
+@use "sass:color";
+
+.datastore-permissions-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+.datastore-permission-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 0.6rem;
+  font-size: 0.75rem;
+  background-color: $nd-color;
+  color: white;
+  cursor: pointer;
+}
+.datastore-permission-present {
+  background-color: green;
+}

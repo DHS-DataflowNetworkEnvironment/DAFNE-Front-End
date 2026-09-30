@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { AuthenticationService } from 'src/app/services/authentication.service';
+import { AuthenticationService } from '@app/services/authentication.service';
+import { MessageService } from '@app/services/message.service';
 
 @Component({
   selector: 'app-header',
@@ -17,12 +18,27 @@ export class HeaderComponent implements OnInit {
 
   constructor(
     private authenticationService: AuthenticationService,
+    private messageService: MessageService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
     this.menuButton = <HTMLElement>document.querySelector('#header-menu-button')!;
     this.dropdownMenu = <HTMLElement>document.querySelector('.dropdown-menu')!;
+
+    this.messageService.showIngestersMessage.subscribe(show => {
+      // Handle the showIngesters message
+      const ingestersMenuButton = <HTMLElement>document.querySelector('#ingesters-menu-button')!;
+      if (show) {
+        (<HTMLButtonElement>ingestersMenuButton).disabled = false;
+      } else {
+        (<HTMLButtonElement>ingestersMenuButton).disabled = true;
+      }
+    });
+  }
+
+  isAdmin() {
+    return this.authenticationService.currentUser.isAdmin;
   }
 
   onMenuClicked() {
@@ -48,7 +64,11 @@ export class HeaderComponent implements OnInit {
     clearTimeout(this.menuHideTimeoutId);
   }
   onHomeClicked() {
-    this.router.navigate(['/gui', { outlets: { centralBodyRouter: ['network-component', 'homeView']}}], { skipLocationChange: true });
+    this.router.navigate(['/home', { outlets: { centralBodyRouter: ['network-view', 'homeView']}}], { skipLocationChange: true });
+  }
+  onGenerateReportClicked() {
+    this.hideDropdown();
+    this.messageService.showReport(true);
   }
   logout() {
     this.hideDropdown();

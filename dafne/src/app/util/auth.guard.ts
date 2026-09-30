@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router, CanActivate} from '@angular/router';
-import { AuthenticationService } from 'src/app/services/authentication.service';
+import { AuthenticationService } from '@app/services/authentication.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthGuard implements CanActivate {
@@ -12,8 +12,8 @@ export class AuthGuard implements CanActivate {
   async canActivate(): Promise<boolean> {
     if (await this.authenticationService.isUserAuthenticated()) {
       return true;
-    } 
+    }
     this.router.navigate(['/dafne-login']);
     return false;
-  } 
+  }
 }

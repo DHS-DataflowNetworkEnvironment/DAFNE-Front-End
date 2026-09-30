@@ -1,12 +1,12 @@
 import { Component, ElementRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AuthenticationService } from 'src/app/services/authentication.service';
-import { MessageService } from 'src/app/services/message.service';
-import { AlertComponent } from 'src/app/alert/alert.component';
+import { AuthenticationService } from '@app/services/authentication.service';
+import { MessageService } from '@app/services/message.service';
+import { AlertService } from '@app/services/alert.service';
 import { ReactiveFormsModule, FormsModule, Validators, FormGroup, FormControl } from '@angular/forms';
-import { Service, ServiceType, Centre } from 'src/app/models/models';
-import { CsvDataService } from 'src/app/services/csv-data.service';
-import { ConfigService } from 'src/app/services/config.service';
+import { Service, ServiceType, Centre } from '@app/models/models';
+import { CsvDataService } from '@app/services/csv-data.service';
+import { ConfigService } from '@app/services/config.service';
 import p5 from 'p5';
 
 const updateValidationAction: any = 'change';
@@ -26,7 +26,7 @@ export class CompletenessComponent implements OnInit {
   public missionFiltered: any = {acronym: ""};
   private productTypeFiltered: string = "";
   public missionName: string = "";
-  public productType: string = ""; 
+  public productType: string = "";
   private platformNumberList: any;
   public platformNumber: string = "";
   private platformNumberFiltered: string = "";
@@ -90,14 +90,9 @@ export class CompletenessComponent implements OnInit {
 
   public p5Chart: any;
 
-  public useSyncFilter: boolean = false;
   public serviceTypeList: Array<ServiceType> = [];
   public serviceTypeChoosen: number = -1;
-  public siSynchronizers: Array<any> = [];
-  public feSynchronizers: Array<any> = [];
-  public beSynchronizers: Array<any> = [];
   public serviceType: string = '';
-  public choosenSync: string = '';
   public canSubmit: boolean = true;
   public tempFilter: any;
   public askForWeekly: boolean = false;
@@ -116,11 +111,7 @@ export class CompletenessComponent implements OnInit {
   public serviceAllCentreList: Array<any> = [];
   private localCentre: any;
   public filter: string = '';
-  private syncList: Array<any> = [];
-  private syncBackendLength: number = 0;
-  private syncBackendLengthArray: Array<any> = [];
   private serviceUrlBackendList: Array<any> = [];
-  private intelligentSyncSupported: Array<any> = [];
   private bodyMission: string = '';
 
 
@@ -136,7 +127,7 @@ export class CompletenessComponent implements OnInit {
   private startDateTemp = new Date(this.initialStartDayMillis);
   public startDate: string = this.startDateTemp.toISOString().slice(0, 10);
   public stopDate: string = this.todayDate;
-  
+
   public selectorText = [
     "Sunburst Single",
     "Sunburst Stacked",
@@ -155,7 +146,7 @@ export class CompletenessComponent implements OnInit {
     private authenticationService: AuthenticationService,
     private messageService: MessageService,
     private csvService: CsvDataService,
-    private alert: AlertComponent,
+    private alert: AlertService,
     public configService: ConfigService
   ) {}
 
@@ -262,7 +253,7 @@ export class CompletenessComponent implements OnInit {
         p.smooth();
         p.frameRate(30);
         p.textFont('NotesESA-Reg');
-        
+
         canvasSpace.mouseWheel((e: any) => wheelZoom(e));
         canvasSpace.doubleClicked(resetZoom);
       };
@@ -294,13 +285,13 @@ export class CompletenessComponent implements OnInit {
             ty -= p.pmouseY - p.mouseY;
           }
         }
-        
+
         if (this.doResetZoom) {
           this.doResetZoom = false;
           resetZoom();
         }
       };
-      
+
       function applyScale(s: number) {
         sf = sf * s;
         if (sf < 0.65) {
@@ -308,7 +299,7 @@ export class CompletenessComponent implements OnInit {
         } else {
           tx = p.mouseX * (1-s) + tx * s;
           ty = p.mouseY * (1-s) + ty * s;
-        }        
+        }
       }
 
       function wheelZoom(e: any) {
@@ -501,7 +492,7 @@ export class CompletenessComponent implements OnInit {
           /* Coloured arcs calcs */
           pieRadiusHover.push([]);
           pieBeginHover.push([]);
-          for (var k = 0; k < this.centreNumber; k++) {         
+          for (var k = 0; k < this.centreNumber; k++) {
             var pieRadius = (this.completenessDataList[i].values[k].value < 0 ? 0 : this.completenessDataList[i].values[k].value);
             for (var j = k + 1; j < this.centreNumber; j++) {
               if (this.completenessDataList[i].values[j].value > 0) pieRadius += this.completenessDataList[i].values[j].value;
@@ -524,7 +515,7 @@ export class CompletenessComponent implements OnInit {
             let hover = false;
             if (k == this.centreNumber - 1) {
               hover = mouseDist <= pieRadiusHover[i][k]/2 && mouseDist > zeroDiameter/2 && mouseAngle >= pieBeginHover[i][k] && mouseAngle < pieBeginHover[i][k] + this.sectionRadians;
-            } else {              
+            } else {
               hover = mouseDist <= pieRadiusHover[i][k]/2 && mouseDist > pieRadiusHover[i][k+1]/2 && mouseAngle >= pieBeginHover[i][k] && mouseAngle < pieBeginHover[i][k] + this.sectionRadians;
             }
 
@@ -534,7 +525,7 @@ export class CompletenessComponent implements OnInit {
             p.arc(xCenter, yCenter, pieRadiusHover[i][k], pieRadiusHover[i][k], pieBeginHover[i][k], pieBeginHover[i][k] + this.sectionRadians, p.PIE);
 
             /* Draw Hovered Arc */
-            if (hover) {             
+            if (hover) {
               isHovering = true;
               hoveringText = this.completenessDataList[i].values[k].value;
               p.fill(0, 0, 0, 127);
@@ -573,7 +564,7 @@ export class CompletenessComponent implements OnInit {
         p.fill(lineColor);
         p.noStroke();
         p.text(0, xCenter, yCenter - zeroRadius + 1);
-        
+
         /* Draw value */
         if (isHovering) {
           p.rectMode(p.CENTER);
@@ -601,7 +592,7 @@ export class CompletenessComponent implements OnInit {
           p.textSize(dateFontSize);
           /* Rotate Dates */
           let tempText
-          tempText = this.completenessDataList[i].date;          
+          tempText = this.completenessDataList[i].date;
           let tempRadium = (sectionXFilledDim - (2 * barGap) - dateFontSize);
           let angle = 0;
           if (tempRadium > p.textWidth(tempText)) tempRadium = p.textWidth(tempText);
@@ -624,7 +615,7 @@ export class CompletenessComponent implements OnInit {
           p.noFill();
           p.stroke(lineColor);
           p.line(xCenter - chartXDim2 + (i + 1) * chartXDim / this.daysNumber, yCenter + chartYDim2 + 5, xCenter - chartXDim2 + (i + 1) * chartXDim / this.daysNumber, yCenter + chartYDim2);
-          
+
           /* Bars */
           p.rectMode(p.CORNER);
           for (var k = 0; k < this.centreNumber; k++) {
@@ -648,8 +639,8 @@ export class CompletenessComponent implements OnInit {
               sinOfAngleTemp = 0.001;
             }
             let sinOfAngle = sinOfAngleTemp * (p.textWidth(tempText) / 2);
-            
-            p.push();          
+
+            p.push();
             p.translate(sectionXCenter - sectionXFilledDim2 + k * sectionXFilledDim / this.centreNumber + (sectionXFilledDim / (this.centreNumber * 2)), yCenter + chartYDim2 - ((this.completenessDataList[i].values[k].value < 0 ? 0 : this.completenessDataList[i].values[k].value) * chartYDim / (maxSumValue+1)) - valueFontSize/2 - sinOfAngle - dateFontSize / 4);
             if (angle > p.PI / 2) angle = p.PI / 2;
             if (angle < 0) angle = 0;
@@ -695,7 +686,7 @@ export class CompletenessComponent implements OnInit {
           p.textSize(dateFontSize);
           /* Rotate Dates */
           let tempText
-          tempText = this.completenessDataList[i].date;          
+          tempText = this.completenessDataList[i].date;
           let tempRadium = (sectionXFilledDim - (2 * barGap) - dateFontSize);
           let angle = 0;
           if (tempRadium > p.textWidth(tempText)) tempRadium = p.textWidth(tempText);
@@ -748,7 +739,7 @@ export class CompletenessComponent implements OnInit {
             p.noStroke();
             p.textSize(valueFontSize);
             p.textAlign(p.CENTER, p.TOP);
-            p.text((this.completenessDataList[i].values[k].value === -1 ? "NaN" : this.completenessDataList[i].values[k].value === -99 ? "ERROR" : (((this.completenessDataList[i].values[k].value < 0 ? 0 : this.completenessDataList[i].values[k].value) * chartYDim / (maxSumValue+1)) > barTextLimit) ? this.completenessDataList[i].values[k].value : this.completenessDataList[i].values[k].value + p.char(0x21b4)), 
+            p.text((this.completenessDataList[i].values[k].value === -1 ? "NaN" : this.completenessDataList[i].values[k].value === -99 ? "ERROR" : (((this.completenessDataList[i].values[k].value < 0 ? 0 : this.completenessDataList[i].values[k].value) * chartYDim / (maxSumValue+1)) > barTextLimit) ? this.completenessDataList[i].values[k].value : this.completenessDataList[i].values[k].value + p.char(0x21b4)),
                     sectionXCenter + (((((this.completenessDataList[i].values[k].value < 0 ? 0 : this.completenessDataList[i].values[k].value) * chartYDim / (maxSumValue+1)) > barTextLimit) || k == 0) ? 0 : 0),
                     yCenter + chartYDim2 - barHeight + ((((this.completenessDataList[i].values[k].value < 0 ? 0 : this.completenessDataList[i].values[k].value) * chartYDim / (maxSumValue+1)) > barTextLimit) ? dateFontSize / 4 : -dateFontSize)
                   );
@@ -827,7 +818,7 @@ export class CompletenessComponent implements OnInit {
           if (sumDayValue[i] > 0) {
             /* Rotate Dates */
             let tempText
-            tempText = this.completenessDataList[i].date;          
+            tempText = this.completenessDataList[i].date;
             let tempRadium = (sectionMinXDim - (2 * barGap) - dateFontSize);
             let angle = 0;
             if (tempRadium > p.textWidth(tempText)) tempRadium = p.textWidth(tempText);
@@ -852,7 +843,7 @@ export class CompletenessComponent implements OnInit {
             p.strokeWeight(1);
             p.line(sectionXCenter[i] + sectionXDim[i] / 2, yCenter + chartYDim2 + 5, sectionXCenter[i] + sectionXDim[i] / 2, yCenter + chartYDim2);
           }
-          
+
           /* xAxis High Text */
           if (sumDayValue[i] > 0) {
             p.textAlign(p.CENTER, p.CENTER);
@@ -962,7 +953,7 @@ export class CompletenessComponent implements OnInit {
       (res: any) => {
         /* Filter services with service_type != Back-End */
         this.serviceList = res.filter((a: Service) => a.service_type != 3);
-        
+
         for (var i = 0; i < this.serviceList.length; i++) {
           this.serviceList[i].service_type = this.serviceList[i].service_type
           this.getServiceType(i, this.serviceList[i].service_type);
@@ -985,26 +976,26 @@ export class CompletenessComponent implements OnInit {
     this.authenticationService.getAllCentres().subscribe(
       (res) => {
         this.allCentreList = res;
-        
+
         /* Sort allCentreList by ID */
         this.allCentreList.sort(this.getSortOrder("id"));
         for (var i = 0; i < this.serviceList.length; i++) {
 
           /* Change Centre.IDs to Centre.Names into serviceList[].name */
           this.serviceList[i].centre = this.allCentreList.filter(a => a.id == this.serviceList[i].centre)[0].name;
-          
+
           /* Copy service centres one by one into tempServiceCentre */
           let tempServiceCentre = this.allCentreList.filter(a => a.name == this.serviceList[i].centre)[0];
 
           /* Add "is-CSC-flag" for every centre */
           tempServiceCentre.isCSC = false;
-          if (tempServiceCentre.name == this.serviceList[i].centre && this.serviceList[i].service_type > 3) {      
+          if (tempServiceCentre.name == this.serviceList[i].centre && this.serviceList[i].service_type > 3) {
             tempServiceCentre.isCSC = true;
           }
 
           /* Copy tempServiceCentre first into a complete list */
           this.serviceAllCentreList.push(tempServiceCentre);
-    
+
           /* and then separate the local into 'serviceLocalCentre' and the remotes into 'serviceRemoteCentreList' */
           (tempServiceCentre.local) ? this.serviceLocalCentre = tempServiceCentre : this.serviceRemoteCentreList.push(tempServiceCentre);
           //if (tempServiceCentre.local == false) this.serviceRemoteCentreList.push(tempServiceCentre);
@@ -1012,24 +1003,22 @@ export class CompletenessComponent implements OnInit {
         /* Sort serviceAllCentreList by IDs and then set Local first */
         this.serviceAllCentreList.sort(this.getSortOrder("id"));
         this.setLocalFirst(this.serviceAllCentreList);
-        
+
         /* Sort All Centres to put CSC at the end */
         this.serviceAllCentreList.sort(this.getSortOrder("isCSC"));
-        
+
         /* Sort serviceRemoteCentreList[] by ID */
         this.serviceRemoteCentreList.sort(this.getSortOrder("id"));
 
         /* Sort Remote Centres to put CSC at the end */
         this.serviceRemoteCentreList.sort(this.getSortOrder("isCSC"));
-        
+
         /* Get complete Centre List (also those without a service) and copy into 'remoteCentreList[]' */
         this.remoteCentreList = res.filter((x: Centre) => x.local === null);
 
         /* Get the local Centre and copy into 'localCentre' */
         this.localCentre = res.filter((x: Centre) => x.local === true)[0];
-        if (this.localCentre) {
-          this.getSynchronizers();
-        } else {
+        if (!this.localCentre) {
           /* If there's no local configured set a blank one. */
           this.localCentre = {
             id: -1,
@@ -1043,43 +1032,7 @@ export class CompletenessComponent implements OnInit {
             isCSC: false
           };
           this.serviceLocalCentre = this.localCentre;
-          this.alert.showErrorAlert("No local Centre is set", "Please setup one Centre as local");
-        }
-      }
-    );
-  }
-
-  getSynchronizers() {
-    this.siSynchronizers = []
-    this.feSynchronizers = []
-    this.beSynchronizers = []
-    this.authenticationService.getSISynchronizersV2().subscribe(
-      (res: any) => {
-        for (var i = 0; i < Object.keys(res).length; i++) {
-          for (var k = 0; k < res[i].synchronizers.length; k++) {
-            res[i].synchronizers[k].serviceUrl = res[i].serviceUrl;
-            this.siSynchronizers.push(res[i].synchronizers[k]);
-          }
-        }
-      }
-    );
-    this.authenticationService.getFESynchronizersV2().subscribe(
-      (res: any) => {        
-        for (var i = 0; i < Object.keys(res).length; i++) {
-          for (var k = 0; k < res[i].synchronizers.length; k++) {
-            res[i].synchronizers[k].serviceUrl = res[i].serviceUrl;
-            this.feSynchronizers.push(res[i].synchronizers[k])
-          }
-        }
-      }
-    );
-    this.authenticationService.getBESynchronizersV2().subscribe(
-      (res: any) => {        
-        for (var i = 0; i < Object.keys(res).length; i++) {
-          for (var k = 0; k < res[i].synchronizers.length; k++) {
-            res[i].synchronizers[k].serviceUrl = res[i].serviceUrl;
-            this.beSynchronizers.push(res[i].synchronizers[k])
-          }
+          this.alert.showAlert("No local Centre has been set", "Please setup one Centre as local");
         }
       }
     );
@@ -1087,108 +1040,27 @@ export class CompletenessComponent implements OnInit {
 
   onUseFilterCheckboxChange() {
     var chkBox = <HTMLInputElement>document.getElementById('use-filter-checkbox');
-    this.useSyncFilter = chkBox.checked;
-    if (this.useSyncFilter) {
-      /* Set initial status for sync filters */
-      this.serviceTypeChoosen = 1;
-      if (this.siSynchronizers[0]) {
-        this.choosenSync = this.siSynchronizers[0].Label
-        this.tempFilter = this.siSynchronizers[0].FilterParam
-        this.canSubmit = true
-      } else {
-        this.tempFilter = "NaN"
-        this.canSubmit = false
-      }
-    } else {
-      /* Set initial status for manual filters */
-      this.missionFiltered = this.totalMissionList[0];
-      this.productTypeFiltered = this.missionFiltered.productType[0];
-      this.missionName = this.missionFiltered.name;
-      this.productType = this.productTypeFiltered;
-      this.platformNumberList = this.missionFiltered.platform[0];
-      this.platformNumber = this.platformNumberList[0];
-      this.platformNumberFiltered = this.platformNumber;
+    
+    /* Set initial status for manual filters */
+    this.missionFiltered = this.totalMissionList[0];
+    this.productTypeFiltered = this.missionFiltered.productType[0];
+    this.missionName = this.missionFiltered.name;
+    this.productType = this.productTypeFiltered;
+    this.platformNumberList = this.missionFiltered.platform[0];
+    this.platformNumber = this.platformNumberList[0];
+    this.platformNumberFiltered = this.platformNumber;
 
 
-      this.filterForm.patchValue({
-        filterProductType: this.productTypeFiltered,
-        filterPlatform: this.platformNumberFiltered
-      })
+    this.filterForm.patchValue({
+      filterProductType: this.productTypeFiltered,
+      filterPlatform: this.platformNumberFiltered
+    })
 
-      this.canSubmit = true
-    }
+    this.canSubmit = true
   }
 
   onServiceTypeChange(serviceType: any) {
-    if (serviceType.target.value == this.serviceTypeList[0].service_type) {  //Single Instance
-      this.serviceTypeChoosen = 1;
-      if (this.siSynchronizers[0]) {
-        this.choosenSync = this.siSynchronizers[0].Label
-        this.tempFilter = this.siSynchronizers[0].FilterParam
-        this.canSubmit = true
-      } else {
-        this.tempFilter = "NaN"
-        this.canSubmit = false
-      }
-    } else if (serviceType.target.value == this.serviceTypeList[1].service_type) { // Front-End
-      this.serviceTypeChoosen = 2;
-      if (this.feSynchronizers[0]) {
-        this.choosenSync = this.feSynchronizers[0].Label
-        this.tempFilter = this.feSynchronizers[0].FilterParam
-        this.canSubmit = true
-      } else {
-        this.tempFilter = "NaN"
-        this.canSubmit = false
-      }
-    } else if (serviceType.target.value == this.serviceTypeList[2].service_type) { // Back-End
-      this.serviceTypeChoosen = 3;
-      if (this.beSynchronizers[0]) {
-        this.choosenSync = this.beSynchronizers[0].Label
-        this.tempFilter = this.beSynchronizers[0].FilterParam
-        this.canSubmit = true
-      } else {
-        this.tempFilter = "NaN"
-        this.canSubmit = false
-      }
-    } else if (serviceType.target.value == this.serviceTypeList[3].service_type) {  // All
-      this.serviceTypeChoosen = 4;
-      if (this.siSynchronizers[0]) {
-        this.choosenSync = this.siSynchronizers[0].Label
-        this.tempFilter = this.siSynchronizers[0].FilterParam
-        this.canSubmit = true
-      } else if (this.feSynchronizers[0]) {
-        this.choosenSync = this.feSynchronizers[0].Label
-        this.tempFilter = this.feSynchronizers[0].FilterParam
-        this.canSubmit = true
-      } else if (this.beSynchronizers[0]) {
-        this.choosenSync = this.beSynchronizers[0].Label
-        this.tempFilter = this.beSynchronizers[0].FilterParam
-        this.canSubmit = true
-      } else {
-        this.tempFilter = "NaN"
-        this.canSubmit = false
-      }
-    }
-  }
-
-  onSyncChange(sync: any) {
-    this.choosenSync = sync.target.value;
-    let tempF;
-    tempF = this.siSynchronizers.filter(a => a.Label == sync.target.value)[0];
-    if (tempF !== undefined) {
-      this.tempFilter = tempF.FilterParam;
-      return;
-    }
-    tempF = this.feSynchronizers.filter(a => a.Label == sync.target.value)[0];
-    if (tempF !== undefined) {
-      this.tempFilter = tempF.FilterParam;
-      return;
-    }
-    tempF = this.beSynchronizers.filter(a => a.Label == sync.target.value)[0];
-    if (tempF !== undefined) {
-      this.tempFilter = tempF.FilterParam;
-      return;
-    }
+    this.canSubmit = true 
   }
 
   onMissionChange() {
@@ -1221,99 +1093,60 @@ export class CompletenessComponent implements OnInit {
 
   onFilterSubmit(): void {
     if (this.localCentre.id == -1) {
-      this.alert.showErrorAlert("No local Centre is set", "Completeness results will be computed on Remotes Centres only");
+      this.alert.showAlert("No local Centre is set", "Please select first a local centre to calculate the completeness");
+      return;
     }
     if (this.canSubmit) {
-      if (this.useSyncFilter == true) {
-        let tempStopDate = new Date(this.stopDate);
-        let tempStartDate = new Date(this.startDate);
-        let tempTimeDifference = tempStopDate.getTime() - tempStartDate.getTime();
-        this.tempDaysNumber = tempTimeDifference / (1000 * 3600 * 24) + 1;
-
-        for (var i = 0; i < this.tempDaysNumber; i++) {
-          let tempFilteredDate = new Date(tempStartDate.getTime() + i*(1000*3600*24));
-          let tempFilteredDateString: string = tempFilteredDate.toISOString().slice(0, 10);
-
-          let body: object = {
-            "filter":this.tempFilter,
-            "startDate":tempFilteredDateString,
-            "stopDate":tempFilteredDateString
-          };
-          this.completenessDailyGetDone[i] = false;   
-          this.getDailyCompleteness(body, i);
-        }
+      /* Get values from filters: */
+      this.missionName = this.filterForm.value.filterMission;
+      this.productType = this.filterForm.value.filterProductType;
+      if (this.filterForm.get('filterPlatform')?.value == '---' || this.filterForm.get('filterPlatform')?.value == 'ALL') {
+        this.platformNumber = '';
       } else {
-        /* Get values from filters: */
-        this.missionName = this.filterForm.value.filterMission;
-        this.productType = this.filterForm.value.filterProductType;
-        if (this.filterForm.get('filterPlatform')?.value == '---' || this.filterForm.get('filterPlatform')?.value == 'ALL') {
-          this.platformNumber = '';
-        } else {
-          this.platformNumber = this.filterForm.value.filterPlatform;
-        }
-        this.bodyMission = this.missionName + this.platformNumber;
-        let tempStartDate = new Date(this.filterForm.value.filterStartDate);
-        let tempStopDate = new Date(this.filterForm.value.filterStopDate);
+        this.platformNumber = this.filterForm.value.filterPlatform;
+      }
+      this.bodyMission = this.missionName + this.platformNumber;
+      let tempStartDate = new Date(this.filterForm.value.filterStartDate);
+      let tempStopDate = new Date(this.filterForm.value.filterStopDate);
 
-        let tempTimeDifference = tempStopDate.getTime() - tempStartDate.getTime();
-        this.tempDaysNumber = tempTimeDifference / (1000 * 3600 * 24) + 1;
-      
-        for (var i = 0; i < this.tempDaysNumber; i++) {
-          let tempFilteredDate = new Date(tempStartDate.getTime() + i*(1000*3600*24));
-          let tempFilteredDateString: string = tempFilteredDate.toISOString().slice(0, 10);
+      let tempTimeDifference = tempStopDate.getTime() - tempStartDate.getTime();
+      this.tempDaysNumber = tempTimeDifference / (1000 * 3600 * 24) + 1;
 
-          let body: object = {
-            "mission":this.bodyMission,
-            "productType":this.productType,
-            "startDate":tempFilteredDateString,
-            "stopDate":tempFilteredDateString
-          };
-          this.completenessDailyGetDone[i] = false;   
-          this.getDailyCompleteness(body, i);
-        }
+      for (var i = 0; i < this.tempDaysNumber; i++) {
+        let tempFilteredDate = new Date(tempStartDate.getTime() + i*(1000*3600*24));
+        let tempFilteredDateString: string = tempFilteredDate.toISOString().slice(0, 10);
+
+        let body: object = {
+          "mission":this.bodyMission,
+          "productType":this.productType,
+          "startDate":tempFilteredDateString,
+          "stopDate":tempFilteredDateString
+        };
+        this.completenessDailyGetDone[i] = false;
+        this.getDailyCompleteness(body, i);
       }
     } else {
-      this.alert.showErrorAlert("No synchronizers configured for the selected service type", "Please select another service type");
+      this.alert.showAlert("Cannot submit for the selected service type", "Please select another service type");
     }
   }
 
   getDailyCompleteness(body: any, index: number) {
-    if (this.useSyncFilter == true) {
-      this.authenticationService.getFilterCompleteness(body).subscribe({
-        next: (res) => {
-          if (res) {
-            this.completenessDailyDataList[index] = res;
-            this.completenessDailyGetDone[index] = true;
-            this.sumDailyCompleteness();
-          } else {
-            this.completenessDailyDataList[index] = [];
-          }
-          this.filter = this.tempFilter;          
-          this.onDataTableShow();
-        },
-        error: (error) => {
-          console.error(error);
-          console.error(error.status);
+    this.authenticationService.getCompleteness(body).subscribe({
+      next: (res) => {
+        if (res) {
+          this.completenessDailyDataList[index] = res;
+          this.completenessDailyGetDone[index] = true;
+          this.sumDailyCompleteness();
+        } else {
+          this.completenessDailyDataList[index] = [];
         }
-      });
-    } else {
-      this.authenticationService.getCompleteness(body).subscribe({
-        next: (res) => {
-          if (res) {
-            this.completenessDailyDataList[index] = res;
-            this.completenessDailyGetDone[index] = true;
-            this.sumDailyCompleteness();
-          } else {
-            this.completenessDailyDataList[index] = [];
-          }
-          this.onDataTableShow();
-        },
-        error: (error) => {
-          console.error(error);
-          console.error(error.status);
-        }
-      });
-    }
+        this.onDataTableShow();
+      },
+      error: (error) => {
+        console.error(error);
+        console.error(error.status);
+      }
+    });
   }
 
   sumDailyCompleteness() {
@@ -1322,7 +1155,7 @@ export class CompletenessComponent implements OnInit {
         return;
       }
     }
-    
+
     let tempJsonCompleteness: Array<any> = [];
     for (var i = 0; i < this.tempDaysNumber; i++) {
       tempJsonCompleteness.push(this.completenessDailyDataList[i][0]);
@@ -1334,7 +1167,7 @@ export class CompletenessComponent implements OnInit {
           this.completenessDataList[i].values[k].isCSC = this.serviceAllCentreList.filter(a => a.id == this.completenessDataList[i].values[k].id)[0].isCSC;
         }
         if (this.completenessDataList[i].values[k].value === -99) {
-          this.alert.showErrorAlert("Error with service: " + this.completenessDataList[i].values[k].name, "Couldn't get data.\nPlease check the service settings and retry.");
+          this.alert.showAlert("Error with service: " + this.completenessDataList[i].values[k].name, "Couldn't get data.\nPlease check the service settings and retry.");
         }
       }
     }
@@ -1346,24 +1179,20 @@ export class CompletenessComponent implements OnInit {
     }
     this.daysNumber = this.tempDaysNumber;
     this.sectionRadians = (2 * Math.PI) / this.daysNumber;
-    if (this.useSyncFilter) {
-      this.centreNumber = this.completenessDataList[0].values.length;
-    } else {
-      this.centreNumber = this.serviceAllCentreList.length;
-    }
+    this.centreNumber = this.serviceAllCentreList.length;
   }
 
-  /* Function to sort arrays of object: */    
-  getSortOrder(prop: any) {    
-    return function(a: any, b: any) {    
-        if (a[prop] > b[prop]) {    
-            return 1;    
-        } else if (a[prop] < b[prop]) {    
-            return -1;    
-        }    
-        return 0;    
-    }    
-  } 
+  /* Function to sort arrays of object: */
+  getSortOrder(prop: any) {
+    return function(a: any, b: any) {
+        if (a[prop] > b[prop]) {
+            return 1;
+        } else if (a[prop] < b[prop]) {
+            return -1;
+        }
+        return 0;
+    }
+  }
 
   /* Function to put local first */
   setLocalFirst(arr: Array<any>) {
@@ -1404,15 +1233,11 @@ export class CompletenessComponent implements OnInit {
         }
         r < (table.childElementCount - 1) ? csvContent += '\n' : null;
       }
-      let tempCompleteCsvMissionName
-      if (this.useSyncFilter) {
-        tempCompleteCsvMissionName = 'Sync(' + this.choosenSync + ')';
-      } else {
-        tempCompleteCsvMissionName = 'Mission(' + this.missionFiltered.acronym + this.platformNumber + ')_Product(' + this.productType + ')';
-      }
+      let tempCompleteCsvMissionName = 'Mission(' + this.missionFiltered.acronym + this.platformNumber + ')_Product(' + this.productType + ')';
+      
       this.csvService.exportToCsv(
         'DAFNE-Completeness_'
-        + tempCompleteCsvMissionName 
+        + tempCompleteCsvMissionName
         + '_From('
         + table.children[0].children[1].innerHTML
         + ')_To('
@@ -1439,28 +1264,28 @@ export class CompletenessComponent implements OnInit {
   }
 
   onStartDateChanged() {
-    let startDate = this.filterForm.value.filterStartDate;
+    let startDate = this.startDate = this.filterForm.value.filterStartDate;
     let tempMillisDate: number = 0;
     if (this.askForWeekly == true) {
       tempMillisDate = (Date.parse(startDate) + this.millisPerMaxWindow);
       if (Date.parse(this.stopDate) > tempMillisDate) {
-        this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 90 days");
+        this.alert.showAlert("Check Date Range", "Please select a maximum range of 90 days");
         let tempDate = new Date(tempMillisDate);
         this.stopDate = tempDate.toISOString().slice(0, 10);
       }
       if (Date.parse(startDate) > Date.parse(this.stopDate)) {
-        this.alert.showErrorAlert("Check Date Range", "Start date cannot be later than stop date");
+        this.alert.showAlert("Check Date Range", "Start date cannot be later than stop date");
         this.stopDate = startDate;
       }
     } else {
       tempMillisDate = (Date.parse(startDate) + this.millisPerMaxPeriod);
       if (Date.parse(this.stopDate) > tempMillisDate) {
-        this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 31 days");
+        this.alert.showAlert("Check Date Range", "Please select a maximum range of 31 days");
         let tempDate = new Date(tempMillisDate);
         this.stopDate = tempDate.toISOString().slice(0, 10);
       }
       if (Date.parse(startDate) > Date.parse(this.stopDate)) {
-        this.alert.showErrorAlert("Check Date Range", "Start date cannot be later than stop date");
+        this.alert.showAlert("Check Date Range", "Start date cannot be later than stop date");
         this.stopDate = startDate;
       }
     }
@@ -1470,28 +1295,28 @@ export class CompletenessComponent implements OnInit {
   }
 
   onStopDateChanged() {
-    let stopDate = this.filterForm.value.filterStopDate;
+    let stopDate = this.stopDate = this.filterForm.value.filterStopDate;
     if (this.askForWeekly == true) {
       let tempMillisDate = (Date.parse(stopDate) - this.millisPerMaxWindow);
       if (Date.parse(this.startDate) < tempMillisDate) {
-        this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 90 days");
+        this.alert.showAlert("Check Date Range", "Please select a maximum range of 90 days");
         let tempDate = new Date(tempMillisDate);
         this.startDate = tempDate.toISOString().slice(0, 10);
       }
       if (Date.parse(stopDate) < Date.parse(this.startDate)) {
-        this.alert.showErrorAlert("Check Date Range", "Stop date cannot be earlier than start date");
+        this.alert.showAlert("Check Date Range", "Stop date cannot be earlier than start date");
         this.startDate = stopDate;
       }
-      
+
     } else {
       let tempMillisDate = (Date.parse(stopDate) - this.millisPerMaxPeriod);
       if (Date.parse(this.startDate) < tempMillisDate) {
-        this.alert.showErrorAlert("Check Date Range", "Please select a maximum range of 31 days");
+        this.alert.showAlert("Check Date Range", "Please select a maximum range of 31 days");
         let tempDate = new Date(tempMillisDate);
         this.startDate = tempDate.toISOString().slice(0, 10);
       }
       if (Date.parse(stopDate) < Date.parse(this.startDate)) {
-        this.alert.showErrorAlert("Check Date Range", "Stop date cannot be earlier than start date");
+        this.alert.showAlert("Check Date Range", "Stop date cannot be earlier than start date");
         this.startDate = stopDate;
       }
     }

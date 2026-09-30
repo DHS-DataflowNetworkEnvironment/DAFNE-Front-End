@@ -11,7 +11,7 @@
 }
 #header-container {
   width: 100%;
-  height: 3rem;
+  height: $header-height;
 }
 #header-container.disabled {
   pointer-events: none;
@@ -20,12 +20,12 @@
 #body-container {
   width: 100vw;
   max-width: 100vw;
-  height: calc(100dvh - 6rem);
+  height: calc(100dvh - 2 * $header-height);
 }
 #footer-container {
   width: 100%;
-  height: 3rem;
-  min-height: 3rem;
+  height: $header-height;
+  min-height: $header-height;
   background-color: $main-bg-color;
   z-index: 2;
 }

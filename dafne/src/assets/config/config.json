@@ -55,8 +55,8 @@
   ],
   "averageAvailabilityColor": "#00d0ff",
   "dataRefreshTime": 300000,
-  "apiUrl": "<back-end-url>",
-  "version": "4.1.1",
+  "apiUrl": "http://localhost:3002",
+  "version": "4.3.1",
   "satelliteList": [
     {
       "name": "Sentinel-1",
@@ -65,13 +65,12 @@
         "RAW",
         "SLC",
         "GRD",
-        "OCN",
-        "AIS"
+        "OCN"
       ],
       "platform": [
         "A",
-        "B",
         "C",
+        "D",
         "ALL"
       ]
     },
